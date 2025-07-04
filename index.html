@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Key 测活工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 40px;
+        }
+        
+        .input-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-control.textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .form-help {
+            color: #6c757d;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .results-section {
+            margin-top: 30px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .valid { color: #28a745; }
+        .invalid { color: #dc3545; }
+        .testing { color: #ffc107; }
+        .total { color: #6f42c1; }
+        
+        .results-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .key-list {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .key-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .key-text {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #495057;
+            flex: 1;
+            margin-right: 10px;
+            word-break: break-all;
+        }
+        
+        .key-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-valid {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-invalid {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-testing {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .copy-btn {
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        
+        .copy-btn:hover {
+            background: #0056b3;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        .alert {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            color: #0c5460;
+        }
+
+        /* 主题切换按钮 */
+        .theme-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* 深色主题 */
+        .dark-theme {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        .dark-theme .container {
+            background: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
+            color: #e8eaed;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .header {
+            background: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
+        }
+
+        .dark-theme .input-section {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #e8eaed;
+            border-color: #3c4269;
+        }
+
+        .dark-theme .form-control:focus {
+            border-color: #4c63d2;
+            box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+        }
+
+        .dark-theme select.form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #e8eaed;
+        }
+
+        .dark-theme select.form-control option {
+            background: #232741;
+            color: #e8eaed;
+        }
+
+        .dark-theme input.form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #e8eaed;
+        }
+
+        .dark-theme textarea.form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #e8eaed;
+        }
+
+        .dark-theme .stat-card {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .key-list {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .key-item {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .key-item:hover {
+            background: linear-gradient(135deg, #2a2d47 0%, #1e1e2e 100%);
+        }
+
+        .dark-theme .tab {
+            color: #b0b3c1;
+        }
+
+        .dark-theme .tab.active {
+            color: #4c63d2;
+        }
+
+        .dark-theme .alert {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+            color: #e8eaed;
+        }
+
+        .dark-theme .btn-secondary {
+            background: linear-gradient(135deg, #3c4269 0%, #2a2d47 100%);
+        }
+
+        .dark-theme .btn-secondary:hover {
+            background: linear-gradient(135deg, #4a5079 0%, #3c4269 100%);
+        }
+
+        .dark-theme .form-help {
+            color: #b0b3c1;
+        }
+
+        .dark-theme .stat-label {
+            color: #b0b3c1;
+        }
+    </style>
+</head>
+<body>
+    <!-- 主题切换控制按钮 -->
+    <div class="theme-controls">
+        <button class="control-btn" onclick="toggleLanguage()" title="切换语言">🌐</button>
+        <button class="control-btn" onclick="toggleTheme()" title="切换主题">🌙</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-lang-key="title">🔑 API Key 测活工具</h1>
+            <p data-lang-key="subtitle">批量检测 Gemini、Claude、GPT API 密钥有效性</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="apiType" data-lang-key="select-api">选择 API 类型</label>
+                    <select id="apiType" class="form-control" onchange="updateProxyPlaceholder()">
+                        <option value="openai">OpenAI GPT</option>
+                        <option value="claude">Claude</option>
+                        <option value="gemini">Google Gemini</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="proxyUrl" data-lang-key="proxy-url">代理服务器 URL (可选)</label>
+                    <input type="text" id="proxyUrl" class="form-control" placeholder="https://your-proxy.com">
+                    <small class="form-help" data-lang-key="proxy-help">留空使用默认代理，建议使用自己的反向代理以提高成功率</small>
+                </div>
+                
+                <div class="input-group">
+                    <label for="apiKeys" data-lang-key="api-keys">API 密钥列表 (每行一个)</label>
+                    <textarea id="apiKeys" class="form-control textarea" data-lang-key="api-keys-placeholder" placeholder="请输入API密钥，每行一个：&#10;sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#10;sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#10;..."></textarea>
+                </div>
+                
+                <div class="alert">
+                    <strong data-lang-key="usage-title">💡 使用说明：</strong> 
+                    <br><span data-lang-key="usage-1">• 强烈建议使用自定义代理URL，公共代理可能不稳定</span>
+                    <br><span data-lang-key="usage-2">• Gemini代理示例: https://gemini.api.2s.lol/v1beta</span>
+                    <br><span data-lang-key="usage-3">• OpenAI代理示例: https://api.openai-proxy.org/v1</span>
+                    <br><span data-lang-key="usage-4">• Claude代理示例: https://claude-api-proxy.com/v1</span>
+                    <br><span data-lang-key="usage-5">• 直接访问官方API会因CORS限制失败</span>
+                    <br><span data-lang-key="usage-6">• 测试过程中密钥仅用于验证，不会被存储</span>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="startTesting()" data-lang-key="start-test">开始测试</button>
+                    <button class="btn btn-secondary" onclick="clearAll()" data-lang-key="clear">清空</button>
+                </div>
+            </div>
+            
+            <div class="progress-bar hidden" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="loading hidden" id="loading">
+                <div class="spinner"></div>
+                <p data-lang-key="testing">正在测试 API 密钥...</p>
+            </div>
+            
+            <div class="results-section hidden" id="resultsSection">
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number total" id="totalCount">0</div>
+                        <div class="stat-label" data-lang-key="total">总计</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number valid" id="validCount">0</div>
+                        <div class="stat-label" data-lang-key="valid">有效</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number invalid" id="invalidCount">0</div>
+                        <div class="stat-label" data-lang-key="invalid">无效</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number testing" id="testingCount">0</div>
+                        <div class="stat-label" data-lang-key="testing-label">测试中</div>
+                    </div>
+                </div>
+                
+                <div class="results-tabs">
+                    <button class="tab active" onclick="showTab('all')" data-lang-key="all">全部</button>
+                    <button class="tab" onclick="showTab('valid')" data-lang-key="valid-keys">有效密钥</button>
+                    <button class="tab" onclick="showTab('invalid')" data-lang-key="invalid-keys">无效密钥</button>
+                </div>
+                
+                <div class="tab-content active" id="allTab">
+                    <div class="key-list" id="allKeys"></div>
+                    <button class="copy-btn" onclick="copyKeys('all')" data-lang-key="copy-all">复制全部</button>
+                </div>
+                
+                <div class="tab-content" id="validTab">
+                    <div class="key-list" id="validKeys"></div>
+                    <button class="copy-btn" onclick="copyKeys('valid')" data-lang-key="copy-valid">复制有效密钥</button>
+                </div>
+                
+                <div class="tab-content" id="invalidTab">
+                    <div class="key-list" id="invalidKeys"></div>
+                    <button class="copy-btn" onclick="copyKeys('invalid')" data-lang-key="copy-invalid">复制无效密钥</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allKeysData = [];
+        let validKeysData = [];
+        let invalidKeysData = [];
+        let currentLang = 'zh';
+        let isDarkTheme = false;
+        
+        const translations = {
+            zh: {
+                'title': '🔑 API Key 测活工具',
+                'subtitle': '批量检测 Gemini、Claude、GPT API 密钥有效性',
+                'select-api': '选择 API 类型',
+                'proxy-url': '代理服务器 URL (可选)',
+                'proxy-help': '留空使用默认代理，建议使用自己的反向代理以提高成功率',
+                'api-keys': 'API 密钥列表 (每行一个)',
+                'api-keys-placeholder': '请输入API密钥，每行一个：\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n...',
+                'usage-title': '💡 使用说明：',
+                'usage-1': '• 强烈建议使用自定义代理URL，公共代理可能不稳定',
+                'usage-2': '• Gemini代理示例: https://gemini.api.2s.lol/v1beta',
+                'usage-3': '• OpenAI代理示例: https://api.openai-proxy.org/v1',
+                'usage-4': '• Claude代理示例: https://claude-api-proxy.com/v1',
+                'usage-5': '• 直接访问官方API会因CORS限制失败',
+                'usage-6': '• 测试过程中密钥仅用于验证，不会被存储',
+                'start-test': '开始测试',
+                'clear': '清空',
+                'testing': '正在测试 API 密钥...',
+                'total': '总计',
+                'valid': '有效',
+                'invalid': '无效',
+                'testing-label': '测试中',
+                'all': '全部',
+                'valid-keys': '有效密钥',
+                'invalid-keys': '无效密钥',
+                'copy-all': '复制全部',
+                'copy-valid': '复制有效密钥',
+                'copy-invalid': '复制无效密钥',
+                'status-valid': '有效',
+                'status-invalid': '无效',
+                'status-testing': '测试中'
+            },
+            en: {
+                'title': '🔑 API Key Tester',
+                'subtitle': 'Batch test Gemini, Claude, GPT API key validity',
+                'select-api': 'Select API Type',
+                'proxy-url': 'Proxy Server URL (Optional)',
+                'proxy-help': 'Leave empty to use default proxy, recommend using your own reverse proxy for better success rate',
+                'api-keys': 'API Key List (one per line)',
+                'api-keys-placeholder': 'Enter API keys, one per line:\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n...',
+                'usage-title': '💡 Usage Instructions:',
+                'usage-1': '• Strongly recommend using custom proxy URL, public proxies may be unstable',
+                'usage-2': '• Gemini proxy example: https://gemini.api.2s.lol/v1beta',
+                'usage-3': '• OpenAI proxy example: https://api.openai-proxy.org/v1',
+                'usage-4': '• Claude proxy example: https://claude-api-proxy.com/v1',
+                'usage-5': '• Direct access to official APIs will fail due to CORS restrictions',
+                'usage-6': '• Keys are only used for validation during testing, not stored',
+                'start-test': 'Start Test',
+                'clear': 'Clear',
+                'testing': 'Testing API keys...',
+                'total': 'Total',
+                'valid': 'Valid',
+                'invalid': 'Invalid',
+                'testing-label': 'Testing',
+                'all': 'All',
+                'valid-keys': 'Valid Keys',
+                'invalid-keys': 'Invalid Keys',
+                'copy-all': 'Copy All',
+                'copy-valid': 'Copy Valid Keys',
+                'copy-invalid': 'Copy Invalid Keys',
+                'status-valid': 'Valid',
+                'status-invalid': 'Invalid',
+                'status-testing': 'Testing'
+            }
+        };
+        
+        function toggleLanguage() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            updateLanguage();
+        }
+        
+        function updateLanguage() {
+            const elements = document.querySelectorAll('[data-lang-key]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-lang-key');
+                if (translations[currentLang][key]) {
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = translations[currentLang][key];
+                    } else {
+                        element.textContent = translations[currentLang][key];
+                    }
+                }
+            });
+            updateKeyLists();
+        }
+        
+        function toggleTheme() {
+            isDarkTheme = !isDarkTheme;
+            const themeBtn = document.querySelector('.control-btn[onclick="toggleTheme()"]');
+            
+            if (isDarkTheme) {
+                document.body.classList.add('dark-theme');
+                themeBtn.textContent = ☀️';
+                themeBtn.title = currentLang === 'zh' ? '切换到浅色模式' : 'Switch to Light Mode';
+            } else {
+                document.body.classList.remove('dark-theme');
+                themeBtn.textContent = '🌙';
+                themeBtn.title = currentLang === 'zh' ? '切换到深色模式' : 'Switch to Dark Mode';
+            }
+        }
+
+        function getApiUrl(apiType, endpoint) {
+            const proxyUrl = document.getElementById('proxyUrl').value.trim();
+            
+            if (proxyUrl) {
+                const baseUrl = proxyUrl.endsWith('/') ? proxyUrl.slice(0, -1) : proxyUrl;
+                return baseUrl + endpoint;
+            } else {
+                // 使用推荐的代理服务器作为默认选项
+                switch (apiType) {
+                    case 'openai':
+                        return 'https://corsproxy.io/?' + encodeURIComponent('https://api.openai.com' + endpoint);
+                    case 'claude':
+                        return 'https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com' + endpoint);
+                    case 'gemini':
+                        // 默认使用推荐的Gemini代理而不是官方API
+                        return 'https://gemini.api.2s.lol/v1beta' + endpoint;
+                }
+            }
+        }
+        
+        function updateProxyPlaceholder() {
+            const apiType = document.getElementById('apiType').value;
+            const proxyInput = document.getElementById('proxyUrl');
+            
+            switch (apiType) {
+                case 'openai':
+                    proxyInput.placeholder = 'https://api.openai-proxy.org/v1';
+                    break;
+                case 'claude':
+                    proxyInput.placeholder = 'https://claude-api-proxy.com/v1';
+                    break;
+                case 'gemini':
+                    proxyInput.placeholder = 'https://gemini.api.2s.lol/v1beta';
+                    break;
+            }
+        }
+
+        async function testOpenAIKey(apiKey) {
+            try {
+                const apiUrl = getApiUrl('openai', '/models');
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + apiKey,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 401) return { valid: false, error: '认证失败 (401)' };
+                    if (response.status === 403) return { valid: false, error: '权限不足 (403)' };
+                    if (response.status === 429) return { valid: false, error: '请求过多 (429)' };
+                    return { valid: false, error: 'HTTP ' + response.status };
+                }
+                
+                const responseText = await response.text();
+                if (!responseText || responseText.trim() === '') {
+                    return { valid: false, error: '空响应' };
+                }
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    return { valid: false, error: 'JSON解析失败' };
+                }
+                
+                if (data && data.data && Array.isArray(data.data)) {
+                    return { valid: true, error: null };
+                } else {
+                    return { valid: false, error: '响应格式错误' };
+                }
+            } catch (error) {
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    return { valid: false, error: '网络连接失败' };
+                }
+                return { valid: false, error: '请求失败: ' + error.message };
+            }
+        }
+        
+        async function testClaudeKey(apiKey) {
+            try {
+                const apiUrl = getApiUrl('claude', '/messages');
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'x-api-key': apiKey,
+                        'Content-Type': 'application/json',
+                        'anthropic-version': '2023-06-01'
+                    },
+                    body: JSON.stringify({
+                        model: 'claude-3-haiku-20240307',
+                        max_tokens: 1,
+                        messages: [{ role: 'user', content: 'Hi' }]
+                    })
+                });
+                
+                if (response.status === 401) return { valid: false, error: '认证失败 (401)' };
+                if (response.status === 403) return { valid: false, error: '权限不足 (403)' };
+                if (response.status === 429) return { valid: false, error: '请求过多 (429)' };
+                
+                const responseText = await response.text();
+                
+                if (response.status === 400) {
+                    try {
+                        const errorData = JSON.parse(responseText);
+                        if (errorData.error && errorData.error.type === 'authentication_error') {
+                            return { valid: false, error: '认证错误' };
+                        }
+                        if (errorData.error && errorData.error.type === 'invalid_request_error') {
+                            return { valid: true, error: null };
+                        }
+                        return { valid: false, error: 'API错误: ' + (errorData.error.type || 'unknown') };
+                    } catch {
+                        return { valid: false, error: 'JSON解析失败' };
+                    }
+                }
+                
+                if (response.ok) {
+                    return { valid: true, error: null };
+                } else {
+                    return { valid: false, error: 'HTTP ' + response.status };
+                }
+            } catch (error) {
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    return { valid: false, error: '网络连接失败' };
+                }
+                return { valid: false, error: '请求失败: ' + error.message };
+            }
+        }
+        
+        async function testGeminiKey(apiKey) {
+            try {
+                const apiUrl = getApiUrl('gemini', '/models?key=' + apiKey);
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    if (response.status === 400) return { valid: false, error: 'API密钥无效 (400)' };
+                    if (response.status === 403) return { valid: false, error: '权限不足 (403)' };
+                    if (response.status === 429) return { valid: false, error: '请求过多 (429)' };
+                    return { valid: false, error: 'HTTP ' + response.status };
+                }
+                
+                const responseText = await response.text();
+                if (!responseText || responseText.trim() === '') {
+                    return { valid: false, error: '空响应' };
+                }
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    return { valid: false, error: 'JSON解析失败' };
+                }
+                
+                if (data && data.models && Array.isArray(data.models)) {
+                    return { valid: true, error: null };
+                } else if (data && data.error) {
+                    return { valid: false, error: 'API错误: ' + (data.error.message || data.error) };
+                } else {
+                    return { valid: false, error: '响应格式错误' };
+                }
+            } catch (error) {
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    return { valid: false, error: '网络连接失败' };
+                }
+                if (error.name === 'SyntaxError' && error.message.includes('JSON')) {
+                    return { valid: false, error: 'JSON解析失败' };
+                }
+                return { valid: false, error: '请求失败: ' + error.message };
+            }
+        }
+
+        async function testApiKey(apiKey, apiType) {
+            switch (apiType) {
+                case 'openai':
+                    return await testOpenAIKey(apiKey);
+                case 'claude':
+                    return await testClaudeKey(apiKey);
+                case 'gemini':
+                    return await testGeminiKey(apiKey);
+                default:
+                    return { valid: false, error: '不支持的API类型' };
+            }
+        }
+
+        function getLocalizedError(errorKey) {
+            const errorMap = {
+                '认证失败 (401)': 'auth-failed',
+                '权限不足 (403)': 'permission-denied', 
+                '请求过多 (429)': 'rate-limited',
+                '网络连接失败': 'network-error',
+                'JSON解析失败': 'json-parse-error',
+                '空响应': 'empty-response',
+                '响应格式错误': 'invalid-format',
+                '认证错误': 'auth-failed'
+            };
+            
+            if (errorKey && errorKey.startsWith('API错误:')) {
+                const detail = errorKey.replace('API错误:', '').trim();
+                return (currentLang === 'zh' ? 'API错误' : 'API Error') + ': ' + detail;
+            }
+            
+            if (errorKey && errorKey.startsWith('请求失败:')) {
+                const detail = errorKey.replace('请求失败:', '').trim();
+                return (currentLang === 'zh' ? '请求失败' : 'Request Failed') + ': ' + detail;
+            }
+            
+            if (errorKey && errorKey.includes('HTTP ')) {
+                return errorKey;
+            }
+            
+            const langKey = errorMap[errorKey];
+            if (langKey && translations[currentLang]) {
+                return currentLang === 'zh' ? errorKey : (
+                    langKey === 'auth-failed' ? 'Auth Failed' :
+                    langKey === 'permission-denied' ? 'Permission Denied' :
+                    langKey === 'rate-limited' ? 'Rate Limited' :
+                    langKey === 'network-error' ? 'Network Error' :
+                    langKey === 'json-parse-error' ? 'JSON Parse Error' :
+                    langKey === 'empty-response' ? 'Empty Response' :
+                    langKey === 'invalid-format' ? 'Invalid Format' : errorKey
+                );
+            }
+            return errorKey;
+        }
+
+        async function startTesting() {
+            const apiType = document.getElementById('apiType').value;
+            const apiKeysText = document.getElementById('apiKeys').value.trim();
+            
+            if (!apiKeysText) {
+                alert(currentLang === 'zh' ? '请输入API密钥！' : 'Please enter API keys!');
+                return;
+            }
+            
+            const apiKeys = apiKeysText.split('\n').filter(key => key.trim());
+            
+            if (apiKeys.length === 0) {
+                alert(currentLang === 'zh' ? '请输入有效的API密钥！' : 'Please enter valid API keys!');
+                return;
+            }
+            
+            allKeysData = [];
+            validKeysData = [];
+            invalidKeysData = [];
+            
+            apiKeys.forEach(apiKey => {
+                const keyData = {
+                    key: apiKey.trim(),
+                    status: 'testing',
+                    error: null,
+                    type: apiType
+                };
+                allKeysData.push(keyData);
+            });
+            
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('progressBar').classList.remove('hidden');
+            document.getElementById('resultsSection').classList.remove('hidden');
+            
+            updateStats();
+            updateKeyLists();
+            
+            let completed = 0;
+            const total = apiKeys.length;
+            const concurrency = 3;
+            const chunks = [];
+            for (let i = 0; i < apiKeys.length; i += concurrency) {
+                chunks.push(apiKeys.slice(i, i + concurrency));
+            }
+            
+            for (const chunk of chunks) {
+                const promises = chunk.map(async (apiKey) => {
+                    const keyData = allKeysData.find(k => k.key === apiKey.trim());
+                    
+                    await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
+                    
+                    const result = await testApiKey(apiKey.trim(), apiType);
+                    
+                    keyData.status = result.valid ? 'valid' : 'invalid';
+                    keyData.error = result.error;
+                    
+                    if (result.valid) {
+                        validKeysData.push(keyData);
+                    } else {
+                        invalidKeysData.push(keyData);
+                    }
+                    
+                    completed++;
+                    const progress = (completed / total) * 100;
+                    document.getElementById('progressFill').style.width = progress + '%';
+                    
+                    updateStats();
+                    updateKeyLists();
+                });
+                
+                await Promise.all(promises);
+            }
+            
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('progressBar').classList.add('hidden');
+        }
+        
+        function updateStats() {
+            document.getElementById('totalCount').textContent = allKeysData.length;
+            document.getElementById('validCount').textContent = validKeysData.length;
+            document.getElementById('invalidCount').textContent = invalidKeysData.length;
+            document.getElementById('testingCount').textContent = allKeysData.filter(k => k.status === 'testing').length;
+        }
+        
+        function updateKeyLists() {
+            updateKeyList('allKeys', allKeysData);
+            updateKeyList('validKeys', validKeysData);
+            updateKeyList('invalidKeys', invalidKeysData);
+        }
+        
+        function updateKeyList(elementId, keys) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+            
+            keys.forEach(keyData => {
+                const keyItem = document.createElement('div');
+                keyItem.className = 'key-item';
+                
+                const statusClass = keyData.status === 'valid' ? 'status-valid' : 
+                                   keyData.status === 'invalid' ? 'status-invalid' : 'status-testing';
+                
+                const statusText = translations[currentLang]['status-' + keyData.status] || keyData.status;
+                
+                let errorDisplay = '';
+                if (keyData.status === 'invalid' && keyData.error) {
+                    const localizedError = getLocalizedError(keyData.error);
+                    errorDisplay = '<div style="font-size: 11px; color: #dc3545; margin-top: 2px;">' + localizedError + '</div>';
+                }
+                
+                keyItem.innerHTML = '<div class="key-text">' + keyData.key + errorDisplay + '</div><div class="key-status ' + statusClass + '">' + statusText + '</div>';
+                
+                container.appendChild(keyItem);
+            });
+        }
+        
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+        }
+        
+        function copyKeys(type) {
+            let keysToCopy = [];
+            
+            switch (type) {
+                case 'all':
+                    keysToCopy = allKeysData.map(k => k.key);
+                    break;
+                case 'valid':
+                    keysToCopy = validKeysData.map(k => k.key);
+                    break;
+                case 'invalid':
+                    keysToCopy = invalidKeysData.map(k => k.key);
+                    break;
+            }
+            
+            if (keysToCopy.length === 0) {
+                const message = currentLang === 'zh' ? '没有可复制的密钥！' : 'No keys to copy!';
+                alert(message);
+                return;
+            }
+            
+            navigator.clipboard.writeText(keysToCopy.join('\n')).then(() => {
+                const message = currentLang === 'zh' ? 
+                    '已复制 ' + keysToCopy.length + ' 个密钥到剪贴板！' : 
+                    'Copied ' + keysToCopy.length + ' keys to clipboard!';
+                alert(message);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                const textArea = document.createElement('textarea');
+                textArea.value = keysToCopy.join('\n');
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                const message = currentLang === 'zh' ? 
+                    '已复制 ' + keysToCopy.length + ' 个密钥到剪贴板！' : 
+                    'Copied ' + keysToCopy.length + ' keys to clipboard!';
+                alert(message);
+            });
+        }
+        
+        function clearAll() {
+            document.getElementById('apiKeys').value = '';
+            document.getElementById('resultsSection').classList.add('hidden');
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('progressBar').classList.add('hidden');
+            
+            allKeysData = [];
+            validKeysData = [];
+            invalidKeysData = [];
+            
+            updateStats();
+            updateKeyLists();
+        }
+
+        updateProxyPlaceholder();
+        updateLanguage();
+    </script>
+</body>
+</html>
