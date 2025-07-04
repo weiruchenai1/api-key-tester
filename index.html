@@ -55,6 +55,13 @@
             padding: 30px;
             margin-bottom: 30px;
             border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .input-section:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.1);
         }
         
         .input-group {
@@ -74,12 +81,18 @@
             border: 2px solid #dee2e6;
             border-radius: 8px;
             font-size: 14px;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
         }
         
         .form-control:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control:hover {
+            border-color: #667eea;
+            background: #fafbff;
         }
         
         .form-control.textarea {
@@ -93,6 +106,242 @@
             font-size: 12px;
             margin-top: 5px;
             display: block;
+        }
+
+        .model-input-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .model-input-group .form-control {
+            flex: 1;
+        }
+
+        .model-toggle-btn {
+            padding: 12px 16px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: background 0.3s ease;
+        }
+
+        .model-toggle-btn:hover {
+            background: #5a6268;
+        }
+
+        .model-toggle-btn.active {
+            background: #667eea;
+        }
+
+        .detected-models {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .detected-models:hover {
+            border-color: #2196f3;
+            background: #e1f5fe;
+            box-shadow: 0 2px 12px rgba(33, 150, 243, 0.15);
+        }
+
+        .detected-models-header {
+            padding: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #bbdefb;
+            transition: background 0.3s ease;
+        }
+
+        .detected-models-header:hover {
+            background: rgba(33, 150, 243, 0.1);
+        }
+
+        .detected-models-header h4 {
+            margin: 0;
+            color: #1976d2;
+            font-size: 14px;
+        }
+
+        .collapse-icon {
+            color: #1976d2;
+            font-size: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .collapse-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .model-list-container {
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .model-list-container.expanded {
+            display: block;
+        }
+
+        .model-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .model-tag {
+            background: #2196f3;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .model-tag:hover {
+            background: #1976d2;
+        }
+
+        /* 并发设置样式 */
+        .concurrency-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-top: 12px;
+            padding: 20px;
+            background: #f1f3f5;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .concurrency-container:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .concurrency-input-section {
+            min-width: 80px;
+        }
+
+        .concurrency-input-section .form-control {
+            width: 80px;
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+            background: white;
+            border: 2px solid #dee2e6;
+        }
+
+        .concurrency-input-section .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .slider-section {
+            flex: 1;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #dee2e6;
+            outline: none;
+            transition: background 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            background: #5a67d8;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+        }
+
+        .slider-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: 700;
+            color: #667eea;
+            font-size: 18px;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 8px 14px;
+            border: 1px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 55px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .preset-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .preset-btn.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
         
         .button-group {
@@ -130,6 +379,15 @@
         .btn-secondary:hover {
             background: #5a6268;
         }
+
+        .btn-detect {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-detect:hover {
+            background: #218838;
+        }
         
         .results-section {
             margin-top: 30px;
@@ -148,6 +406,14 @@
             border-radius: 12px;
             text-align: center;
             border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
         }
         
         .stat-number {
@@ -204,6 +470,13 @@
             padding: 20px;
             max-height: 400px;
             overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .key-list:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            box-shadow: 0 2px 12px rgba(102, 126, 234, 0.1);
         }
         
         .key-item {
@@ -215,6 +488,14 @@
             background: white;
             border-radius: 8px;
             border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+        }
+
+        .key-item:hover {
+            border-color: #667eea;
+            background: #fafbff;
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
         }
         
         .key-text {
@@ -312,6 +593,13 @@
             border-radius: 8px;
             margin-top: 15px;
             color: #0c5460;
+            transition: all 0.3s ease;
+        }
+
+        .alert:hover {
+            border-color: #17a2b8;
+            background: #c3e6ea;
+            box-shadow: 0 2px 12px rgba(23, 162, 184, 0.15);
         }
 
         /* 主题切换按钮 */
@@ -364,6 +652,12 @@
             border-color: #3c4269;
         }
 
+        .dark-theme .input-section:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            box-shadow: 0 4px 20px rgba(76, 99, 210, 0.15);
+        }
+
         .dark-theme .form-control {
             background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
             color: #e8eaed;
@@ -373,6 +667,11 @@
         .dark-theme .form-control:focus {
             border-color: #4c63d2;
             box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+        }
+
+        .dark-theme .form-control:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #252849 0%, #2a2d47 100%);
         }
 
         .dark-theme select.form-control {
@@ -400,9 +699,22 @@
             border-color: #3c4269;
         }
 
+        .dark-theme .stat-card:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(76, 99, 210, 0.2);
+        }
+
         .dark-theme .key-list {
             background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
             border-color: #3c4269;
+        }
+
+        .dark-theme .key-list:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            box-shadow: 0 2px 12px rgba(76, 99, 210, 0.15);
         }
 
         .dark-theme .key-item {
@@ -412,6 +724,9 @@
 
         .dark-theme .key-item:hover {
             background: linear-gradient(135deg, #2a2d47 0%, #1e1e2e 100%);
+            border-color: #4c63d2;
+            transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(76, 99, 210, 0.15);
         }
 
         .dark-theme .tab {
@@ -428,6 +743,12 @@
             color: #e8eaed;
         }
 
+        .dark-theme .alert:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
+        }
+
         .dark-theme .btn-secondary {
             background: linear-gradient(135deg, #3c4269 0%, #2a2d47 100%);
         }
@@ -442,6 +763,115 @@
 
         .dark-theme .stat-label {
             color: #b0b3c1;
+        }
+
+        .dark-theme .detected-models {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .detected-models:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
+        }
+
+        .dark-theme .detected-models-header {
+            border-bottom-color: #3c4269;
+        }
+
+        .dark-theme .detected-models-header:hover {
+            background: rgba(76, 99, 210, 0.1);
+        }
+
+        .dark-theme .detected-models-header h4 {
+            color: #4c63d2;
+        }
+
+        .dark-theme .collapse-icon {
+            color: #4c63d2;
+        }
+
+        .dark-theme .model-tag {
+            background: #4c63d2;
+        }
+
+        .dark-theme .model-tag:hover {
+            background: #3c52d2;
+        }
+
+        .dark-theme .model-toggle-btn {
+            background: #3c4269;
+        }
+
+        .dark-theme .model-toggle-btn:hover {
+            background: #4a5079;
+        }
+
+        .dark-theme .model-toggle-btn.active {
+            background: #4c63d2;
+        }
+
+        .dark-theme .concurrency-container {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .concurrency-container:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+        }
+
+        .dark-theme .concurrency-input-section .form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #4c63d2;
+            border-color: #3c4269;
+        }
+
+        .dark-theme .concurrency-input-section .form-control:focus {
+            border-color: #4c63d2;
+            box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+        }
+
+        .dark-theme .slider {
+            background: #3c4269;
+        }
+
+        .dark-theme .slider::-webkit-slider-thumb {
+            background: #4c63d2;
+        }
+
+        .dark-theme .slider::-webkit-slider-thumb:hover {
+            background: #3c52d2;
+        }
+
+        .dark-theme .slider::-moz-range-thumb {
+            background: #4c63d2;
+        }
+
+        .dark-theme .slider-value {
+            color: #4c63d2;
+            background: #232741;
+            border-color: #3c4269;
+        }
+
+        .dark-theme .preset-btn {
+            border-color: #4c63d2;
+            color: #4c63d2;
+            background: #232741;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .preset-btn:hover {
+            background: #4c63d2;
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 99, 210, 0.3);
+        }
+
+        .dark-theme .preset-btn.active {
+            background: #4c63d2;
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 99, 210, 0.4);
         }
     </style>
 </head>
@@ -470,9 +900,53 @@
                 </div>
                 
                 <div class="input-group">
+                    <label for="modelInput" data-lang-key="select-model">测试模型</label>
+                    <div class="model-input-group">
+                        <select id="modelSelect" class="form-control">
+                            <!-- 模型选项会根据API类型动态更新 -->
+                        </select>
+                        <input type="text" id="modelInput" class="form-control hidden" data-lang-key="model-input-placeholder" placeholder="输入自定义模型名">
+                        <button type="button" class="model-toggle-btn" id="modelToggleBtn" data-lang-key="custom-model">自定义</button>
+                    </div>
+                    <small class="form-help" data-lang-key="model-help">可以选择预设模型或输入自定义模型名</small>
+                </div>
+
+                <div class="detected-models" id="detectedModels">
+                    <div class="detected-models-header" id="detectedModelsHeader">
+                        <h4 data-lang-key="detected-models-title">检测到的可用模型</h4>
+                        <span class="collapse-icon collapsed" id="collapseIcon">▼</span>
+                    </div>
+                    <div class="model-list-container" id="modelListContainer">
+                        <div class="model-list" id="modelList"></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
                     <label for="proxyUrl" data-lang-key="proxy-url">代理服务器 URL (可选)</label>
                     <input type="text" id="proxyUrl" class="form-control" placeholder="https://your-proxy.com">
                     <small class="form-help" data-lang-key="proxy-help">留空使用默认代理，建议使用自己的反向代理以提高成功率</small>
+                </div>
+
+                <!-- 新增并发控制 -->
+                <div class="input-group">
+                    <label data-lang-key="concurrency-control">并发控制</label>
+                    <div class="concurrency-container">
+                        <div class="concurrency-input-section">
+                            <input type="number" id="concurrencyInput" class="form-control" value="5" min="1">
+                        </div>
+                        <div class="slider-section">
+                            <div class="slider-container">
+                                <input type="range" id="concurrencySlider" class="slider" min="1" max="50" value="5">
+                                <span class="slider-value" id="sliderValue">5</span>
+                            </div>
+                            <div class="preset-buttons">
+                                <button type="button" class="preset-btn" data-concurrency="1" data-lang-key="slow">慢速</button>
+                                <button type="button" class="preset-btn active" data-concurrency="5" data-lang-key="normal">正常</button>
+                                <button type="button" class="preset-btn" data-concurrency="10" data-lang-key="fast">快速</button>
+                                <button type="button" class="preset-btn" data-concurrency="20" data-lang-key="ultra">极速</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="input-group">
@@ -491,6 +965,7 @@
                 </div>
                 
                 <div class="button-group">
+                    <button class="btn btn-detect" id="detectBtn" data-lang-key="detect-models">检测模型</button>
                     <button class="btn btn-primary" id="startBtn" data-lang-key="start-test">开始测试</button>
                     <button class="btn btn-secondary" id="clearBtn" data-lang-key="clear">清空</button>
                 </div>
@@ -555,14 +1030,53 @@
         let invalidKeysData = [];
         let currentLang = 'zh';
         let isDarkTheme = false;
+        let isCustomModel = false;
+        let detectedModels = new Set();
+        let currentConcurrency = 5;
+
+        // 模型配置 - 使用官方名称
+        const modelOptions = {
+            openai: [
+                'gpt-4o',
+                'gpt-4o-mini', 
+                'gpt-4-turbo',
+                'gpt-4',
+                'gpt-3.5-turbo'
+            ],
+            claude: [
+                'claude-3-5-sonnet-20241022',
+                'claude-3-5-haiku-20241022',
+                'claude-3-opus-20240229',
+                'claude-3-sonnet-20240229',
+                'claude-3-haiku-20240307'
+            ],
+            gemini: [
+                'gemini-2.0-flash-exp',
+                'gemini-1.5-flash',
+                'gemini-1.5-flash-8b',
+                'gemini-1.5-pro',
+                'gemini-pro'
+            ]
+        };
         
         const translations = {
             zh: {
                 'title': '🔑 API Key 测活工具',
                 'subtitle': '批量检测 Gemini、Claude、GPT API 密钥有效性',
                 'select-api': '选择 API 类型',
+                'select-model': '测试模型',
+                'custom-model': '自定义',
+                'preset-model': '预设',
+                'model-help': '可以选择预设模型或输入自定义模型名',
+                'model-input-placeholder': '输入自定义模型名',
+                'detected-models-title': '检测到的可用模型',
                 'proxy-url': '代理服务器 URL (可选)',
                 'proxy-help': '留空使用默认代理，建议使用自己的反向代理以提高成功率',
+                'concurrency-control': '并发控制',
+                'slow': '慢速',
+                'normal': '正常',
+                'fast': '快速',
+                'ultra': '极速',
                 'api-keys': 'API 密钥列表 (每行一个)',
                 'api-keys-placeholder': '请输入API密钥，每行一个：\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n...',
                 'usage-title': '💡 使用说明：',
@@ -572,9 +1086,11 @@
                 'usage-4': '• Claude代理示例: https://claude-api-proxy.com/v1',
                 'usage-5': '• 直接访问官方API会因CORS限制失败',
                 'usage-6': '• 测试过程中密钥仅用于验证，不会被存储',
+                'detect-models': '检测模型',
                 'start-test': '开始测试',
                 'clear': '清空',
                 'testing': '正在测试 API 密钥...',
+                'no-models-detected': '无可用模型',
                 'total': '总计',
                 'valid': '有效',
                 'invalid': '无效',
@@ -593,8 +1109,19 @@
                 'title': '🔑 API Key Tester',
                 'subtitle': 'Batch test Gemini, Claude, GPT API key validity',
                 'select-api': 'Select API Type',
+                'select-model': 'Test Model',
+                'custom-model': 'Custom',
+                'preset-model': 'Preset',
+                'model-help': 'Choose preset model or enter custom model name',
+                'model-input-placeholder': 'Enter custom model name',
+                'detected-models-title': 'Detected Available Models',
                 'proxy-url': 'Proxy Server URL (Optional)',
                 'proxy-help': 'Leave empty to use default proxy, recommend using your own reverse proxy for better success rate',
+                'concurrency-control': 'Concurrency Control',
+                'slow': 'Slow',
+                'normal': 'Normal',
+                'fast': 'Fast',
+                'ultra': 'Ultra',
                 'api-keys': 'API Key List (one per line)',
                 'api-keys-placeholder': 'Enter API keys, one per line:\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n...',
                 'usage-title': '💡 Usage Instructions:',
@@ -604,9 +1131,11 @@
                 'usage-4': '• Claude proxy example: https://claude-api-proxy.com/v1',
                 'usage-5': '• Direct access to official APIs will fail due to CORS restrictions',
                 'usage-6': '• Keys are only used for validation during testing, not stored',
+                'detect-models': 'Detect Models',
                 'start-test': 'Start Test',
                 'clear': 'Clear',
                 'testing': 'Testing API keys...',
+                'no-models-detected': 'No Available Models',
                 'total': 'Total',
                 'valid': 'Valid',
                 'invalid': 'Invalid',
@@ -622,6 +1151,66 @@
                 'status-testing': 'Testing'
             }
         };
+
+        // 并发控制相关函数
+        function updateConcurrency(value) {
+            currentConcurrency = parseInt(value);
+            document.getElementById('concurrencyInput').value = currentConcurrency;
+            document.getElementById('concurrencySlider').value = Math.min(currentConcurrency, 50);
+            document.getElementById('sliderValue').textContent = currentConcurrency;
+            
+            // 更新预设按钮状态
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (parseInt(btn.getAttribute('data-concurrency')) === currentConcurrency) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function initConcurrencyControls() {
+            const input = document.getElementById('concurrencyInput');
+            const slider = document.getElementById('concurrencySlider');
+            const presetButtons = document.querySelectorAll('.preset-btn');
+
+            // 输入框变化
+            input.addEventListener('input', (e) => {
+                let value = parseInt(e.target.value);
+                if (isNaN(value) || value < 1) value = 1;
+                e.target.value = value;
+                updateConcurrency(value);
+            });
+
+            // 滑块变化
+            slider.addEventListener('input', (e) => {
+                updateConcurrency(e.target.value);
+            });
+
+            // 预设按钮
+            presetButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const value = parseInt(btn.getAttribute('data-concurrency'));
+                    updateConcurrency(value);
+                });
+            });
+
+            // 初始化
+            updateConcurrency(5);
+        }
+
+        function updateModelOptions() {
+            const apiType = document.getElementById('apiType').value;
+            const modelSelect = document.getElementById('modelSelect');
+            const options = modelOptions[apiType];
+            
+            modelSelect.innerHTML = '';
+            options.forEach(model => {
+                const optionElement = document.createElement('option');
+                optionElement.value = model;
+                optionElement.textContent = model;
+                modelSelect.appendChild(optionElement);
+            });
+        }
         
         function toggleLanguage() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
@@ -640,12 +1229,13 @@
                     }
                 }
             });
+            updateModelOptions();
             updateKeyLists();
         }
         
         function toggleTheme() {
             isDarkTheme = !isDarkTheme;
-            const themeBtn = document.querySelector('.control-btn[onclick="toggleTheme()"]');
+            const themeBtn = document.getElementById('themeBtn');
             
             if (isDarkTheme) {
                 document.body.classList.add('dark-theme');
@@ -658,6 +1248,105 @@
             }
         }
 
+        function toggleModelInput() {
+            isCustomModel = !isCustomModel;
+            const modelSelect = document.getElementById('modelSelect');
+            const modelInput = document.getElementById('modelInput');
+            const toggleBtn = document.getElementById('modelToggleBtn');
+            
+            if (isCustomModel) {
+                modelSelect.classList.add('hidden');
+                modelInput.classList.remove('hidden');
+                toggleBtn.textContent = translations[currentLang]['preset-model'];
+                toggleBtn.classList.add('active');
+            } else {
+                modelSelect.classList.remove('hidden');
+                modelInput.classList.add('hidden');
+                toggleBtn.textContent = translations[currentLang]['custom-model'];
+                toggleBtn.classList.remove('active');
+            }
+        }
+
+        function getSelectedModel() {
+            if (isCustomModel) {
+                return document.getElementById('modelInput').value.trim();
+            } else {
+                return document.getElementById('modelSelect').value;
+            }
+        }
+
+        function addDetectedModel(model) {
+            if (!detectedModels.has(model)) {
+                detectedModels.add(model);
+                updateDetectedModelsList();
+            }
+        }
+
+        function updateDetectedModelsList() {
+            const modelList = document.getElementById('modelList');
+            const detectedModelsDiv = document.getElementById('detectedModels');
+            const modelCountSpan = document.querySelector('#detectedModelsHeader h4');
+            
+            if (detectedModels.size > 0) {
+                detectedModelsDiv.style.display = 'block';
+                
+                // 更新标题显示模型数量
+                const titleKey = 'detected-models-title';
+                const baseTitle = translations[currentLang][titleKey];
+                modelCountSpan.textContent = `${baseTitle} (${detectedModels.size})`;
+                
+                modelList.innerHTML = '';
+                
+                detectedModels.forEach(model => {
+                    const modelTag = document.createElement('div');
+                    modelTag.className = 'model-tag';
+                    modelTag.textContent = model;
+                    modelTag.onclick = () => selectDetectedModel(model);
+                    modelList.appendChild(modelTag);
+                });
+            } else {
+                detectedModelsDiv.style.display = 'none';
+            }
+        }
+
+        function toggleModelList() {
+            const container = document.getElementById('modelListContainer');
+            const icon = document.getElementById('collapseIcon');
+            
+            if (container.classList.contains('expanded')) {
+                container.classList.remove('expanded');
+                icon.classList.add('collapsed');
+            } else {
+                container.classList.add('expanded');
+                icon.classList.remove('collapsed');
+            }
+        }
+
+        function selectDetectedModel(model) {
+            if (isCustomModel) {
+                document.getElementById('modelInput').value = model;
+            } else {
+                const modelSelect = document.getElementById('modelSelect');
+                // 检查是否已存在该选项
+                let optionExists = false;
+                for (let option of modelSelect.options) {
+                    if (option.value === model) {
+                        modelSelect.value = model;
+                        optionExists = true;
+                        break;
+                    }
+                }
+                // 如果不存在，添加新选项
+                if (!optionExists) {
+                    const newOption = document.createElement('option');
+                    newOption.value = model;
+                    newOption.textContent = model;
+                    modelSelect.appendChild(newOption);
+                    modelSelect.value = model;
+                }
+            }
+        }
+
         function getApiUrl(apiType, endpoint) {
             const proxyUrl = document.getElementById('proxyUrl').value.trim();
             
@@ -665,14 +1354,12 @@
                 const baseUrl = proxyUrl.endsWith('/') ? proxyUrl.slice(0, -1) : proxyUrl;
                 return baseUrl + endpoint;
             } else {
-                // 使用推荐的代理服务器作为默认选项
                 switch (apiType) {
                     case 'openai':
                         return 'https://corsproxy.io/?' + encodeURIComponent('https://api.openai.com' + endpoint);
                     case 'claude':
                         return 'https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com' + endpoint);
                     case 'gemini':
-                        // 默认使用推荐的Gemini代理而不是官方API
                         return 'https://gemini.api.2s.lol/v1beta' + endpoint;
                 }
             }
@@ -693,17 +1380,213 @@
                     proxyInput.placeholder = 'https://gemini.api.2s.lol/v1beta';
                     break;
             }
+            
+            updateModelOptions();
         }
 
-        async function testOpenAIKey(apiKey) {
+        async function detectModels() {
+            const apiType = document.getElementById('apiType').value;
+            const apiKeysText = document.getElementById('apiKeys').value.trim();
+            
+            if (!apiKeysText) {
+                alert(currentLang === 'zh' ? '请先输入API密钥！' : 'Please enter API keys first!');
+                return;
+            }
+            
+            const apiKeys = apiKeysText.split('\n').filter(key => key.trim());
+            
+            if (apiKeys.length === 0) {
+                alert(currentLang === 'zh' ? '请输入有效的API密钥！' : 'Please enter valid API keys!');
+                return;
+            }
+
+            // 只取第一个key进行检测
+            const testKey = apiKeys[0].trim();
+            
+            document.getElementById('loading').classList.remove('hidden');
+            const loadingText = document.querySelector('#loading p');
+            loadingText.textContent = translations[currentLang]['detecting'];
+            
+            detectedModels.clear();
+            
+            try {
+                const models = await getAvailableModels(testKey, apiType);
+                
+                if (models && models.length > 0) {
+                    models.forEach(model => addDetectedModel(model));
+                    alert(currentLang === 'zh' ? 
+                        `检测到 ${models.length} 个可用模型` : 
+                        `Detected ${models.length} available models`);
+                } else {
+                    // 没有检测到模型，显示详细的检查建议
+                    alert(currentLang === 'zh' ? 
+                        '未检测到可用模型。请检查：\n• API密钥是否有效\n• 代理设置是否正确\n• 网络连接是否正常' : 
+                        'No available models detected. Please check:\n• API key validity\n• Proxy settings\n• Network connection');
+                }
+            } catch (error) {
+                // 统一显示详细的检查建议
+                alert(currentLang === 'zh' ? 
+                    '未检测到可用模型。请检查：\n• API密钥是否有效\n• 代理设置是否正确\n• 网络连接是否正常' : 
+                    'No available models detected. Please check:\n• API key validity\n• Proxy settings\n• Network connection');
+            } finally {
+                document.getElementById('loading').classList.add('hidden');
+                loadingText.textContent = translations[currentLang]['testing'];
+            }
+        }
+
+        async function getAvailableModels(apiKey, apiType) {
+            switch (apiType) {
+                case 'openai':
+                    return await getOpenAIModels(apiKey);
+                case 'claude':
+                    return await getClaudeModels(apiKey);
+                case 'gemini':
+                    return await getGeminiModels(apiKey);
+                default:
+                    return [];
+            }
+        }
+
+        async function getOpenAIModels(apiKey) {
             try {
                 const apiUrl = getApiUrl('openai', '/models');
+                
                 const response = await fetch(apiUrl, {
                     method: 'GET',
                     headers: {
                         'Authorization': 'Bearer ' + apiKey,
                         'Content-Type': 'application/json'
                     }
+                });
+                
+                if (!response.ok) {
+                    // API密钥无效或其他错误
+                    if (response.status === 401 || response.status === 403) {
+                        return []; // 返回空数组而不是抛出错误
+                    }
+                    return [];
+                }
+                
+                const data = await response.json();
+                
+                if (data && data.data && Array.isArray(data.data)) {
+                    // 过滤出聊天模型，排除嵌入模型等
+                    const models = data.data
+                        .filter(model => {
+                            const id = model.id.toLowerCase();
+                            return (id.includes('gpt') || id.includes('chat')) && 
+                                   !id.includes('embed') && 
+                                   !id.includes('whisper') && 
+                                   !id.includes('tts') &&
+                                   !id.includes('dall-e');
+                        })
+                        .map(model => model.id)
+                        .sort();
+                    
+                    return models;
+                }
+                return [];
+            } catch (error) {
+                // 网络错误或其他异常，返回空数组
+                return [];
+            }
+        }
+
+        async function getClaudeModels(apiKey) {
+            // Claude API目前没有公开的模型列表端点，返回常见模型
+            // 可以尝试测试这些模型的可用性
+            const commonModels = [
+                'claude-3-5-sonnet-20241022',
+                'claude-3-5-sonnet-20240620', 
+                'claude-3-5-haiku-20241022',
+                'claude-3-opus-20240229',
+                'claude-3-sonnet-20240229',
+                'claude-3-haiku-20240307',
+                'claude-2.1',
+                'claude-2.0',
+                'claude-instant-1.2'
+            ];
+            
+            const availableModels = [];
+            
+            // 测试每个模型的可用性
+            for (const model of commonModels) {
+                try {
+                    const result = await testClaudeKey(apiKey, model);
+                    if (result.valid) {
+                        availableModels.push(model);
+                    }
+                } catch (error) {
+                    // 继续测试下一个模型
+                    continue;
+                }
+            }
+            
+            return availableModels;
+        }
+
+        async function getGeminiModels(apiKey) {
+            try {
+                const apiUrl = getApiUrl('gemini', '/models?key=' + apiKey);
+                
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    // API密钥无效或其他错误
+                    if (response.status === 400 || response.status === 401 || response.status === 403) {
+                        return []; // 返回空数组而不是抛出错误
+                    }
+                    return [];
+                }
+                
+                const data = await response.json();
+                
+                if (data && data.models && Array.isArray(data.models)) {
+                    const models = data.models
+                        .filter(model => {
+                            // 只返回生成内容的模型
+                            return model.supportedGenerationMethods && 
+                                   model.supportedGenerationMethods.includes('generateContent');
+                        })
+                        .map(model => {
+                            // 提取模型名称（去掉 models/ 前缀）
+                            return model.name.replace('models/', '');
+                        })
+                        .sort();
+                    
+                    return models;
+                }
+                return [];
+            } catch (error) {
+                // 网络错误或其他异常，返回空数组
+                return [];
+            }
+        }
+
+        async function testOpenAIKey(apiKey, model = null) {
+            try {
+                const selectedModel = model || getSelectedModel();
+                if (!selectedModel) {
+                    return { valid: false, error: '未指定模型' };
+                }
+                
+                const apiUrl = getApiUrl('openai', '/chat/completions');
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + apiKey,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: selectedModel,
+                        messages: [{ role: 'user', content: 'Hi' }],
+                        max_tokens: 1
+                    })
                 });
                 
                 if (!response.ok) {
@@ -725,7 +1608,7 @@
                     return { valid: false, error: 'JSON解析失败' };
                 }
                 
-                if (data && data.data && Array.isArray(data.data)) {
+                if (data && data.choices && Array.isArray(data.choices)) {
                     return { valid: true, error: null };
                 } else {
                     return { valid: false, error: '响应格式错误' };
@@ -738,8 +1621,13 @@
             }
         }
         
-        async function testClaudeKey(apiKey) {
+        async function testClaudeKey(apiKey, model = null) {
             try {
+                const selectedModel = model || getSelectedModel();
+                if (!selectedModel) {
+                    return { valid: false, error: '未指定模型' };
+                }
+                
                 const apiUrl = getApiUrl('claude', '/messages');
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -749,7 +1637,7 @@
                         'anthropic-version': '2023-06-01'
                     },
                     body: JSON.stringify({
-                        model: 'claude-3-haiku-20240307',
+                        model: selectedModel,
                         max_tokens: 1,
                         messages: [{ role: 'user', content: 'Hi' }]
                     })
@@ -789,13 +1677,35 @@
             }
         }
         
-        async function testGeminiKey(apiKey) {
+        async function testGeminiKey(apiKey, model = null) {
             try {
-                const apiUrl = getApiUrl('gemini', '/models?key=' + apiKey);
-                const response = await fetch(apiUrl);
+                const selectedModel = model || getSelectedModel();
+                if (!selectedModel) {
+                    return { valid: false, error: '未指定模型' };
+                }
+                
+                const apiUrl = getApiUrl('gemini', '/models/' + selectedModel + ':generateContent?key=' + apiKey);
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [
+                            {
+                                parts: [
+                                    {
+                                        text: "Hi"
+                                    }
+                                ]
+                            }
+                        ]
+                    })
+                });
                 
                 if (!response.ok) {
                     if (response.status === 400) return { valid: false, error: 'API密钥无效 (400)' };
+                    if (response.status === 401) return { valid: false, error: '认证失败 (401)' };
                     if (response.status === 403) return { valid: false, error: '权限不足 (403)' };
                     if (response.status === 429) return { valid: false, error: '请求过多 (429)' };
                     return { valid: false, error: 'HTTP ' + response.status };
@@ -813,7 +1723,7 @@
                     return { valid: false, error: 'JSON解析失败' };
                 }
                 
-                if (data && data.models && Array.isArray(data.models)) {
+                if (data && data.candidates && Array.isArray(data.candidates) && data.candidates.length > 0) {
                     return { valid: true, error: null };
                 } else if (data && data.error) {
                     return { valid: false, error: 'API错误: ' + (data.error.message || data.error) };
@@ -844,6 +1754,19 @@
             }
         }
 
+        async function testApiKeyWithModel(apiKey, apiType, model) {
+            switch (apiType) {
+                case 'openai':
+                    return await testOpenAIKey(apiKey, model);
+                case 'claude':
+                    return await testClaudeKey(apiKey, model);
+                case 'gemini':
+                    return await testGeminiKey(apiKey, model);
+                default:
+                    return { valid: false, error: '不支持的API类型' };
+            }
+        }
+
         function getLocalizedError(errorKey) {
             const errorMap = {
                 '认证失败 (401)': 'auth-failed',
@@ -853,7 +1776,8 @@
                 'JSON解析失败': 'json-parse-error',
                 '空响应': 'empty-response',
                 '响应格式错误': 'invalid-format',
-                '认证错误': 'auth-failed'
+                '认证错误': 'auth-failed',
+                '未指定模型': 'no-model-specified'
             };
             
             if (errorKey && errorKey.startsWith('API错误:')) {
@@ -879,7 +1803,8 @@
                     langKey === 'network-error' ? 'Network Error' :
                     langKey === 'json-parse-error' ? 'JSON Parse Error' :
                     langKey === 'empty-response' ? 'Empty Response' :
-                    langKey === 'invalid-format' ? 'Invalid Format' : errorKey
+                    langKey === 'invalid-format' ? 'Invalid Format' :
+                    langKey === 'no-model-specified' ? 'No Model Specified' : errorKey
                 );
             }
             return errorKey;
@@ -888,9 +1813,15 @@
         async function startTesting() {
             const apiType = document.getElementById('apiType').value;
             const apiKeysText = document.getElementById('apiKeys').value.trim();
+            const selectedModel = getSelectedModel();
             
             if (!apiKeysText) {
                 alert(currentLang === 'zh' ? '请输入API密钥！' : 'Please enter API keys!');
+                return;
+            }
+
+            if (!selectedModel) {
+                alert(currentLang === 'zh' ? '请选择或输入模型名！' : 'Please select or enter model name!');
                 return;
             }
             
@@ -910,7 +1841,8 @@
                     key: apiKey.trim(),
                     status: 'testing',
                     error: null,
-                    type: apiType
+                    type: apiType,
+                    model: selectedModel
                 };
                 allKeysData.push(keyData);
             });
@@ -924,16 +1856,18 @@
             
             let completed = 0;
             const total = apiKeys.length;
-            const concurrency = 3;
             const chunks = [];
-            for (let i = 0; i < apiKeys.length; i += concurrency) {
-                chunks.push(apiKeys.slice(i, i + concurrency));
+            
+            // 使用用户设置的并发数
+            for (let i = 0; i < apiKeys.length; i += currentConcurrency) {
+                chunks.push(apiKeys.slice(i, i + currentConcurrency));
             }
             
             for (const chunk of chunks) {
                 const promises = chunk.map(async (apiKey) => {
                     const keyData = allKeysData.find(k => k.key === apiKey.trim());
                     
+                    // 添加随机延迟以避免过于频繁的请求
                     await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
                     
                     const result = await testApiKey(apiKey.trim(), apiType);
@@ -960,6 +1894,12 @@
             
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('progressBar').classList.add('hidden');
+            
+            // 显示测试完成提示
+            const message = currentLang === 'zh' ? 
+                `测试完成！有效密钥: ${validKeysData.length}，无效密钥: ${invalidKeysData.length}` :
+                `Test completed! Valid keys: ${validKeysData.length}, Invalid keys: ${invalidKeysData.length}`;
+            alert(message);
         }
         
         function updateStats() {
@@ -993,8 +1933,13 @@
                     const localizedError = getLocalizedError(keyData.error);
                     errorDisplay = '<div style="font-size: 11px; color: #dc3545; margin-top: 2px;">' + localizedError + '</div>';
                 }
+
+                let modelDisplay = '';
+                if (keyData.model) {
+                    modelDisplay = '<div style="font-size: 11px; color: #6c757d; margin-top: 2px;">Model: ' + keyData.model + '</div>';
+                }
                 
-                keyItem.innerHTML = '<div class="key-text">' + keyData.key + errorDisplay + '</div><div class="key-status ' + statusClass + '">' + statusText + '</div>';
+                keyItem.innerHTML = '<div class="key-text">' + keyData.key + modelDisplay + errorDisplay + '</div><div class="key-status ' + statusClass + '">' + statusText + '</div>';
                 
                 container.appendChild(keyItem);
             });
@@ -1051,39 +1996,37 @@
         
         function clearAll() {
             document.getElementById('apiKeys').value = '';
+            document.getElementById('modelInput').value = '';
             document.getElementById('resultsSection').classList.add('hidden');
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('progressBar').classList.add('hidden');
+            document.getElementById('detectedModels').style.display = 'none';
             
             allKeysData = [];
             validKeysData = [];
             invalidKeysData = [];
+            detectedModels.clear();
             
             updateStats();
             updateKeyLists();
         }
 
-        // 事件绑定 - 确保在DOM加载完成后执行
         function initializeEventListeners() {
-            // 主题和语言切换
             document.getElementById('langBtn').addEventListener('click', toggleLanguage);
             document.getElementById('themeBtn').addEventListener('click', toggleTheme);
-            
-            // API类型选择
             document.getElementById('apiType').addEventListener('change', updateProxyPlaceholder);
-            
-            // 开始测试和清空按钮
+            document.getElementById('modelToggleBtn').addEventListener('click', toggleModelInput);
+            document.getElementById('detectedModelsHeader').addEventListener('click', toggleModelList);
+            document.getElementById('detectBtn').addEventListener('click', detectModels);
             document.getElementById('startBtn').addEventListener('click', startTesting);
             document.getElementById('clearBtn').addEventListener('click', clearAll);
             
-            // 标签页切换
             document.querySelectorAll('[data-tab]').forEach(tab => {
                 tab.addEventListener('click', (e) => {
                     showTab(e.target.getAttribute('data-tab'));
                 });
             });
             
-            // 复制按钮
             document.querySelectorAll('[data-copy]').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     copyKeys(e.target.getAttribute('data-copy'));
@@ -1091,24 +2034,25 @@
             });
         }
 
-        // 页面加载完成后初始化
         document.addEventListener('DOMContentLoaded', function() {
             updateProxyPlaceholder();
             updateLanguage();
             initializeEventListeners();
+            initConcurrencyControls();
         });
 
-        // 兼容性：如果DOMContentLoaded已经触发
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
                 updateProxyPlaceholder();
                 updateLanguage();
                 initializeEventListeners();
+                initConcurrencyControls();
             });
         } else {
             updateProxyPlaceholder();
             updateLanguage();
             initializeEventListeners();
+            initConcurrencyControls();
         }
     </script>
 </body>
