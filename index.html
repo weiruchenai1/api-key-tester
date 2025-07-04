@@ -429,13 +429,15 @@
         
         .valid { color: #28a745; }
         .invalid { color: #dc3545; }
-        .testing { color: #ffc107; }
+        .rate-limited { color: #ffc107; }
+        .testing { color: #6f42c1; }
         .total { color: #6f42c1; }
         
         .results-tabs {
             display: flex;
             margin-bottom: 20px;
             border-bottom: 2px solid #e9ecef;
+            flex-wrap: wrap;
         }
         
         .tab {
@@ -448,6 +450,7 @@
             color: #6c757d;
             border-bottom: 3px solid transparent;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
         
         .tab.active {
@@ -525,9 +528,14 @@
             color: #721c24;
         }
         
-        .status-testing {
+        .status-rate-limited {
             background: #fff3cd;
             color: #856404;
+        }
+        
+        .status-testing {
+            background: #e2e3e5;
+            color: #6c757d;
         }
         
         .copy-btn {
@@ -927,7 +935,7 @@
                     <small class="form-help" data-lang-key="proxy-help">留空使用默认代理，建议使用自己的反向代理以提高成功率</small>
                 </div>
 
-                <!-- 新增并发控制 -->
+                <!-- 并发控制 -->
                 <div class="input-group">
                     <label data-lang-key="concurrency-control">并发控制</label>
                     <div class="concurrency-container">
@@ -995,6 +1003,10 @@
                         <div class="stat-label" data-lang-key="invalid">无效</div>
                     </div>
                     <div class="stat-card">
+                        <div class="stat-number rate-limited" id="rateLimitedCount">0</div>
+                        <div class="stat-label" data-lang-key="rate-limited">速率限制</div>
+                    </div>
+                    <div class="stat-card">
                         <div class="stat-number testing" id="testingCount">0</div>
                         <div class="stat-label" data-lang-key="testing-label">测试中</div>
                     </div>
@@ -1004,6 +1016,7 @@
                     <button class="tab active" data-tab="all" data-lang-key="all">全部</button>
                     <button class="tab" data-tab="valid" data-lang-key="valid-keys">有效密钥</button>
                     <button class="tab" data-tab="invalid" data-lang-key="invalid-keys">无效密钥</button>
+                    <button class="tab" data-tab="rate-limited" data-lang-key="rate-limited-keys">速率限制</button>
                 </div>
                 
                 <div class="tab-content active" id="allTab">
@@ -1020,6 +1033,11 @@
                     <div class="key-list" id="invalidKeys"></div>
                     <button class="copy-btn" data-copy="invalid" data-lang-key="copy-invalid">复制无效密钥</button>
                 </div>
+                
+                <div class="tab-content" id="rateLimitedTab">
+                    <div class="key-list" id="rateLimitedKeys"></div>
+                    <button class="copy-btn" data-copy="rate-limited" data-lang-key="copy-rate-limited">复制速率限制密钥</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1028,6 +1046,7 @@
         let allKeysData = [];
         let validKeysData = [];
         let invalidKeysData = [];
+        let rateLimitedKeysData = [];
         let currentLang = 'zh';
         let isDarkTheme = false;
         let isCustomModel = false;
@@ -1090,19 +1109,24 @@
                 'start-test': '开始测试',
                 'clear': '清空',
                 'testing': '正在测试 API 密钥...',
+                'detecting': '正在检测可用模型...',
                 'no-models-detected': '无可用模型',
                 'total': '总计',
                 'valid': '有效',
                 'invalid': '无效',
+                'rate-limited': '速率限制',
                 'testing-label': '测试中',
                 'all': '全部',
                 'valid-keys': '有效密钥',
                 'invalid-keys': '无效密钥',
+                'rate-limited-keys': '速率限制',
                 'copy-all': '复制全部',
                 'copy-valid': '复制有效密钥',
                 'copy-invalid': '复制无效密钥',
+                'copy-rate-limited': '复制速率限制密钥',
                 'status-valid': '有效',
                 'status-invalid': '无效',
+                'status-rate-limited': '速率限制',
                 'status-testing': '测试中'
             },
             en: {
@@ -1135,19 +1159,24 @@
                 'start-test': 'Start Test',
                 'clear': 'Clear',
                 'testing': 'Testing API keys...',
+                'detecting': 'Detecting available models...',
                 'no-models-detected': 'No Available Models',
                 'total': 'Total',
                 'valid': 'Valid',
                 'invalid': 'Invalid',
+                'rate-limited': 'Rate Limited',
                 'testing-label': 'Testing',
                 'all': 'All',
                 'valid-keys': 'Valid Keys',
                 'invalid-keys': 'Invalid Keys',
+                'rate-limited-keys': 'Rate Limited',
                 'copy-all': 'Copy All',
                 'copy-valid': 'Copy Valid Keys',
                 'copy-invalid': 'Copy Invalid Keys',
+                'copy-rate-limited': 'Copy Rate Limited Keys',
                 'status-valid': 'Valid',
                 'status-invalid': 'Invalid',
+                'status-rate-limited': 'Rate Limited',
                 'status-testing': 'Testing'
             }
         };
@@ -1572,7 +1601,7 @@
             try {
                 const selectedModel = model || getSelectedModel();
                 if (!selectedModel) {
-                    return { valid: false, error: '未指定模型' };
+                    return { valid: false, error: '未指定模型', isRateLimit: false };
                 }
                 
                 const apiUrl = getApiUrl('openai', '/chat/completions');
@@ -1590,34 +1619,43 @@
                 });
                 
                 if (!response.ok) {
-                    if (response.status === 401) return { valid: false, error: '认证失败 (401)' };
-                    if (response.status === 403) return { valid: false, error: '权限不足 (403)' };
-                    if (response.status === 429) return { valid: false, error: '请求过多 (429)' };
-                    return { valid: false, error: 'HTTP ' + response.status };
+                    if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };                    if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
+                    if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
+                    return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429 };
                 }
                 
                 const responseText = await response.text();
                 if (!responseText || responseText.trim() === '') {
-                    return { valid: false, error: '空响应' };
+                    return { valid: false, error: '空响应', isRateLimit: false };
                 }
                 
                 let data;
                 try {
                     data = JSON.parse(responseText);
                 } catch (parseError) {
-                    return { valid: false, error: 'JSON解析失败' };
+                    return { valid: false, error: 'JSON解析失败', isRateLimit: false };
+                }
+                
+                // 检查响应中是否包含速率限制相关信息
+                if (data && data.error) {
+                    const errorMessage = data.error.message || data.error.toString();
+                    if (errorMessage.toLowerCase().includes('rate limit') || 
+                        errorMessage.toLowerCase().includes('too many requests') ||
+                        errorMessage.toLowerCase().includes('quota exceeded')) {
+                        return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true };
+                    }
                 }
                 
                 if (data && data.choices && Array.isArray(data.choices)) {
-                    return { valid: true, error: null };
+                    return { valid: true, error: null, isRateLimit: false };
                 } else {
-                    return { valid: false, error: '响应格式错误' };
+                    return { valid: false, error: '响应格式错误', isRateLimit: false };
                 }
             } catch (error) {
                 if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                    return { valid: false, error: '网络连接失败' };
+                    return { valid: false, error: '网络连接失败', isRateLimit: false };
                 }
-                return { valid: false, error: '请求失败: ' + error.message };
+                return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
             }
         }
         
@@ -1625,7 +1663,7 @@
             try {
                 const selectedModel = model || getSelectedModel();
                 if (!selectedModel) {
-                    return { valid: false, error: '未指定模型' };
+                    return { valid: false, error: '未指定模型', isRateLimit: false };
                 }
                 
                 const apiUrl = getApiUrl('claude', '/messages');
@@ -1643,9 +1681,9 @@
                     })
                 });
                 
-                if (response.status === 401) return { valid: false, error: '认证失败 (401)' };
-                if (response.status === 403) return { valid: false, error: '权限不足 (403)' };
-                if (response.status === 429) return { valid: false, error: '请求过多 (429)' };
+                if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
+                if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
+                if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
                 
                 const responseText = await response.text();
                 
@@ -1653,27 +1691,30 @@
                     try {
                         const errorData = JSON.parse(responseText);
                         if (errorData.error && errorData.error.type === 'authentication_error') {
-                            return { valid: false, error: '认证错误' };
+                            return { valid: false, error: '认证错误', isRateLimit: false };
+                        }
+                        if (errorData.error && errorData.error.type === 'rate_limit_error') {
+                            return { valid: false, error: 'Rate Limit Error', isRateLimit: true };
                         }
                         if (errorData.error && errorData.error.type === 'invalid_request_error') {
-                            return { valid: true, error: null };
+                            return { valid: true, error: null, isRateLimit: false };
                         }
-                        return { valid: false, error: 'API错误: ' + (errorData.error.type || 'unknown') };
+                        return { valid: false, error: 'API错误: ' + (errorData.error.type || 'unknown'), isRateLimit: false };
                     } catch {
-                        return { valid: false, error: 'JSON解析失败' };
+                        return { valid: false, error: 'JSON解析失败', isRateLimit: false };
                     }
                 }
                 
                 if (response.ok) {
-                    return { valid: true, error: null };
+                    return { valid: true, error: null, isRateLimit: false };
                 } else {
-                    return { valid: false, error: 'HTTP ' + response.status };
+                    return { valid: false, error: 'HTTP ' + response.status, isRateLimit: false };
                 }
             } catch (error) {
                 if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                    return { valid: false, error: '网络连接失败' };
+                    return { valid: false, error: '网络连接失败', isRateLimit: false };
                 }
-                return { valid: false, error: '请求失败: ' + error.message };
+                return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
             }
         }
         
@@ -1681,7 +1722,7 @@
             try {
                 const selectedModel = model || getSelectedModel();
                 if (!selectedModel) {
-                    return { valid: false, error: '未指定模型' };
+                    return { valid: false, error: '未指定模型', isRateLimit: false };
                 }
                 
                 const apiUrl = getApiUrl('gemini', '/models/' + selectedModel + ':generateContent?key=' + apiKey);
@@ -1704,54 +1745,72 @@
                 });
                 
                 if (!response.ok) {
-                    if (response.status === 400) return { valid: false, error: 'API密钥无效 (400)' };
-                    if (response.status === 401) return { valid: false, error: '认证失败 (401)' };
-                    if (response.status === 403) return { valid: false, error: '权限不足 (403)' };
-                    if (response.status === 429) return { valid: false, error: '请求过多 (429)' };
-                    return { valid: false, error: 'HTTP ' + response.status };
+                    if (response.status === 400) return { valid: false, error: 'API密钥无效 (400)', isRateLimit: false };
+                    if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
+                    if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
+                    if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
+                    return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429 };
                 }
                 
                 const responseText = await response.text();
                 if (!responseText || responseText.trim() === '') {
-                    return { valid: false, error: '空响应' };
+                    return { valid: false, error: '空响应', isRateLimit: false };
                 }
                 
                 let data;
                 try {
                     data = JSON.parse(responseText);
                 } catch (parseError) {
-                    return { valid: false, error: 'JSON解析失败' };
+                    return { valid: false, error: 'JSON解析失败', isRateLimit: false };
                 }
                 
                 if (data && data.candidates && Array.isArray(data.candidates) && data.candidates.length > 0) {
-                    return { valid: true, error: null };
+                    return { valid: true, error: null, isRateLimit: false };
                 } else if (data && data.error) {
-                    return { valid: false, error: 'API错误: ' + (data.error.message || data.error) };
+                    const errorMessage = data.error.message || data.error.toString();
+                    // 检查是否为速率限制错误
+                    if (errorMessage.toLowerCase().includes('quota exceeded') || 
+                        errorMessage.toLowerCase().includes('rate limit') ||
+                        errorMessage.toLowerCase().includes('too many requests')) {
+                        return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true };
+                    }
+                    return { valid: false, error: 'API错误: ' + errorMessage, isRateLimit: false };
                 } else {
-                    return { valid: false, error: '响应格式错误' };
+                    return { valid: false, error: '响应格式错误', isRateLimit: false };
                 }
             } catch (error) {
                 if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                    return { valid: false, error: '网络连接失败' };
+                    return { valid: false, error: '网络连接失败', isRateLimit: false };
                 }
                 if (error.name === 'SyntaxError' && error.message.includes('JSON')) {
-                    return { valid: false, error: 'JSON解析失败' };
+                    return { valid: false, error: 'JSON解析失败', isRateLimit: false };
                 }
-                return { valid: false, error: '请求失败: ' + error.message };
+                return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
             }
         }
 
         async function testApiKey(apiKey, apiType) {
+            let result;
             switch (apiType) {
                 case 'openai':
-                    return await testOpenAIKey(apiKey);
+                    result = await testOpenAIKey(apiKey);
+                    break;
                 case 'claude':
-                    return await testClaudeKey(apiKey);
+                    result = await testClaudeKey(apiKey);
+                    break;
                 case 'gemini':
-                    return await testGeminiKey(apiKey);
+                    result = await testGeminiKey(apiKey);
+                    break;
                 default:
-                    return { valid: false, error: '不支持的API类型' };
+                    result = { valid: false, error: '不支持的API类型', isRateLimit: false };
             }
+            
+            // 通用的429错误检测 - 如果错误信息包含429，强制标记为速率限制
+            if (!result.valid && result.error && (result.error.includes('429') || result.error.includes('请求过多') || result.error.toLowerCase().includes('rate limit') || result.error.toLowerCase().includes('too many requests'))) {
+                result.isRateLimit = true;
+            }
+            
+            return result;
         }
 
         async function testApiKeyWithModel(apiKey, apiType, model) {
@@ -1763,15 +1822,34 @@
                 case 'gemini':
                     return await testGeminiKey(apiKey, model);
                 default:
-                    return { valid: false, error: '不支持的API类型' };
+                    return { valid: false, error: '不支持的API类型', isRateLimit: false };
             }
         }
 
         function getLocalizedError(errorKey) {
+            // 首先检查是否包含429或速率限制相关关键词
+            if (errorKey && (errorKey.includes('429') || errorKey.includes('Rate Limited') || errorKey.toLowerCase().includes('rate limit'))) {
+                // 根据当前语言返回本地化的速率限制错误信息
+                if (currentLang === 'zh') {
+                    if (errorKey.includes('Rate Limited (429)')) {
+                        return '速率限制 (429)';
+                    } else if (errorKey.includes('Rate Limited')) {
+                        return '速率限制';
+                    } else if (errorKey.includes('429')) {
+                        return '速率限制 (429)';
+                    }
+                    return '速率限制';
+                } else {
+                    // 英文环境下保持原样
+                    return errorKey;
+                }
+            }
+            
             const errorMap = {
                 '认证失败 (401)': 'auth-failed',
                 '权限不足 (403)': 'permission-denied', 
                 '请求过多 (429)': 'rate-limited',
+                'Rate Limited (429)': 'rate-limited',
                 '网络连接失败': 'network-error',
                 'JSON解析失败': 'json-parse-error',
                 '空响应': 'empty-response',
@@ -1788,6 +1866,16 @@
             if (errorKey && errorKey.startsWith('请求失败:')) {
                 const detail = errorKey.replace('请求失败:', '').trim();
                 return (currentLang === 'zh' ? '请求失败' : 'Request Failed') + ': ' + detail;
+            }
+            
+            if (errorKey && errorKey.startsWith('Rate Limited:')) {
+                // 处理 "Rate Limited: xxx" 格式的错误信息
+                if (currentLang === 'zh') {
+                    const detail = errorKey.replace('Rate Limited:', '').trim();
+                    return '速率限制: ' + detail;
+                } else {
+                    return errorKey; // 英文环境下保持原样
+                }
             }
             
             if (errorKey && errorKey.includes('HTTP ')) {
@@ -1835,6 +1923,7 @@
             allKeysData = [];
             validKeysData = [];
             invalidKeysData = [];
+            rateLimitedKeysData = [];
             
             apiKeys.forEach(apiKey => {
                 const keyData = {
@@ -1872,13 +1961,38 @@
                     
                     const result = await testApiKey(apiKey.trim(), apiType);
                     
-                    keyData.status = result.valid ? 'valid' : 'invalid';
+                    // 调试日志
+                    console.log('API测试结果:', {
+                        key: apiKey.trim().substring(0, 10) + '...',
+                        valid: result.valid,
+                        isRateLimit: result.isRateLimit,
+                        error: result.error
+                    });
+                    
+                    // 设置错误信息
                     keyData.error = result.error;
                     
                     if (result.valid) {
-                        validKeysData.push(keyData);
+                        keyData.status = 'valid';
+                        // 确保不重复添加
+                        if (!validKeysData.find(k => k.key === keyData.key)) {
+                            validKeysData.push(keyData);
+                        }
+
+                    } else if (result.isRateLimit) {
+                        keyData.status = 'rate-limited';
+                        // 确保不重复添加
+                        if (!rateLimitedKeysData.find(k => k.key === keyData.key)) {
+                            rateLimitedKeysData.push(keyData);
+                        }
+
                     } else {
-                        invalidKeysData.push(keyData);
+                        keyData.status = 'invalid';
+                        // 确保不重复添加
+                        if (!invalidKeysData.find(k => k.key === keyData.key)) {
+                            invalidKeysData.push(keyData);
+                        }
+
                     }
                     
                     completed++;
@@ -1897,8 +2011,8 @@
             
             // 显示测试完成提示
             const message = currentLang === 'zh' ? 
-                `测试完成！有效密钥: ${validKeysData.length}，无效密钥: ${invalidKeysData.length}` :
-                `Test completed! Valid keys: ${validKeysData.length}, Invalid keys: ${invalidKeysData.length}`;
+                `测试完成！有效密钥: ${validKeysData.length}，无效密钥: ${invalidKeysData.length}，速率限制: ${rateLimitedKeysData.length}` :
+                `Test completed! Valid keys: ${validKeysData.length}, Invalid keys: ${invalidKeysData.length}, Rate limited: ${rateLimitedKeysData.length}`;
             alert(message);
         }
         
@@ -1906,17 +2020,35 @@
             document.getElementById('totalCount').textContent = allKeysData.length;
             document.getElementById('validCount').textContent = validKeysData.length;
             document.getElementById('invalidCount').textContent = invalidKeysData.length;
+            document.getElementById('rateLimitedCount').textContent = rateLimitedKeysData.length;
             document.getElementById('testingCount').textContent = allKeysData.filter(k => k.status === 'testing').length;
         }
         
         function updateKeyLists() {
+            // 清理重复数据，确保每个数组中的密钥唯一
+            validKeysData = [...new Map(validKeysData.map(item => [item.key, item])).values()];
+            invalidKeysData = [...new Map(invalidKeysData.map(item => [item.key, item])).values()];
+            rateLimitedKeysData = [...new Map(rateLimitedKeysData.map(item => [item.key, item])).values()];
+            
+            // 确保allKeysData包含所有最新状态的密钥
+            allKeysData.forEach(keyData => {
+                if (keyData.status === 'rate-limited' && !rateLimitedKeysData.find(k => k.key === keyData.key)) {
+                    rateLimitedKeysData.push(keyData);
+                }
+            });
+            
             updateKeyList('allKeys', allKeysData);
             updateKeyList('validKeys', validKeysData);
             updateKeyList('invalidKeys', invalidKeysData);
+            updateKeyList('rateLimitedKeys', rateLimitedKeysData);
         }
         
         function updateKeyList(elementId, keys) {
             const container = document.getElementById(elementId);
+            if (!container) {
+                return;
+            }
+            
             container.innerHTML = '';
             
             keys.forEach(keyData => {
@@ -1924,14 +2056,17 @@
                 keyItem.className = 'key-item';
                 
                 const statusClass = keyData.status === 'valid' ? 'status-valid' : 
-                                   keyData.status === 'invalid' ? 'status-invalid' : 'status-testing';
+                                   keyData.status === 'invalid' ? 'status-invalid' : 
+                                   keyData.status === 'rate-limited' ? 'status-rate-limited' : 'status-testing';
                 
                 const statusText = translations[currentLang]['status-' + keyData.status] || keyData.status;
                 
                 let errorDisplay = '';
-                if (keyData.status === 'invalid' && keyData.error) {
+                if ((keyData.status === 'invalid' || keyData.status === 'rate-limited') && keyData.error) {
                     const localizedError = getLocalizedError(keyData.error);
-                    errorDisplay = '<div style="font-size: 11px; color: #dc3545; margin-top: 2px;">' + localizedError + '</div>';
+                    // 为速率限制使用橙色，为无效使用红色
+                    const errorColor = keyData.status === 'rate-limited' ? '#856404' : '#dc3545';
+                    errorDisplay = '<div style="font-size: 11px; color: ' + errorColor + '; margin-top: 2px;">' + localizedError + '</div>';
                 }
 
                 let modelDisplay = '';
@@ -1949,8 +2084,20 @@
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             
-            document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-            document.getElementById(tab + 'Tab').classList.add('active');
+            const tabButton = document.querySelector(`[data-tab="${tab}"]`);
+            // 特殊处理rate-limited标签页的ID
+            let tabContentId = tab + 'Tab';
+            if (tab === 'rate-limited') {
+                tabContentId = 'rateLimitedTab';
+            }
+            const tabContent = document.getElementById(tabContentId);
+            
+            if (tabButton) {
+                tabButton.classList.add('active');
+            }
+            if (tabContent) {
+                tabContent.classList.add('active');
+            }
         }
         
         function copyKeys(type) {
@@ -1965,6 +2112,9 @@
                     break;
                 case 'invalid':
                     keysToCopy = invalidKeysData.map(k => k.key);
+                    break;
+                case 'rate-limited':
+                    keysToCopy = rateLimitedKeysData.map(k => k.key);
                     break;
             }
             
@@ -1994,21 +2144,28 @@
             });
         }
         
+
+        
         function clearAll() {
             document.getElementById('apiKeys').value = '';
             document.getElementById('modelInput').value = '';
             document.getElementById('resultsSection').classList.add('hidden');
             document.getElementById('loading').classList.add('hidden');
             document.getElementById('progressBar').classList.add('hidden');
+            document.getElementById('progressFill').style.width = '0%';
             document.getElementById('detectedModels').style.display = 'none';
             
             allKeysData = [];
             validKeysData = [];
             invalidKeysData = [];
+            rateLimitedKeysData = [];
             detectedModels.clear();
             
             updateStats();
             updateKeyLists();
+            
+            // 重置标签页到"全部"
+            showTab('all');
         }
 
         function initializeEventListeners() {
