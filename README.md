@@ -29,9 +29,14 @@
 ## ⚠️ 重要提醒
 
 由于浏览器 CORS 限制，必须使用代理服务器：
-- **Gemini**: `https://gemini.api.2s.lol/v1beta`
-- **OpenAI**: `https://api.openai-proxy.org/v1`
-- **Claude**: `https://claude-api-proxy.com/v1`
+- **Gemini**: 
+`https://gemini.api.2s.lol/v1beta`
+- **OpenAI**: 
+`https://api.openai-proxy.org/v1`
+`https://openai.api.2s.lol/v1`
+- **Claude**: 
+`https://claude-api-proxy.com/v1`
+`https://claude.api.2s.lol/v1`
 
 ## 💡 适用场景
 
