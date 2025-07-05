@@ -50,7 +50,7 @@
 <details>
 <summary>🛠️ 如何搭建自己的反向代理</summary>
 
-### Cloudflare Workers 方案（推荐）
+<summary>### Cloudflare Workers 方案（推荐）<summary>
 
 1. **注册 Cloudflare 账号**：访问 [cloudflare.com](https://cloudflare.com) 注册
 
@@ -119,7 +119,7 @@ export default {
    - Claude: `https://your-worker.workers.dev/claude`
    - Gemini: `https://your-worker.workers.dev/gemini`
 
-### Nginx 反向代理方案
+<summary>### Nginx 反向代理方案<summary>
 
 如果你有自己的海外服务器，可以使用 Nginx 搭建反向代理：
 
@@ -268,7 +268,7 @@ curl https://gemini.your-domain.com/v1beta/models
 - Claude: `https://claude.your-domain.com`  
 - Gemini: `https://gemini.your-domain.com`
 
-### Vercel 方案
+<summary>### Vercel 方案<summary>
 
 1. **Fork 项目**：
 ```bash
