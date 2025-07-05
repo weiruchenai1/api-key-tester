@@ -33,17 +33,14 @@
 - **Gemini**: 
 `https://gemini.api.2s.lol/v1beta`
 - **OpenAI**: 
-`https://api.openai-proxy.org/v1`
 `https://openai.api.2s.lol/v1`
 - **Claude**: 
-`https://claude-api-proxy.com/v1`
 `https://claude.api.2s.lol/v1`
 
 **公共代理风险提醒：**
 - ⚠️ **安全风险**：API密钥可能被代理服务器记录
 - 📉 **稳定性差**：可能随时失效或速度很慢
 - 🚫 **使用限制**：可能有请求频率或数量限制
-- 💰 **潜在收费**：免费代理可能突然开始收费
 
 **强烈建议使用自己的反向代理以获得更好的安全性、稳定性和成功率。**
 
@@ -156,35 +153,43 @@ sudo nano /etc/nginx/sites-available/openai-proxy
 ```nginx
 # OpenAI 反向代理
 server {
-    listen 443 ssl;                    # 监听443端口，启用SSL
-    server_name openai.your-domain.com; # 绑定域名
+    listen 443 ssl;
+    server_name openai.your-domain.com;
     
-    # SSL证书配置
-    ssl_certificate /etc/letsencrypt/live/openai.your-domain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/openai.your-domain.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/claude.your-domain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/claude.your-domain.com/privkey.pem;
     
     location / {
-        # 反向代理到OpenAI官方API
+        # DNS解析器，禁用IPv6
+        resolver 8.8.8.8 ipv6=off;
+        
+        # 反向代理配置
         proxy_pass https://api.openai.com/;
+        proxy_ssl_server_name on;
+        proxy_set_header Host api.openai.com;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
         
-        # SSL相关设置
-        proxy_ssl_server_name on;       # 启用SNI支持
+        # 隐藏后端服务器的CORS头，避免重复
+        proxy_hide_header Access-Control-Allow-Origin;
+        proxy_hide_header Access-Control-Allow-Methods;
+        proxy_hide_header Access-Control-Allow-Headers;
+        proxy_hide_header Access-Control-Allow-Credentials;
         
-        # 请求头设置
-        proxy_set_header Host api.openai.com;                    # 设置目标主机头
-        proxy_set_header X-Real-IP $remote_addr;                 # 传递真实客户端IP
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; # 代理链IP
-        proxy_set_header X-Forwarded-Proto $scheme;              # 传递协议类型
-        
-        # CORS跨域设置（重要：允许浏览器访问）
-        add_header Access-Control-Allow-Origin *;                # 允许所有域名跨域
-        add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE, OPTIONS'; # 允许的HTTP方法
-        add_header Access-Control-Allow-Headers '*';             # 允许所有请求头
-        
-        # 处理预检请求
+        # 处理OPTIONS预检请求
         if ($request_method = 'OPTIONS') {
-            return 204;                 # 直接返回204状态码
+            add_header Access-Control-Allow-Origin *;
+            add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE, OPTIONS';
+            add_header Access-Control-Allow-Headers '*';
+            add_header Access-Control-Max-Age 86400;
+            return 204;
         }
+        
+        # 为所有其他请求添加CORS头
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE, OPTIONS' always;
+        add_header Access-Control-Allow-Headers '*' always;
     }
 }
 ```
@@ -205,6 +210,10 @@ server {
     ssl_certificate_key /etc/letsencrypt/live/claude.your-domain.com/privkey.pem;
     
     location / {
+        # DNS解析器，禁用IPv6
+        resolver 8.8.8.8 ipv6=off;
+        
+        # 反向代理配置
         proxy_pass https://api.anthropic.com/;
         proxy_ssl_server_name on;
         proxy_set_header Host api.anthropic.com;
@@ -212,14 +221,25 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         
-        # CORS 设置
-        add_header Access-Control-Allow-Origin *;
-        add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE, OPTIONS';
-        add_header Access-Control-Allow-Headers '*';
+        # 隐藏后端服务器的CORS头，避免重复
+        proxy_hide_header Access-Control-Allow-Origin;
+        proxy_hide_header Access-Control-Allow-Methods;
+        proxy_hide_header Access-Control-Allow-Headers;
+        proxy_hide_header Access-Control-Allow-Credentials;
         
+        # 处理OPTIONS预检请求
         if ($request_method = 'OPTIONS') {
+            add_header Access-Control-Allow-Origin *;
+            add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE, OPTIONS';
+            add_header Access-Control-Allow-Headers '*';
+            add_header Access-Control-Max-Age 86400;
             return 204;
         }
+        
+        # 为所有其他请求添加CORS头
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE, OPTIONS' always;
+        add_header Access-Control-Allow-Headers '*' always;
     }
 }
 ```
@@ -236,10 +256,14 @@ server {
     listen 443 ssl;
     server_name gemini.your-domain.com;
     
-    ssl_certificate /etc/letsencrypt/live/gemini.your-domain.com/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/gemini.your-domain.com/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/claude.your-domain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/claude.your-domain.com/privkey.pem;
     
     location / {
+        # DNS解析器，禁用IPv6
+        resolver 8.8.8.8 ipv6=off;
+        
+        # 反向代理配置
         proxy_pass https://generativelanguage.googleapis.com/;
         proxy_ssl_server_name on;
         proxy_set_header Host generativelanguage.googleapis.com;
@@ -247,14 +271,25 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         
-        # CORS 设置
-        add_header Access-Control-Allow-Origin *;
-        add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE, OPTIONS';
-        add_header Access-Control-Allow-Headers '*';
+        # 隐藏后端服务器的CORS头，避免重复
+        proxy_hide_header Access-Control-Allow-Origin;
+        proxy_hide_header Access-Control-Allow-Methods;
+        proxy_hide_header Access-Control-Allow-Headers;
+        proxy_hide_header Access-Control-Allow-Credentials;
         
+        # 处理OPTIONS预检请求
         if ($request_method = 'OPTIONS') {
+            add_header Access-Control-Allow-Origin *;
+            add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE, OPTIONS';
+            add_header Access-Control-Allow-Headers '*';
+            add_header Access-Control-Max-Age 86400;
             return 204;
         }
+        
+        # 为所有其他请求添加CORS头
+        add_header Access-Control-Allow-Origin * always;
+        add_header Access-Control-Allow-Methods 'GET, POST, PUT, DELETE, OPTIONS' always;
+        add_header Access-Control-Allow-Headers '*' always;
     }
 }
 ```
