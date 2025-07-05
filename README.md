@@ -148,11 +148,11 @@ sudo certbot --nginx -d your-domain.com
 
 **3. 创建反向代理配置**
 ```bash
-cd /etc/nginx/conf.d
-sudo vi api-proxy.conf
+# 为每个API创建单独的配置文件
+sudo nano /etc/nginx/sites-available/openai-proxy
 ```
 
-**4. 添加配置内容**
+**4. 添加OpenAI配置内容**
 ```nginx
 # OpenAI 反向代理
 server {
@@ -187,7 +187,15 @@ server {
         }
     }
 }
+```
 
+**5. 创建Claude配置**
+```bash
+sudo nano /etc/nginx/sites-available/claude-proxy
+```
+
+添加以下内容：
+```nginx
 # Claude 反向代理
 server {
     listen 443 ssl;
@@ -214,7 +222,15 @@ server {
         }
     }
 }
+```
 
+**6. 创建Gemini配置**
+```bash
+sudo nano /etc/nginx/sites-available/gemini-proxy
+```
+
+添加以下内容：
+```nginx
 # Gemini 反向代理
 server {
     listen 443 ssl;
@@ -243,11 +259,20 @@ server {
 }
 ```
 
+**7. 启用配置**
+```bash
+# 启用所有代理配置
+sudo ln -s /etc/nginx/sites-available/openai-proxy /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/claude-proxy /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/gemini-proxy /etc/nginx/sites-enabled/
+```
+
 **配置说明：**
 - 将 `your-domain.com` 替换为你的实际域名
+- 每个API使用单独的配置文件，便于管理
 - 证书路径会在申请SSL证书后自动生成，无需手动修改
 
-**5. 重启 Nginx**
+**8. 重启 Nginx**
 ```bash
 sudo nginx -t  # 检查配置
 sudo nginx -s reload  # 重新加载配置
