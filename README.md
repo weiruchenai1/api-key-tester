@@ -50,7 +50,8 @@
 <details>
 <summary>🛠️ 如何搭建自己的反向代理</summary>
 
-<summary>### Cloudflare Workers 方案（推荐）<summary>
+<details>
+<summary>📦 Cloudflare Workers 方案</summary>
 
 1. **注册 Cloudflare 账号**：访问 [cloudflare.com](https://cloudflare.com) 注册
 
@@ -118,8 +119,10 @@ export default {
    - OpenAI: `https://your-worker.workers.dev/openai`
    - Claude: `https://your-worker.workers.dev/claude`
    - Gemini: `https://your-worker.workers.dev/gemini`
+</details>
 
-<summary>### Nginx 反向代理方案<summary>
+<details>
+<summary>🖥️ Nginx 反向代理方案</summary>
 
 如果你有自己的海外服务器，可以使用 Nginx 搭建反向代理：
 
@@ -267,8 +270,10 @@ curl https://gemini.your-domain.com/v1beta/models
 - OpenAI: `https://openai.your-domain.com`
 - Claude: `https://claude.your-domain.com`  
 - Gemini: `https://gemini.your-domain.com`
+</details>
 
-<summary>### Vercel 方案<summary>
+<details>
+<summary>⚡ Vercel 方案</summary>
 
 1. **Fork 项目**：
 ```bash
@@ -332,6 +337,7 @@ vercel --prod
 - **Cloudflare**: `https://your-worker.workers.dev/openai`
 - **Nginx**: `https://openai.your-domain.com`  
 - **Vercel**: `https://your-app.vercel.app/api/openai`
+</details>
 
 ### 方案对比
 
