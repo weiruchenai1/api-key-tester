@@ -1320,6 +1320,7 @@
                 <div class="button-group">
                     <button class="btn btn-detect" id="detectBtn" data-lang-key="detect-models">检测模型</button>
                     <button class="btn btn-primary" id="startBtn" data-lang-key="start-test">开始测试</button>
+                    <button class="btn btn-secondary" id="dedupeBtn" data-lang-key="dedupe-keys">去重密钥</button>
                     <button class="btn btn-secondary" id="clearBtn" data-lang-key="clear">清空</button>
                 </div>
             </div>
@@ -1388,15 +1389,14 @@
     </div>
 
     <script>
+        // 全局变量
         let allKeysData = [];
-        let validKeysData = [];
-        let invalidKeysData = [];
-        let rateLimitedKeysData = [];
         let currentLang = 'zh';
         let isDarkTheme = false;
         let isCustomModel = false;
         let detectedModels = new Set();
         let currentConcurrency = 5;
+        let isTestingInProgress = false;
 
         // 模型配置 - 使用官方名称
         const modelOptions = {
@@ -1452,6 +1452,7 @@
                 'usage-6': '• 测试过程中密钥仅用于验证，不会被存储',
                 'detect-models': '检测模型',
                 'start-test': '开始测试',
+                'dedupe-keys': '去重密钥',
                 'clear': '清空',
                 'testing': '正在测试 API 密钥...',
                 'detecting': '正在检测可用模型...',
@@ -1502,6 +1503,7 @@
                 'usage-6': '• Keys are only used for validation during testing, not stored',
                 'detect-models': 'Detect Models',
                 'start-test': 'Start Test',
+                'dedupe-keys': 'Dedupe Keys',
                 'clear': 'Clear',
                 'testing': 'Testing API keys...',
                 'detecting': 'Detecting available models...',
@@ -2159,19 +2161,6 @@
             return result;
         }
 
-        async function testApiKeyWithModel(apiKey, apiType, model) {
-            switch (apiType) {
-                case 'openai':
-                    return await testOpenAIKey(apiKey, model);
-                case 'claude':
-                    return await testClaudeKey(apiKey, model);
-                case 'gemini':
-                    return await testGeminiKey(apiKey, model);
-                default:
-                    return { valid: false, error: '不支持的API类型', isRateLimit: false };
-            }
-        }
-
         function getLocalizedError(errorKey) {
             // 首先检查是否包含429或速率限制相关关键词
             if (errorKey && (errorKey.includes('429') || errorKey.includes('Rate Limited') || errorKey.toLowerCase().includes('rate limit'))) {
@@ -2244,6 +2233,26 @@
             return errorKey;
         }
 
+        // 去重和清理密钥函数
+        function deduplicateAndCleanKeys(keys) {
+            const seen = new Set();
+            const uniqueKeys = [];
+            const duplicates = [];
+            
+            keys.forEach(key => {
+                const cleanKey = key.trim();
+                if (cleanKey && !seen.has(cleanKey)) {
+                    seen.add(cleanKey);
+                    uniqueKeys.push(cleanKey);
+                } else if (cleanKey && seen.has(cleanKey)) {
+                    duplicates.push(cleanKey);
+                }
+            });
+            
+            return { uniqueKeys, duplicates };
+        }
+
+        // 修复后的测试函数，确保所有密钥都能完成测试并正确分类
         async function startTesting() {
             const apiType = document.getElementById('apiType').value;
             const apiKeysText = document.getElementById('apiKeys').value.trim();
@@ -2258,22 +2267,42 @@
                 alert(currentLang === 'zh' ? '请选择或输入模型名！' : 'Please select or enter model name!');
                 return;
             }
+
+            if (isTestingInProgress) {
+                alert(currentLang === 'zh' ? '测试正在进行中，请等待完成！' : 'Testing in progress, please wait for completion!');
+                return;
+            }
             
-            const apiKeys = apiKeysText.split('\n').filter(key => key.trim());
+            const rawKeys = apiKeysText.split('\n').filter(key => key.trim());
             
-            if (apiKeys.length === 0) {
+            if (rawKeys.length === 0) {
                 alert(currentLang === 'zh' ? '请输入有效的API密钥！' : 'Please enter valid API keys!');
                 return;
             }
             
-            allKeysData = [];
-            validKeysData = [];
-            invalidKeysData = [];
-            rateLimitedKeysData = [];
+            // 去重处理
+            const { uniqueKeys, duplicates } = deduplicateAndCleanKeys(rawKeys);
             
+            // 如果发现重复密钥，提示用户
+            if (duplicates.length > 0) {
+                const message = currentLang === 'zh' ? 
+                    `发现 ${duplicates.length} 个重复密钥，已自动去除。将测试 ${uniqueKeys.length} 个唯一密钥。` :
+                    `Found ${duplicates.length} duplicate keys, automatically removed. Will test ${uniqueKeys.length} unique keys.`;
+                alert(message);
+            }
+            
+            const apiKeys = uniqueKeys;
+            
+            // 设置测试状态
+            isTestingInProgress = true;
+            
+            // 重置数据
+            allKeysData = [];
+            
+            // 初始化所有密钥为测试中状态
             apiKeys.forEach(apiKey => {
                 const keyData = {
-                    key: apiKey.trim(),
+                    key: apiKey,
                     status: 'testing',
                     error: null,
                     type: apiType,
@@ -2291,102 +2320,105 @@
             
             let completed = 0;
             const total = apiKeys.length;
-            const chunks = [];
             
-            // 使用用户设置的并发数
-            for (let i = 0; i < apiKeys.length; i += currentConcurrency) {
-                chunks.push(apiKeys.slice(i, i + currentConcurrency));
-            }
-            
-            for (const chunk of chunks) {
-                const promises = chunk.map(async (apiKey) => {
-                    const keyData = allKeysData.find(k => k.key === apiKey.trim());
+            try {
+                // 创建所有测试任务的Promise
+                const testPromises = apiKeys.map(async (apiKey, index) => {
+                    const keyData = allKeysData[index];
                     
-                    // 添加随机延迟以避免过于频繁的请求
-                    await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
-                    
-                    const result = await testApiKey(apiKey.trim(), apiType);
-                    
-                    // 调试日志
-                    console.log('API测试结果:', {
-                        key: apiKey.trim().substring(0, 10) + '...',
-                        valid: result.valid,
-                        isRateLimit: result.isRateLimit,
-                        error: result.error
-                    });
-                    
-                    // 设置错误信息
-                    keyData.error = result.error;
-                    
-                    if (result.valid) {
-                        keyData.status = 'valid';
-                        // 确保不重复添加
-                        if (!validKeysData.find(k => k.key === keyData.key)) {
-                            validKeysData.push(keyData);
+                    try {
+                        // 添加随机延迟以避免过于频繁的请求
+                        await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
+                        
+                        const result = await testApiKey(apiKey, apiType);
+                        
+                        // 更新密钥状态
+                        keyData.error = result.error;
+                        
+                        if (result.valid) {
+                            keyData.status = 'valid';
+                        } else if (result.isRateLimit) {
+                            keyData.status = 'rate-limited';
+                        } else {
+                            keyData.status = 'invalid';
                         }
-
-                    } else if (result.isRateLimit) {
-                        keyData.status = 'rate-limited';
-                        // 确保不重复添加
-                        if (!rateLimitedKeysData.find(k => k.key === keyData.key)) {
-                            rateLimitedKeysData.push(keyData);
-                        }
-
-                    } else {
+                        
+                    } catch (error) {
+                        // 处理测试异常
                         keyData.status = 'invalid';
-                        // 确保不重复添加
-                        if (!invalidKeysData.find(k => k.key === keyData.key)) {
-                            invalidKeysData.push(keyData);
-                        }
-
+                        keyData.error = '测试异常: ' + error.message;
                     }
                     
+                    // 更新进度
                     completed++;
                     const progress = (completed / total) * 100;
                     document.getElementById('progressFill').style.width = progress + '%';
                     
+                    // 更新显示
                     updateStats();
                     updateKeyLists();
                 });
+
+                // 使用并发控制，分批处理
+                const chunks = [];
+                for (let i = 0; i < testPromises.length; i += currentConcurrency) {
+                    chunks.push(testPromises.slice(i, i + currentConcurrency));
+                }
+
+                // 依次处理每个批次
+                for (const chunk of chunks) {
+                    await Promise.allSettled(chunk); // 使用 allSettled 确保所有Promise都完成
+                }
+
+            } catch (error) {
+                console.error('测试过程中发生错误:', error);
+            } finally {
+                // 确保测试完成后清理状态
+                isTestingInProgress = false;
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('progressBar').classList.add('hidden');
                 
-                await Promise.all(promises);
+                // 最终更新统计和列表
+                updateStats();
+                updateKeyLists();
+                
+                // 统计各状态数量
+                const validCount = allKeysData.filter(k => k.status === 'valid').length;
+                const invalidCount = allKeysData.filter(k => k.status === 'invalid').length;
+                const rateLimitedCount = allKeysData.filter(k => k.status === 'rate-limited').length;
+                
+                // 显示测试完成提示
+                const message = currentLang === 'zh' ? 
+                    `测试完成！有效密钥: ${validCount}，无效密钥: ${invalidCount}，速率限制: ${rateLimitedCount}` :
+                    `Test completed! Valid keys: ${validCount}, Invalid keys: ${invalidCount}, Rate limited: ${rateLimitedCount}`;
+                alert(message);
             }
-            
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('progressBar').classList.add('hidden');
-            
-            // 显示测试完成提示
-            const message = currentLang === 'zh' ? 
-                `测试完成！有效密钥: ${validKeysData.length}，无效密钥: ${invalidKeysData.length}，速率限制: ${rateLimitedKeysData.length}` :
-                `Test completed! Valid keys: ${validKeysData.length}, Invalid keys: ${invalidKeysData.length}, Rate limited: ${rateLimitedKeysData.length}`;
-            alert(message);
         }
         
         function updateStats() {
+            // 重新统计各种状态的数量
+            const validKeys = allKeysData.filter(k => k.status === 'valid');
+            const invalidKeys = allKeysData.filter(k => k.status === 'invalid'); 
+            const rateLimitedKeys = allKeysData.filter(k => k.status === 'rate-limited');
+            const testingKeys = allKeysData.filter(k => k.status === 'testing');
+            
             document.getElementById('totalCount').textContent = allKeysData.length;
-            document.getElementById('validCount').textContent = validKeysData.length;
-            document.getElementById('invalidCount').textContent = invalidKeysData.length;
-            document.getElementById('rateLimitedCount').textContent = rateLimitedKeysData.length;
-            document.getElementById('testingCount').textContent = allKeysData.filter(k => k.status === 'testing').length;
+            document.getElementById('validCount').textContent = validKeys.length;
+            document.getElementById('invalidCount').textContent = invalidKeys.length;
+            document.getElementById('rateLimitedCount').textContent = rateLimitedKeys.length;
+            document.getElementById('testingCount').textContent = testingKeys.length;
         }
         
         function updateKeyLists() {
-            // 清理重复数据，确保每个数组中的密钥唯一
-            validKeysData = [...new Map(validKeysData.map(item => [item.key, item])).values()];
-            invalidKeysData = [...new Map(invalidKeysData.map(item => [item.key, item])).values()];
-            rateLimitedKeysData = [...new Map(rateLimitedKeysData.map(item => [item.key, item])).values()];
-            
-            // 确保allKeysData包含所有最新状态的密钥
-            allKeysData.forEach(keyData => {
-                if (keyData.status === 'rate-limited' && !rateLimitedKeysData.find(k => k.key === keyData.key)) {
-                    rateLimitedKeysData.push(keyData);
-                }
-            });
+            // 根据状态分类密钥
+            const validKeys = allKeysData.filter(k => k.status === 'valid');
+            const invalidKeys = allKeysData.filter(k => k.status === 'invalid');
+            const rateLimitedKeys = allKeysData.filter(k => k.status === 'rate-limited');
             
             updateKeyList('allKeys', allKeysData);
-            updateKeyList('validKeys', validKeysData);
-            updateKeyList('invalidKeys', invalidKeysData);
-            updateKeyList('rateLimitedKeys', rateLimitedKeysData);
+            updateKeyList('validKeys', validKeys);
+            updateKeyList('invalidKeys', invalidKeys);
+            updateKeyList('rateLimitedKeys', rateLimitedKeys);
         }
         
         function updateKeyList(elementId, keys) {
@@ -2486,13 +2518,13 @@
                     keysToCopy = allKeysData.map(k => k.key);
                     break;
                 case 'valid':
-                    keysToCopy = validKeysData.map(k => k.key);
+                    keysToCopy = allKeysData.filter(k => k.status === 'valid').map(k => k.key);
                     break;
                 case 'invalid':
-                    keysToCopy = invalidKeysData.map(k => k.key);
+                    keysToCopy = allKeysData.filter(k => k.status === 'invalid').map(k => k.key);
                     break;
                 case 'rate-limited':
-                    keysToCopy = rateLimitedKeysData.map(k => k.key);
+                    keysToCopy = allKeysData.filter(k => k.status === 'rate-limited').map(k => k.key);
                     break;
             }
             
@@ -2522,7 +2554,41 @@
             });
         }
         
+        // 添加一个便捷的去重按钮功能
+        function deduplicateKeys() {
+            const apiKeysText = document.getElementById('apiKeys').value.trim();
+            
+            if (!apiKeysText) {
+                alert(currentLang === 'zh' ? '请先输入API密钥！' : 'Please enter API keys first!');
+                return;
+            }
+            
+            const rawKeys = apiKeysText.split('\n').filter(key => key.trim());
+            const { uniqueKeys, duplicates } = deduplicateAndCleanKeys(rawKeys);
+            
+            if (duplicates.length > 0) {
+                // 更新输入框内容
+                document.getElementById('apiKeys').value = uniqueKeys.join('\n');
+                
+                const message = currentLang === 'zh' ? 
+                    `已去除 ${duplicates.length} 个重复密钥，保留 ${uniqueKeys.length} 个唯一密钥。` :
+                    `Removed ${duplicates.length} duplicate keys, kept ${uniqueKeys.length} unique keys.`;
+                alert(message);
+            } else {
+                const message = currentLang === 'zh' ? 
+                    '未发现重复密钥。' :
+                    'No duplicate keys found.';
+                alert(message);
+            }
+        }
+        
         function clearAll() {
+            if (isTestingInProgress) {
+                const message = currentLang === 'zh' ? '测试正在进行中，无法清空！' : 'Testing in progress, cannot clear!';
+                alert(message);
+                return;
+            }
+            
             document.getElementById('apiKeys').value = '';
             document.getElementById('modelInput').value = '';
             document.getElementById('resultsSection').classList.add('hidden');
@@ -2532,9 +2598,6 @@
             document.getElementById('detectedModels').style.display = 'none';
             
             allKeysData = [];
-            validKeysData = [];
-            invalidKeysData = [];
-            rateLimitedKeysData = [];
             detectedModels.clear();
             
             updateStats();
@@ -2552,6 +2615,7 @@
             document.getElementById('detectedModelsHeader').addEventListener('click', toggleModelList);
             document.getElementById('detectBtn').addEventListener('click', detectModels);
             document.getElementById('startBtn').addEventListener('click', startTesting);
+            document.getElementById('dedupeBtn').addEventListener('click', deduplicateKeys);
             document.getElementById('clearBtn').addEventListener('click', clearAll);
             
             document.querySelectorAll('[data-tab]').forEach(tab => {
