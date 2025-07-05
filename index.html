@@ -361,6 +361,143 @@
             color: white;
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
+
+        /* 重试设置样式 */
+        .retry-container {
+            display: flex;
+            flex-direction: row;
+            gap: 16px;
+            align-items: center;
+            margin-top: 12px;
+            padding: 16px;
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .retry-container:hover {
+            border-color: #f39c12;
+            background: #fef9e7;
+        }
+
+        .retry-input-section {
+            flex-shrink: 0;
+            min-width: 80px;
+        }
+
+        .retry-input-section .form-control {
+            width: 80px;
+            text-align: center;
+            font-weight: 600;
+            color: #f39c12;
+            background: white;
+            border: 2px solid #ffeaa7;
+        }
+
+        .retry-input-section .form-control:focus {
+            border-color: #f39c12;
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+        }
+
+        .retry-slider-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .retry-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .retry-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #ffeaa7;
+            outline: none;
+            transition: background 0.3s ease;
+        }
+
+        .retry-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #f39c12;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: 0 2px 6px rgba(243, 156, 18, 0.3);
+        }
+
+        .retry-slider::-webkit-slider-thumb:hover {
+            background: #e67e22;
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+        }
+
+        .retry-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #f39c12;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(243, 156, 18, 0.3);
+        }
+
+        .retry-slider-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: 700;
+            color: #f39c12;
+            font-size: clamp(14px, 2.5vw, 18px);
+            background: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #ffeaa7;
+            flex-shrink: 0;
+        }
+
+        .retry-preset-buttons {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .retry-preset-btn {
+            padding: 8px 12px;
+            border: 1px solid #f39c12;
+            background: white;
+            color: #f39c12;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: clamp(11px, 2vw, 13px);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 50px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            max-width: 80px;
+        }
+
+        .retry-preset-btn:hover {
+            background: #f39c12;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+        }
+
+        .retry-preset-btn.active {
+            background: #f39c12;
+            color: white;
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+        }
         
         .button-group {
             display: flex;
@@ -452,6 +589,7 @@
         .invalid { color: #dc3545; }
         .rate-limited { color: #ffc107; }
         .testing { color: #6f42c1; }
+        .retrying { color: #fd7e14; }
         .total { color: #6f42c1; }
         
         .results-tabs {
@@ -592,6 +730,17 @@
         .status-testing {
             background: #e2e3e5;
             color: #6c757d;
+        }
+
+        .status-retrying {
+            background: #ffeaa7;
+            color: #d68910;
+            animation: pulse 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.6; }
+            to { opacity: 1; }
         }
         
         .copy-btn {
@@ -954,6 +1103,69 @@
             box-shadow: 0 4px 12px rgba(76, 99, 210, 0.4);
         }
 
+        /* 深色主题重试相关样式 */
+        .dark-theme .retry-container {
+            background: linear-gradient(135deg, #3d3314 0%, #2d2a1a 100%);
+            border-color: #5d4e23;
+        }
+
+        .dark-theme .retry-container:hover {
+            border-color: #d68910;
+            background: linear-gradient(135deg, #4d4024 0%, #3d3314 100%);
+        }
+
+        .dark-theme .retry-input-section .form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #d68910;
+            border-color: #5d4e23;
+        }
+
+        .dark-theme .retry-input-section .form-control:focus {
+            border-color: #d68910;
+            box-shadow: 0 0 0 3px rgba(214, 137, 16, 0.1);
+        }
+
+        .dark-theme .retry-slider {
+            background: #5d4e23;
+        }
+
+        .dark-theme .retry-slider::-webkit-slider-thumb {
+            background: #d68910;
+        }
+
+        .dark-theme .retry-slider::-webkit-slider-thumb:hover {
+            background: #b7791f;
+        }
+
+        .dark-theme .retry-slider::-moz-range-thumb {
+            background: #d68910;
+        }
+
+        .dark-theme .retry-slider-value {
+            color: #d68910;
+            background: #232741;
+            border-color: #5d4e23;
+        }
+
+        .dark-theme .retry-preset-btn {
+            border-color: #d68910;
+            color: #d68910;
+            background: #232741;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .retry-preset-btn:hover {
+            background: #d68910;
+            color: white;
+            box-shadow: 0 4px 12px rgba(214, 137, 16, 0.3);
+        }
+
+        .dark-theme .retry-preset-btn.active {
+            background: #d68910;
+            color: white;
+            box-shadow: 0 4px 12px rgba(214, 137, 16, 0.4);
+        }
+
         /* 移动端特殊优化 */
         @media (max-width: 768px) {
             body {
@@ -988,33 +1200,33 @@
                 margin-top: 8px;
             }
             
-            .concurrency-container {
+            .concurrency-container, .retry-container {
                 flex-direction: column;
                 gap: 12px;
                 padding: 12px;
                 align-items: stretch;
             }
             
-            .concurrency-input-section {
+            .concurrency-input-section, .retry-input-section {
                 align-self: center;
                 min-width: auto;
             }
             
-            .concurrency-input-section .form-control {
+            .concurrency-input-section .form-control, .retry-input-section .form-control {
                 width: 100px;
                 margin: 0 auto;
             }
             
-            .slider-section {
+            .slider-section, .retry-slider-section {
                 width: 100%;
             }
             
-            .preset-buttons {
+            .preset-buttons, .retry-preset-buttons {
                 gap: 4px;
                 margin-top: 8px;
             }
             
-            .preset-btn {
+            .preset-btn, .retry-preset-btn {
                 min-width: 60px;
                 max-width: none;
                 flex: 1;
@@ -1094,14 +1306,14 @@
             }
             
             .stats {
-                grid-template-columns: repeat(5, 1fr);
+                grid-template-columns: repeat(6, 1fr);
             }
             
             .results-tabs {
                 justify-content: center;
             }
             
-            .concurrency-container {
+            .concurrency-container, .retry-container {
                 flex-direction: row;
                 align-items: center;
             }
@@ -1113,7 +1325,7 @@
                 padding: 40px;
             }
             
-            .concurrency-container {
+            .concurrency-container, .retry-container {
                 flex-direction: row;
                 align-items: center;
             }
@@ -1130,7 +1342,7 @@
             }
             
             .stats {
-                grid-template-columns: repeat(5, 1fr);
+                grid-template-columns: repeat(6, 1fr);
             }
             
             .button-group {
@@ -1142,12 +1354,12 @@
                 flex: 1;
             }
             
-            .concurrency-container {
+            .concurrency-container, .retry-container {
                 flex-direction: row;
                 align-items: center;
             }
             
-            .concurrency-input-section {
+            .concurrency-input-section, .retry-input-section {
                 align-self: center;
             }
         }
@@ -1209,7 +1421,8 @@
             .alert:hover,
             .detected-models:hover,
             .detected-models-header:hover,
-            .concurrency-container:hover {
+            .concurrency-container:hover,
+            .retry-container:hover {
                 transform: none;
                 box-shadow: initial;
             }
@@ -1218,11 +1431,13 @@
                 transform: scale(0.98);
             }
             
-            .preset-btn:hover {
+            .preset-btn:hover,
+            .retry-preset-btn:hover {
                 transform: none;
             }
             
-            .preset-btn:active {
+            .preset-btn:active,
+            .retry-preset-btn:active {
                 transform: scale(0.95);
             }
         }
@@ -1301,6 +1516,29 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- 重试控制 -->
+                <div class="input-group">
+                    <label data-lang-key="retry-control">重试控制</label>
+                    <div class="retry-container">
+                        <div class="retry-input-section">
+                            <input type="number" id="retryInput" class="form-control" value="3" min="0" max="10">
+                        </div>
+                        <div class="retry-slider-section">
+                            <div class="retry-slider-container">
+                                <input type="range" id="retrySlider" class="retry-slider" min="0" max="10" value="3">
+                                <span class="retry-slider-value" id="retrySliderValue">3</span>
+                            </div>
+                            <div class="retry-preset-buttons">
+                                <button type="button" class="retry-preset-btn" data-retry="0" data-lang-key="no-retry">不重试</button>
+                                <button type="button" class="retry-preset-btn" data-retry="2" data-lang-key="light-retry">轻度</button>
+                                <button type="button" class="retry-preset-btn active" data-retry="3" data-lang-key="normal-retry">正常</button>
+                                <button type="button" class="retry-preset-btn" data-retry="5" data-lang-key="heavy-retry">重度</button>
+                            </div>
+                        </div>
+                    </div>
+                    <small class="form-help" data-lang-key="retry-help">遇到临时错误(如403)时重试次数，有助于提高检测准确性</small>
+                </div>
                 
                 <div class="input-group">
                     <label for="apiKeys" data-lang-key="api-keys">API 密钥列表 (每行一个)</label>
@@ -1315,6 +1553,7 @@
                     <br><span data-lang-key="usage-4">• Claude代理示例: https://claude-api-proxy.com/v1</span>
                     <br><span data-lang-key="usage-5">• 直接访问官方API会因CORS限制失败</span>
                     <br><span data-lang-key="usage-6">• 测试过程中密钥仅用于验证，不会被存储</span>
+                    <br><span data-lang-key="usage-7">• 智能重试机制可提高检测准确性，减少误判</span>
                 </div>
                 
                 <div class="button-group">
@@ -1356,6 +1595,10 @@
                         <div class="stat-number testing" id="testingCount">0</div>
                         <div class="stat-label" data-lang-key="testing-label">测试中</div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-number retrying" id="retryingCount">0</div>
+                        <div class="stat-label" data-lang-key="retrying">重试中</div>
+                    </div>
                 </div>
                 
                 <div class="results-tabs">
@@ -1396,6 +1639,7 @@
         let isCustomModel = false;
         let detectedModels = new Set();
         let currentConcurrency = 5;
+        let currentRetryCount = 3;
         let isTestingInProgress = false;
 
         // 模型配置 - 使用官方名称
@@ -1415,11 +1659,9 @@
                 'claude-3-haiku-20240307'
             ],
             gemini: [
-                'gemini-2.0-flash-exp',
-                'gemini-1.5-flash',
-                'gemini-1.5-flash-8b',
-                'gemini-1.5-pro',
-                'gemini-pro'
+                'gemini-2.0-flash',
+                'gemini-2.5-flash',
+                'gemini-2.5-pro'
             ]
         };
         
@@ -1437,10 +1679,16 @@
                 'proxy-url': '代理服务器 URL (可选)',
                 'proxy-help': '留空使用默认代理，建议使用自己的反向代理以提高成功率',
                 'concurrency-control': '并发控制',
+                'retry-control': '重试控制',
+                'retry-help': '遇到临时错误(如403)时重试次数，有助于提高检测准确性',
                 'slow': '慢速',
                 'normal': '正常',
                 'fast': '快速',
                 'ultra': '极速',
+                'no-retry': '不重试',
+                'light-retry': '轻度',
+                'normal-retry': '正常',
+                'heavy-retry': '重度',
                 'api-keys': 'API 密钥列表 (每行一个)',
                 'api-keys-placeholder': '请输入API密钥，每行一个：\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n...',
                 'usage-title': '💡 使用说明：',
@@ -1450,6 +1698,7 @@
                 'usage-4': '• Claude代理示例: https://claude-api-proxy.com/v1',
                 'usage-5': '• 直接访问官方API会因CORS限制失败',
                 'usage-6': '• 测试过程中密钥仅用于验证，不会被存储',
+                'usage-7': '• 智能重试机制可提高检测准确性，减少误判',
                 'detect-models': '检测模型',
                 'start-test': '开始测试',
                 'dedupe-keys': '去重密钥',
@@ -1462,6 +1711,7 @@
                 'invalid': '无效',
                 'rate-limited': '速率限制',
                 'testing-label': '测试中',
+                'retrying': '重试中',
                 'all': '全部',
                 'valid-keys': '有效密钥',
                 'invalid-keys': '无效密钥',
@@ -1473,7 +1723,8 @@
                 'status-valid': '有效',
                 'status-invalid': '无效',
                 'status-rate-limited': '速率限制',
-                'status-testing': '测试中'
+                'status-testing': '测试中',
+                'status-retrying': '重试中'
             },
             en: {
                 'title': '🔑 API Key Tester',
@@ -1488,10 +1739,16 @@
                 'proxy-url': 'Proxy Server URL (Optional)',
                 'proxy-help': 'Leave empty to use default proxy, recommend using your own reverse proxy for better success rate',
                 'concurrency-control': 'Concurrency Control',
+                'retry-control': 'Retry Control',
+                'retry-help': 'Number of retries when encountering temporary errors (like 403), helps improve detection accuracy',
                 'slow': 'Slow',
                 'normal': 'Normal',
                 'fast': 'Fast',
                 'ultra': 'Ultra',
+                'no-retry': 'No Retry',
+                'light-retry': 'Light',
+                'normal-retry': 'Normal',
+                'heavy-retry': 'Heavy',
                 'api-keys': 'API Key List (one per line)',
                 'api-keys-placeholder': 'Enter API keys, one per line:\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n...',
                 'usage-title': '💡 Usage Instructions:',
@@ -1501,6 +1758,7 @@
                 'usage-4': '• Claude proxy example: https://claude-api-proxy.com/v1',
                 'usage-5': '• Direct access to official APIs will fail due to CORS restrictions',
                 'usage-6': '• Keys are only used for validation during testing, not stored',
+                'usage-7': '• Smart retry mechanism improves detection accuracy and reduces false negatives',
                 'detect-models': 'Detect Models',
                 'start-test': 'Start Test',
                 'dedupe-keys': 'Dedupe Keys',
@@ -1513,6 +1771,7 @@
                 'invalid': 'Invalid',
                 'rate-limited': 'Rate Limited',
                 'testing-label': 'Testing',
+                'retrying': 'Retrying',
                 'all': 'All',
                 'valid-keys': 'Valid Keys',
                 'invalid-keys': 'Invalid Keys',
@@ -1524,9 +1783,57 @@
                 'status-valid': 'Valid',
                 'status-invalid': 'Invalid',
                 'status-rate-limited': 'Rate Limited',
-                'status-testing': 'Testing'
+                'status-testing': 'Testing',
+                'status-retrying': 'Retrying'
             }
         };
+
+        // 重试控制相关函数
+        function updateRetryCount(value) {
+            currentRetryCount = parseInt(value);
+            document.getElementById('retryInput').value = currentRetryCount;
+            document.getElementById('retrySlider').value = currentRetryCount;
+            document.getElementById('retrySliderValue').textContent = currentRetryCount;
+            
+            // 更新预设按钮状态
+            document.querySelectorAll('.retry-preset-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (parseInt(btn.getAttribute('data-retry')) === currentRetryCount) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function initRetryControls() {
+            const input = document.getElementById('retryInput');
+            const slider = document.getElementById('retrySlider');
+            const presetButtons = document.querySelectorAll('.retry-preset-btn');
+
+            // 输入框变化
+            input.addEventListener('input', (e) => {
+                let value = parseInt(e.target.value);
+                if (isNaN(value) || value < 0) value = 0;
+                if (value > 10) value = 10;
+                e.target.value = value;
+                updateRetryCount(value);
+            });
+
+            // 滑块变化
+            slider.addEventListener('input', (e) => {
+                updateRetryCount(e.target.value);
+            });
+
+            // 预设按钮
+            presetButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const value = parseInt(btn.getAttribute('data-retry'));
+                    updateRetryCount(value);
+                });
+            });
+
+            // 初始化
+            updateRetryCount(3);
+        }
 
         // 并发控制相关函数
         function updateConcurrency(value) {
@@ -1758,6 +2065,130 @@
             }
             
             updateModelOptions();
+        }
+
+        // 判断错误是否应该重试
+        function shouldRetry(error, statusCode) {
+            // 需要重试的情况：
+            // 1. 403 错误（可能是临时的权限问题）
+            // 2. 502/503/504 网关错误
+            // 3. 网络连接超时
+            // 4. 某些临时的服务器错误
+            
+            if (statusCode === 403 || statusCode === 502 || statusCode === 503 || statusCode === 504) {
+                return true;
+            }
+            
+            if (error && typeof error === 'string') {
+                const errorLower = error.toLowerCase();
+                if (errorLower.includes('timeout') || 
+                    errorLower.includes('network') || 
+                    errorLower.includes('连接') ||
+                    errorLower.includes('fetch')) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        // 带重试的API测试函数
+        async function testApiKeyWithRetry(apiKey, apiType, maxRetries = 0) {
+            let lastResult = null;
+            let attempt = 0;
+            
+            // 找到对应的密钥数据对象，用于更新状态
+            const keyData = allKeysData.find(k => k.key === apiKey);
+            
+            while (attempt <= maxRetries) {
+                try {
+                    // 如果是重试，更新状态为重试中并添加延迟
+                    if (attempt > 0) {
+                        if (keyData) {
+                            keyData.status = 'retrying';
+                            keyData.retryCount = attempt;
+                            // 实时更新UI显示
+                            updateStats();
+                            updateKeyLists();
+                        }
+                        await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+                    }
+                    
+                    const result = await testApiKey(apiKey, apiType);
+                    
+                    // 如果成功或者是速率限制，直接返回（不需要重试）
+                    if (result.valid || result.isRateLimit) {
+                        if (keyData) {
+                            keyData.retryCount = attempt; // 记录最终重试次数
+                        }
+                        return result;
+                    }
+                    
+                    // 如果是最后一次尝试，返回结果
+                    if (attempt === maxRetries) {
+                        if (keyData) {
+                            keyData.retryCount = attempt;
+                        }
+                        return result;
+                    }
+                    
+                    // 检查是否应该重试
+                    const statusCode = extractStatusCode(result.error);
+                    if (!shouldRetry(result.error, statusCode)) {
+                        // 不需要重试的错误直接返回
+                        if (keyData) {
+                            keyData.retryCount = attempt;
+                        }
+                        return result;
+                    }
+                    
+                    lastResult = result;
+                    attempt++;
+                    
+                } catch (error) {
+                    // 如果是最后一次尝试，返回错误
+                    if (attempt === maxRetries) {
+                        if (keyData) {
+                            keyData.retryCount = attempt;
+                        }
+                        return { valid: false, error: '测试异常: ' + error.message, isRateLimit: false };
+                    }
+                    
+                    attempt++;
+                    if (keyData) {
+                        keyData.status = 'retrying';
+                        keyData.retryCount = attempt;
+                        // 实时更新UI显示
+                        updateStats();
+                        updateKeyLists();
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
+                }
+            }
+            
+            if (keyData) {
+                keyData.retryCount = attempt;
+            }
+            return lastResult || { valid: false, error: '重试失败', isRateLimit: false };
+        }
+
+        // 从错误信息中提取状态码
+        function extractStatusCode(error) {
+            if (!error || typeof error !== 'string') return null;
+            
+            const match = error.match(/\((\d{3})\)/);
+            if (match) {
+                return parseInt(match[1]);
+            }
+            
+            if (error.includes('HTTP ')) {
+                const httpMatch = error.match(/HTTP (\d{3})/);
+                if (httpMatch) {
+                    return parseInt(httpMatch[1]);
+                }
+            }
+            
+            return null;
         }
 
         async function detectModels() {
@@ -2181,26 +2612,42 @@
             }
             
             const errorMap = {
-                '认证失败 (401)': 'auth-failed',
-                '权限不足 (403)': 'permission-denied', 
-                '请求过多 (429)': 'rate-limited',
-                'Rate Limited (429)': 'rate-limited',
-                '网络连接失败': 'network-error',
-                'JSON解析失败': 'json-parse-error',
-                '空响应': 'empty-response',
-                '响应格式错误': 'invalid-format',
-                '认证错误': 'auth-failed',
-                '未指定模型': 'no-model-specified'
+                // 中文错误信息映射
+                '认证失败 (401)': currentLang === 'zh' ? '认证失败 (401)' : 'Auth Failed (401)',
+                '权限不足 (403)': currentLang === 'zh' ? '权限不足 (403)' : 'Permission Denied (403)',
+                '请求过多 (429)': currentLang === 'zh' ? '请求过多 (429)' : 'Too Many Requests (429)',
+                'Rate Limited (429)': currentLang === 'zh' ? '速率限制 (429)' : 'Rate Limited (429)',
+                '网络连接失败': currentLang === 'zh' ? '网络连接失败' : 'Network Connection Failed',
+                'JSON解析失败': currentLang === 'zh' ? 'JSON解析失败' : 'JSON Parse Failed',
+                '空响应': currentLang === 'zh' ? '空响应' : 'Empty Response',
+                '响应格式错误': currentLang === 'zh' ? '响应格式错误' : 'Invalid Response Format',
+                '认证错误': currentLang === 'zh' ? '认证错误' : 'Authentication Error',
+                '未指定模型': currentLang === 'zh' ? '未指定模型' : 'No Model Specified',
+                'API密钥无效 (400)': currentLang === 'zh' ? 'API密钥无效 (400)' : 'Invalid API Key (400)',
+                '测试异常': currentLang === 'zh' ? '测试异常' : 'Test Exception',
+                '重试失败': currentLang === 'zh' ? '重试失败' : 'Retry Failed',
+                '不支持的API类型': currentLang === 'zh' ? '不支持的API类型' : 'Unsupported API Type'
             };
             
+            // 检查完整匹配
+            if (errorMap[errorKey]) {
+                return errorMap[errorKey];
+            }
+            
+            // 处理动态错误信息
             if (errorKey && errorKey.startsWith('API错误:')) {
                 const detail = errorKey.replace('API错误:', '').trim();
-                return (currentLang === 'zh' ? 'API错误' : 'API Error') + ': ' + detail;
+                return currentLang === 'zh' ? 'API错误: ' + detail : 'API Error: ' + detail;
             }
             
             if (errorKey && errorKey.startsWith('请求失败:')) {
                 const detail = errorKey.replace('请求失败:', '').trim();
-                return (currentLang === 'zh' ? '请求失败' : 'Request Failed') + ': ' + detail;
+                return currentLang === 'zh' ? '请求失败: ' + detail : 'Request Failed: ' + detail;
+            }
+            
+            if (errorKey && errorKey.startsWith('测试异常:')) {
+                const detail = errorKey.replace('测试异常:', '').trim();
+                return currentLang === 'zh' ? '测试异常: ' + detail : 'Test Exception: ' + detail;
             }
             
             if (errorKey && errorKey.startsWith('Rate Limited:')) {
@@ -2213,24 +2660,33 @@
                 }
             }
             
+            // 处理HTTP状态码错误
             if (errorKey && errorKey.includes('HTTP ')) {
-                return errorKey;
+                return errorKey; // HTTP状态码保持原样
             }
             
-            const langKey = errorMap[errorKey];
-            if (langKey && translations[currentLang]) {
-                return currentLang === 'zh' ? errorKey : (
-                    langKey === 'auth-failed' ? 'Auth Failed' :
-                    langKey === 'permission-denied' ? 'Permission Denied' :
-                    langKey === 'rate-limited' ? 'Rate Limited' :
-                    langKey === 'network-error' ? 'Network Error' :
-                    langKey === 'json-parse-error' ? 'JSON Parse Error' :
-                    langKey === 'empty-response' ? 'Empty Response' :
-                    langKey === 'invalid-format' ? 'Invalid Format' :
-                    langKey === 'no-model-specified' ? 'No Model Specified' : errorKey
-                );
+            // 处理括号内的状态码格式，如 "其他错误 (400)"
+            if (errorKey && errorKey.includes('(') && errorKey.includes(')')) {
+                const match = errorKey.match(/^(.+?)\s*\((\d{3})\)$/);
+                if (match) {
+                    const errorText = match[1];
+                    const statusCode = match[2];
+                    
+                    // 翻译常见的错误文本
+                    const errorTextMap = {
+                        'API密钥无效': currentLang === 'zh' ? 'API密钥无效' : 'Invalid API Key',
+                        '认证失败': currentLang === 'zh' ? '认证失败' : 'Auth Failed',
+                        '权限不足': currentLang === 'zh' ? '权限不足' : 'Permission Denied',
+                        '请求过多': currentLang === 'zh' ? '请求过多' : 'Too Many Requests'
+                    };
+                    
+                    const translatedText = errorTextMap[errorText] || errorText;
+                    return `${translatedText} (${statusCode})`;
+                }
             }
-            return errorKey;
+            
+            // 如果没有匹配的翻译，返回原始错误信息
+            return errorKey || (currentLang === 'zh' ? '未知错误' : 'Unknown Error');
         }
 
         // 去重和清理密钥函数
@@ -2252,7 +2708,7 @@
             return { uniqueKeys, duplicates };
         }
 
-        // 修复后的测试函数，确保所有密钥都能完成测试并正确分类
+        // 修复后的测试函数，包含智能重试机制
         async function startTesting() {
             const apiType = document.getElementById('apiType').value;
             const apiKeysText = document.getElementById('apiKeys').value.trim();
@@ -2306,7 +2762,8 @@
                     status: 'testing',
                     error: null,
                     type: apiType,
-                    model: selectedModel
+                    model: selectedModel,
+                    retryCount: 0
                 };
                 allKeysData.push(keyData);
             });
@@ -2330,7 +2787,8 @@
                         // 添加随机延迟以避免过于频繁的请求
                         await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
                         
-                        const result = await testApiKey(apiKey, apiType);
+                        // 使用带重试的测试函数
+                        const result = await testApiKeyWithRetry(apiKey, apiType, currentRetryCount);
                         
                         // 更新密钥状态
                         keyData.error = result.error;
@@ -2401,12 +2859,14 @@
             const invalidKeys = allKeysData.filter(k => k.status === 'invalid'); 
             const rateLimitedKeys = allKeysData.filter(k => k.status === 'rate-limited');
             const testingKeys = allKeysData.filter(k => k.status === 'testing');
+            const retryingKeys = allKeysData.filter(k => k.status === 'retrying');
             
             document.getElementById('totalCount').textContent = allKeysData.length;
             document.getElementById('validCount').textContent = validKeys.length;
             document.getElementById('invalidCount').textContent = invalidKeys.length;
             document.getElementById('rateLimitedCount').textContent = rateLimitedKeys.length;
             document.getElementById('testingCount').textContent = testingKeys.length;
+            document.getElementById('retryingCount').textContent = retryingKeys.length;
         }
         
         function updateKeyLists() {
@@ -2467,7 +2927,8 @@
                 
                 const statusClass = keyData.status === 'valid' ? 'status-valid' : 
                                    keyData.status === 'invalid' ? 'status-invalid' : 
-                                   keyData.status === 'rate-limited' ? 'status-rate-limited' : 'status-testing';
+                                   keyData.status === 'rate-limited' ? 'status-rate-limited' : 
+                                   keyData.status === 'retrying' ? 'status-retrying' : 'status-testing';
                 
                 const statusText = translations[currentLang]['status-' + keyData.status] || keyData.status;
                 
@@ -2483,8 +2944,15 @@
                 if (keyData.model) {
                     modelDisplay = '<div style="font-size: 11px; color: #6c757d; margin-top: 2px;">Model: ' + keyData.model + '</div>';
                 }
+
+                // 显示重试信息
+                let retryDisplay = '';
+                if (keyData.retryCount && keyData.retryCount > 0) {
+                    const retryText = currentLang === 'zh' ? '重试' : 'Retry';
+                    retryDisplay = '<div style="font-size: 11px; color: #f39c12; margin-top: 2px;">' + retryText + ': ' + keyData.retryCount + '</div>';
+                }
                 
-                keyItem.innerHTML = '<div class="key-text">' + keyData.key + modelDisplay + errorDisplay + '</div><div class="key-status ' + statusClass + '">' + statusText + '</div>';
+                keyItem.innerHTML = '<div class="key-text">' + keyData.key + modelDisplay + errorDisplay + retryDisplay + '</div><div class="key-status ' + statusClass + '">' + statusText + '</div>';
                 
                 container.appendChild(keyItem);
             });
@@ -2650,6 +3118,7 @@
             updateLanguage();
             initializeEventListeners();
             initConcurrencyControls();
+            initRetryControls();
             
             // 添加窗口大小调整监听器
             window.addEventListener('resize', handleResize);
