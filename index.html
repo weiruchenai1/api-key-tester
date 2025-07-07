@@ -546,15 +546,6 @@
         .btn-detect:hover {
             background: #218838;
         }
-
-        .btn-cancel {
-            background: #dc3545;
-            color: white;
-        }
-
-        .btn-cancel:hover {
-            background: #c82333;
-        }
         
         .results-section {
             margin-top: 20px;
@@ -975,10 +966,6 @@
             color: #4c63d2;
         }
 
-        .dark-theme .results-tabs {
-            border-bottom-color: #3c4269;
-        }
-
         .dark-theme .alert {
             background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
             border-color: #3c4269;
@@ -1005,10 +992,6 @@
 
         .dark-theme .stat-label {
             color: #b0b3c1;
-        }
-
-        .dark-theme .input-group label {
-            color: #e8eaed;
         }
 
         .dark-theme .detected-models {
@@ -1576,7 +1559,6 @@
                 <div class="button-group">
                     <button class="btn btn-detect" id="detectBtn" data-lang-key="detect-models">检测模型</button>
                     <button class="btn btn-primary" id="startBtn" data-lang-key="start-test">开始测试</button>
-                    <button class="btn btn-cancel hidden" id="cancelBtn" data-lang-key="cancel-test">取消测试</button>
                     <button class="btn btn-secondary" id="dedupeBtn" data-lang-key="dedupe-keys">去重密钥</button>
                     <button class="btn btn-secondary" id="clearBtn" data-lang-key="clear">清空</button>
                 </div>
@@ -1659,8 +1641,6 @@
         let currentConcurrency = 5;
         let currentRetryCount = 3;
         let isTestingInProgress = false;
-        let cancelTesting = false; // 新增：取消测试标志
-        let testingController = null; // 新增：用于存储AbortController
 
         // 模型配置 - 使用官方名称
         const modelOptions = {
@@ -1721,7 +1701,6 @@
                 'usage-7': '• 智能重试机制可提高检测准确性，减少误判',
                 'detect-models': '检测模型',
                 'start-test': '开始测试',
-                'cancel-test': '取消测试',
                 'dedupe-keys': '去重密钥',
                 'clear': '清空',
                 'testing': '正在测试 API 密钥...',
@@ -1745,8 +1724,7 @@
                 'status-invalid': '无效',
                 'status-rate-limited': '速率限制',
                 'status-testing': '测试中',
-                'status-retrying': '重试中',
-                'cancelled': '已取消'
+                'status-retrying': '重试中'
             },
             en: {
                 'title': '🔑 API Key Tester',
@@ -1783,7 +1761,6 @@
                 'usage-7': '• Smart retry mechanism improves detection accuracy and reduces false negatives',
                 'detect-models': 'Detect Models',
                 'start-test': 'Start Test',
-                'cancel-test': 'Cancel Test',
                 'dedupe-keys': 'Dedupe Keys',
                 'clear': 'Clear',
                 'testing': 'Testing API keys...',
@@ -1807,39 +1784,9 @@
                 'status-invalid': 'Invalid',
                 'status-rate-limited': 'Rate Limited',
                 'status-testing': 'Testing',
-                'status-retrying': 'Retrying',
-                'cancelled': 'Cancelled'
+                'status-retrying': 'Retrying'
             }
         };
-
-        // 取消测试功能
-        function cancelCurrentTesting() {
-            cancelTesting = true;
-            if (testingController) {
-                testingController.abort();
-            }
-            
-            // 更新所有还在测试中的密钥状态为已取消
-            allKeysData.forEach(keyData => {
-                if (keyData.status === 'testing' || keyData.status === 'retrying') {
-                    keyData.status = 'cancelled';
-                    keyData.error = currentLang === 'zh' ? '用户取消' : 'User cancelled';
-                }
-            });
-            
-            // 重置状态
-            isTestingInProgress = false;
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('startBtn').classList.remove('hidden');
-            document.getElementById('cancelBtn').classList.add('hidden');
-            
-            // 更新UI
-            updateStats();
-            updateKeyLists();
-            
-            const message = currentLang === 'zh' ? '测试已取消' : 'Test cancelled';
-            alert(message);
-        }
 
         // 重试控制相关函数
         function updateRetryCount(value) {
@@ -2146,7 +2093,7 @@
         }
 
         // 带重试的API测试函数
-        async function testApiKeyWithRetry(apiKey, apiType, maxRetries = 0, signal = null) {
+        async function testApiKeyWithRetry(apiKey, apiType, maxRetries = 0) {
             let lastResult = null;
             let attempt = 0;
             
@@ -2154,15 +2101,6 @@
             const keyData = allKeysData.find(k => k.key === apiKey);
             
             while (attempt <= maxRetries) {
-                // 检查是否已被取消
-                if (cancelTesting || (signal && signal.aborted)) {
-                    if (keyData) {
-                        keyData.status = 'cancelled';
-                        keyData.error = currentLang === 'zh' ? '用户取消' : 'User cancelled';
-                    }
-                    return { valid: false, error: 'Cancelled', isRateLimit: false };
-                }
-
                 try {
                     // 如果是重试，更新状态为重试中并添加延迟
                     if (attempt > 0) {
@@ -2176,7 +2114,7 @@
                         await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
                     }
                     
-                    const result = await testApiKey(apiKey, apiType, signal);
+                    const result = await testApiKey(apiKey, apiType);
                     
                     // 如果成功或者是速率限制，直接返回（不需要重试）
                     if (result.valid || result.isRateLimit) {
@@ -2208,15 +2146,6 @@
                     attempt++;
                     
                 } catch (error) {
-                    // 检查是否是取消操作
-                    if (error.name === 'AbortError' || cancelTesting) {
-                        if (keyData) {
-                            keyData.status = 'cancelled';
-                            keyData.error = currentLang === 'zh' ? '用户取消' : 'User cancelled';
-                        }
-                        return { valid: false, error: 'Cancelled', isRateLimit: false };
-                    }
-
                     // 如果是最后一次尝试，返回错误
                     if (attempt === maxRetries) {
                         if (keyData) {
@@ -2325,7 +2254,6 @@
             }
         }
 
-        // 优化的OpenAI模型检测 - 返回所有可用模型
         async function getOpenAIModels(apiKey) {
             try {
                 const apiUrl = getApiUrl('openai', '/models');
@@ -2349,8 +2277,16 @@
                 const data = await response.json();
                 
                 if (data && data.data && Array.isArray(data.data)) {
-                    // 返回所有模型，不进行过滤（适用于第三方兼容API）
+                    // 过滤出聊天模型，排除嵌入模型等
                     const models = data.data
+                        .filter(model => {
+                            const id = model.id.toLowerCase();
+                            return (id.includes('gpt') || id.includes('chat')) && 
+                                   !id.includes('embed') && 
+                                   !id.includes('whisper') && 
+                                   !id.includes('tts') &&
+                                   !id.includes('dall-e');
+                        })
                         .map(model => model.id)
                         .sort();
                     
@@ -2439,7 +2375,7 @@
             }
         }
 
-        async function testOpenAIKey(apiKey, model = null, signal = null) {
+        async function testOpenAIKey(apiKey, model = null) {
             try {
                 const selectedModel = model || getSelectedModel();
                 if (!selectedModel) {
@@ -2457,8 +2393,7 @@
                         model: selectedModel,
                         messages: [{ role: 'user', content: 'Hi' }],
                         max_tokens: 1
-                    }),
-                    signal: signal
+                    })
                 });
                 
                 if (!response.ok) {
@@ -2496,9 +2431,6 @@
                     return { valid: false, error: '响应格式错误', isRateLimit: false };
                 }
             } catch (error) {
-                if (error.name === 'AbortError') {
-                    return { valid: false, error: 'Cancelled', isRateLimit: false };
-                }
                 if (error.name === 'TypeError' && error.message.includes('fetch')) {
                     return { valid: false, error: '网络连接失败', isRateLimit: false };
                 }
@@ -2506,7 +2438,7 @@
             }
         }
         
-        async function testClaudeKey(apiKey, model = null, signal = null) {
+        async function testClaudeKey(apiKey, model = null) {
             try {
                 const selectedModel = model || getSelectedModel();
                 if (!selectedModel) {
@@ -2525,8 +2457,7 @@
                         model: selectedModel,
                         max_tokens: 1,
                         messages: [{ role: 'user', content: 'Hi' }]
-                    }),
-                    signal: signal
+                    })
                 });
                 
                 if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
@@ -2559,9 +2490,6 @@
                     return { valid: false, error: 'HTTP ' + response.status, isRateLimit: false };
                 }
             } catch (error) {
-                if (error.name === 'AbortError') {
-                    return { valid: false, error: 'Cancelled', isRateLimit: false };
-                }
                 if (error.name === 'TypeError' && error.message.includes('fetch')) {
                     return { valid: false, error: '网络连接失败', isRateLimit: false };
                 }
@@ -2569,7 +2497,7 @@
             }
         }
         
-        async function testGeminiKey(apiKey, model = null, signal = null) {
+        async function testGeminiKey(apiKey, model = null) {
             try {
                 const selectedModel = model || getSelectedModel();
                 if (!selectedModel) {
@@ -2592,8 +2520,7 @@
                                 ]
                             }
                         ]
-                    }),
-                    signal: signal
+                    })
                 });
                 
                 if (!response.ok) {
@@ -2631,9 +2558,6 @@
                     return { valid: false, error: '响应格式错误', isRateLimit: false };
                 }
             } catch (error) {
-                if (error.name === 'AbortError') {
-                    return { valid: false, error: 'Cancelled', isRateLimit: false };
-                }
                 if (error.name === 'TypeError' && error.message.includes('fetch')) {
                     return { valid: false, error: '网络连接失败', isRateLimit: false };
                 }
@@ -2644,17 +2568,17 @@
             }
         }
 
-        async function testApiKey(apiKey, apiType, signal = null) {
+        async function testApiKey(apiKey, apiType) {
             let result;
             switch (apiType) {
                 case 'openai':
-                    result = await testOpenAIKey(apiKey, null, signal);
+                    result = await testOpenAIKey(apiKey);
                     break;
                 case 'claude':
-                    result = await testClaudeKey(apiKey, null, signal);
+                    result = await testClaudeKey(apiKey);
                     break;
                 case 'gemini':
-                    result = await testGeminiKey(apiKey, null, signal);
+                    result = await testGeminiKey(apiKey);
                     break;
                 default:
                     result = { valid: false, error: '不支持的API类型', isRateLimit: false };
@@ -2702,9 +2626,7 @@
                 'API密钥无效 (400)': currentLang === 'zh' ? 'API密钥无效 (400)' : 'Invalid API Key (400)',
                 '测试异常': currentLang === 'zh' ? '测试异常' : 'Test Exception',
                 '重试失败': currentLang === 'zh' ? '重试失败' : 'Retry Failed',
-                '不支持的API类型': currentLang === 'zh' ? '不支持的API类型' : 'Unsupported API Type',
-                '用户取消': currentLang === 'zh' ? '用户取消' : 'User cancelled',
-                'Cancelled': currentLang === 'zh' ? '已取消' : 'Cancelled'
+                '不支持的API类型': currentLang === 'zh' ? '不支持的API类型' : 'Unsupported API Type'
             };
             
             // 检查完整匹配
@@ -2786,7 +2708,7 @@
             return { uniqueKeys, duplicates };
         }
 
-        // 修复后的测试函数，包含智能重试机制和取消功能
+        // 修复后的测试函数，包含智能重试机制
         async function startTesting() {
             const apiType = document.getElementById('apiType').value;
             const apiKeysText = document.getElementById('apiKeys').value.trim();
@@ -2829,12 +2751,6 @@
             
             // 设置测试状态
             isTestingInProgress = true;
-            cancelTesting = false;
-            testingController = new AbortController();
-            
-            // UI状态更新
-            document.getElementById('startBtn').classList.add('hidden');
-            document.getElementById('cancelBtn').classList.remove('hidden');
             
             // 重置数据
             allKeysData = [];
@@ -2871,15 +2787,8 @@
                         // 添加随机延迟以避免过于频繁的请求
                         await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
                         
-                        // 检查是否已被取消
-                        if (cancelTesting || testingController.signal.aborted) {
-                            keyData.status = 'cancelled';
-                            keyData.error = currentLang === 'zh' ? '用户取消' : 'User cancelled';
-                            return;
-                        }
-                        
                         // 使用带重试的测试函数
-                        const result = await testApiKeyWithRetry(apiKey, apiType, currentRetryCount, testingController.signal);
+                        const result = await testApiKeyWithRetry(apiKey, apiType, currentRetryCount);
                         
                         // 更新密钥状态
                         keyData.error = result.error;
@@ -2888,21 +2797,14 @@
                             keyData.status = 'valid';
                         } else if (result.isRateLimit) {
                             keyData.status = 'rate-limited';
-                        } else if (result.error === 'Cancelled') {
-                            keyData.status = 'cancelled';
                         } else {
                             keyData.status = 'invalid';
                         }
                         
                     } catch (error) {
                         // 处理测试异常
-                        if (error.name === 'AbortError' || cancelTesting) {
-                            keyData.status = 'cancelled';
-                            keyData.error = currentLang === 'zh' ? '用户取消' : 'User cancelled';
-                        } else {
-                            keyData.status = 'invalid';
-                            keyData.error = '测试异常: ' + error.message;
-                        }
+                        keyData.status = 'invalid';
+                        keyData.error = '测试异常: ' + error.message;
                     }
                     
                     // 更新进度
@@ -2923,7 +2825,6 @@
 
                 // 依次处理每个批次
                 for (const chunk of chunks) {
-                    if (cancelTesting) break; // 检查是否已被取消
                     await Promise.allSettled(chunk); // 使用 allSettled 确保所有Promise都完成
                 }
 
@@ -2932,31 +2833,23 @@
             } finally {
                 // 确保测试完成后清理状态
                 isTestingInProgress = false;
-                cancelTesting = false;
-                testingController = null;
-                
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('progressBar').classList.add('hidden');
-                document.getElementById('startBtn').classList.remove('hidden');
-                document.getElementById('cancelBtn').classList.add('hidden');
                 
                 // 最终更新统计和列表
                 updateStats();
                 updateKeyLists();
                 
-                // 统计各状态数量（排除取消的）
+                // 统计各状态数量
                 const validCount = allKeysData.filter(k => k.status === 'valid').length;
                 const invalidCount = allKeysData.filter(k => k.status === 'invalid').length;
                 const rateLimitedCount = allKeysData.filter(k => k.status === 'rate-limited').length;
-                const cancelledCount = allKeysData.filter(k => k.status === 'cancelled').length;
                 
-                // 只有在没有全部取消的情况下才显示完成提示
-                if (cancelledCount < total) {
-                    const message = currentLang === 'zh' ? 
-                        `测试完成！有效密钥: ${validCount}，无效密钥: ${invalidCount}，速率限制: ${rateLimitedCount}` :
-                        `Test completed! Valid keys: ${validCount}, Invalid keys: ${invalidCount}, Rate limited: ${rateLimitedCount}`;
-                    alert(message);
-                }
+                // 显示测试完成提示
+                const message = currentLang === 'zh' ? 
+                    `测试完成！有效密钥: ${validCount}，无效密钥: ${invalidCount}，速率限制: ${rateLimitedCount}` :
+                    `Test completed! Valid keys: ${validCount}, Invalid keys: ${invalidCount}, Rate limited: ${rateLimitedCount}`;
+                alert(message);
             }
         }
         
@@ -3035,19 +2928,15 @@
                 const statusClass = keyData.status === 'valid' ? 'status-valid' : 
                                    keyData.status === 'invalid' ? 'status-invalid' : 
                                    keyData.status === 'rate-limited' ? 'status-rate-limited' : 
-                                   keyData.status === 'retrying' ? 'status-retrying' : 
-                                   keyData.status === 'cancelled' ? 'status-invalid' : 'status-testing';
+                                   keyData.status === 'retrying' ? 'status-retrying' : 'status-testing';
                 
-                const statusText = keyData.status === 'cancelled' ? 
-                                  translations[currentLang]['cancelled'] : 
-                                  translations[currentLang]['status-' + keyData.status] || keyData.status;
+                const statusText = translations[currentLang]['status-' + keyData.status] || keyData.status;
                 
                 let errorDisplay = '';
-                if ((keyData.status === 'invalid' || keyData.status === 'rate-limited' || keyData.status === 'cancelled') && keyData.error) {
+                if ((keyData.status === 'invalid' || keyData.status === 'rate-limited') && keyData.error) {
                     const localizedError = getLocalizedError(keyData.error);
-                    // 为速率限制使用橙色，为无效使用红色，为取消使用灰色
-                    const errorColor = keyData.status === 'rate-limited' ? '#856404' : 
-                                      keyData.status === 'cancelled' ? '#6c757d' : '#dc3545';
+                    // 为速率限制使用橙色，为无效使用红色
+                    const errorColor = keyData.status === 'rate-limited' ? '#856404' : '#dc3545';
                     errorDisplay = '<div style="font-size: 11px; color: ' + errorColor + '; margin-top: 2px;">' + localizedError + '</div>';
                 }
 
@@ -3194,7 +3083,6 @@
             document.getElementById('detectedModelsHeader').addEventListener('click', toggleModelList);
             document.getElementById('detectBtn').addEventListener('click', detectModels);
             document.getElementById('startBtn').addEventListener('click', startTesting);
-            document.getElementById('cancelBtn').addEventListener('click', cancelCurrentTesting);
             document.getElementById('dedupeBtn').addEventListener('click', deduplicateKeys);
             document.getElementById('clearBtn').addEventListener('click', clearAll);
             
