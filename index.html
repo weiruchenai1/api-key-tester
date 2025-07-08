@@ -2678,11 +2678,13 @@
                     const models = data.data
                         .filter(model => {
                             const id = model.id.toLowerCase();
-                            return (id.includes('gpt') || id.includes('chat')) && 
-                                   !id.includes('embed') && 
+                            return !id.includes('embed') && 
                                    !id.includes('whisper') && 
                                    !id.includes('tts') &&
-                                   !id.includes('dall-e');
+                                   !id.includes('dall-e') &&
+                                   !id.includes('moderation') &&
+                                   !id.includes('search') &&
+                                   !id.includes('similarity');
                         })
                         .map(model => model.id)
                         .sort();
