@@ -1760,9 +1760,9 @@
                 <div class="alert">
                     <strong data-lang-key="usage-title">💡 使用说明：</strong> 
                     <br><span data-lang-key="usage-1">• 强烈建议使用自定义代理URL，公共代理可能不稳定</span>
-                    <br><span data-lang-key="usage-2">• Gemini代理示例: https://gemini.api.2s.lol/v1beta</span>
-                    <br><span data-lang-key="usage-3">• OpenAI代理示例: https://api.openai-proxy.org/v1</span>
-                    <br><span data-lang-key="usage-4">• Claude代理示例: https://claude-api-proxy.com/v1</span>
+                    <br><span data-lang-key="usage-2">• Gemini代理示例: https://gemini.weiruchenai.me/v1beta</span>
+<br><span data-lang-key="usage-3">• OpenAI代理示例: https://openai.weiruchenai.me/v1</span>
+<br><span data-lang-key="usage-4">• Claude代理示例: https://claude.weiruchenai.me/v1</span>
                     <br><span data-lang-key="usage-5">• 直接访问官方API会因CORS限制失败</span>
                     <br><span data-lang-key="usage-6">• 测试过程中密钥仅用于验证，不会被存储</span>
                     <br><span data-lang-key="usage-7">• 智能重试机制可提高检测准确性，减少误判</span>
@@ -1908,9 +1908,9 @@
                 'api-keys-placeholder': '请输入API密钥，每行一个：\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n...',
                 'usage-title': '💡 使用说明：',
                 'usage-1': '• 强烈建议使用自定义代理URL，公共代理可能不稳定',
-                'usage-2': '• Gemini代理示例: https://gemini.api.2s.lol/v1beta',
-                'usage-3': '• OpenAI代理示例: https://api.openai-proxy.org/v1',
-                'usage-4': '• Claude代理示例: https://claude-api-proxy.com/v1',
+                'usage-2': '• Gemini代理示例: https://gemini.weiruchenai.me/v1beta',
+        'usage-3': '• OpenAI代理示例: https://openai.weiruchenai.me/v1',
+        'usage-4': '• Claude代理示例: https://claude.weiruchenai.me/v1',
                 'usage-5': '• 直接访问官方API会因CORS限制失败',
                 'usage-6': '• 测试过程中密钥仅用于验证，不会被存储',
                 'usage-7': '• 智能重试机制可提高检测准确性，减少误判',
@@ -1968,9 +1968,9 @@
                 'api-keys-placeholder': 'Enter API keys, one per line:\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n...',
                 'usage-title': '💡 Usage Instructions:',
                 'usage-1': '• Strongly recommend using custom proxy URL, public proxies may be unstable',
-                'usage-2': '• Gemini proxy example: https://gemini.api.2s.lol/v1beta',
-                'usage-3': '• OpenAI proxy example: https://api.openai-proxy.org/v1',
-                'usage-4': '• Claude proxy example: https://claude-api-proxy.com/v1',
+                'usage-2': '• Gemini proxy example: https://gemini.weiruchenai.me/v1beta',
+                'usage-3': '• OpenAI proxy example: https://openai.weiruchenai.me/v1',
+                'usage-4': '• Claude proxy example: https://claude.weiruchenai.me/v1',
                 'usage-5': '• Direct access to official APIs will fail due to CORS restrictions',
                 'usage-6': '• Keys are only used for validation during testing, not stored',
                 'usage-7': '• Smart retry mechanism improves detection accuracy and reduces false negatives',
@@ -2564,11 +2564,11 @@
             } else {
                 switch (apiType) {
                     case 'openai':
-                        return 'https://corsproxy.io/?' + encodeURIComponent('https://api.openai.com' + endpoint);
+                        return 'https://openai.weiruchenai.me/v1' + endpoint;
                     case 'claude':
-                        return 'https://corsproxy.io/?' + encodeURIComponent('https://api.anthropic.com' + endpoint);
+                        return 'https://claude.weiruchenai.me/v1' + endpoint;
                     case 'gemini':
-                        return 'https://gemini.api.2s.lol/v1beta' + endpoint;
+                        return 'https://gemini.weiruchenai.me/v1beta' + endpoint;
                 }
             }
         }
@@ -2579,13 +2579,13 @@
             
             switch (apiType) {
                 case 'openai':
-                    proxyInput.placeholder = 'https://api.openai-proxy.org/v1';
+                    proxyInput.placeholder = 'https://openai.weiruchenai.me/v1';
                     break;
                 case 'claude':
-                    proxyInput.placeholder = 'https://claude-api-proxy.com/v1';
+                    proxyInput.placeholder = 'https://claude.weiruchenai.me/v1';
                     break;
                 case 'gemini':
-                    proxyInput.placeholder = 'https://gemini.api.2s.lol/v1beta';
+                    proxyInput.placeholder = 'https://gemini.weiruchenai.me/v1beta';
                     break;
             }
             

@@ -31,11 +31,11 @@
 
 由于浏览器 CORS 限制，必须使用代理服务器：
 - **Gemini**: 
-`https://gemini.api.2s.lol/v1beta`
+`https://gemini.weiruchenai.me/v1beta`
 - **OpenAI**: 
-`https://openai.api.2s.lol/v1`
+`https://openai.weiruchenai.me/v1`
 - **Claude**: 
-`https://claude.api.2s.lol/v1`
+`https://claude.weiruchenai.me/v1`
 
 **公共代理风险提醒：**
 - ⚠️ **安全风险**：API密钥可能被代理服务器记录
