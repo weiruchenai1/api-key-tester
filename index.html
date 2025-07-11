@@ -1628,30 +1628,105 @@
             box-shadow: 0 4px 12px rgba(214, 137, 16, 0.4);
         }
 
-        /* 滚动条样式 */
+        /* 浅色主题滚动条样式 */
+        .model-list-container::-webkit-scrollbar,
+        .results-tabs::-webkit-scrollbar,
+        .key-list::-webkit-scrollbar,
+        #apiKeys::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .model-list-container::-webkit-scrollbar-track,
+        .results-tabs::-webkit-scrollbar-track,
+        .key-list::-webkit-scrollbar-track,
+        #apiKeys::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        .model-list-container::-webkit-scrollbar-thumb,
+        .results-tabs::-webkit-scrollbar-thumb,
+        .key-list::-webkit-scrollbar-thumb,
+        #apiKeys::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        .model-list-container::-webkit-scrollbar-thumb:hover,
+        .results-tabs::-webkit-scrollbar-thumb:hover,
+        .key-list::-webkit-scrollbar-thumb:hover,
+        #apiKeys::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* 深色主题滚动条样式 */
         .dark-theme .model-list-container::-webkit-scrollbar,
         .dark-theme .results-tabs::-webkit-scrollbar,
-        .dark-theme .key-list::-webkit-scrollbar {
+        .dark-theme .key-list::-webkit-scrollbar,
+        .dark-theme #apiKeys::-webkit-scrollbar {
             width: 8px;
         }
 
         .dark-theme .model-list-container::-webkit-scrollbar-track,
         .dark-theme .results-tabs::-webkit-scrollbar-track,
-        .dark-theme .key-list::-webkit-scrollbar-track {
+        .dark-theme .key-list::-webkit-scrollbar-track,
+        .dark-theme #apiKeys::-webkit-scrollbar-track {
             background: #1e1e2e;
+            border-radius: 4px;
         }
 
         .dark-theme .model-list-container::-webkit-scrollbar-thumb,
         .dark-theme .results-tabs::-webkit-scrollbar-thumb,
-        .dark-theme .key-list::-webkit-scrollbar-thumb {
+        .dark-theme .key-list::-webkit-scrollbar-thumb,
+        .dark-theme #apiKeys::-webkit-scrollbar-thumb {
             background: #4c63d2;
             border-radius: 4px;
         }
 
         .dark-theme .model-list-container::-webkit-scrollbar-thumb:hover,
         .dark-theme .results-tabs::-webkit-scrollbar-thumb:hover,
-        .dark-theme .key-list::-webkit-scrollbar-thumb:hover {
+        .dark-theme .key-list::-webkit-scrollbar-thumb:hover,
+        .dark-theme #apiKeys::-webkit-scrollbar-thumb:hover {
             background: #5a73e0;
+        }
+
+        /* 粘贴按钮样式 */
+        .textarea-wrapper {
+            position: relative;
+        }
+
+        .paste-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .paste-btn:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .paste-btn:active {
+            transform: scale(0.95);
+        }
+
+        .dark-theme .paste-btn {
+            background: #2a2d47;
+            border-color: #3c4269;
+            color: #e8eaed;
+        }
+
+        .dark-theme .paste-btn:hover {
+            background: #323556;
+            border-color: #4c63d2;
         }
     </style>
 </head>
@@ -1754,7 +1829,10 @@
                 
                 <div class="input-group">
                     <label for="apiKeys" data-lang-key="api-keys">API 密钥列表 (每行一个)</label>
-                    <textarea id="apiKeys" class="form-control textarea" data-lang-key="api-keys-placeholder" placeholder="请输入API密钥，每行一个：&#10;sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#10;sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#10;..."></textarea>
+                    <div class="textarea-wrapper">
+                        <textarea id="apiKeys" class="form-control textarea" data-lang-key="api-keys-placeholder" placeholder="请输入API密钥，每行一个：&#10;sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#10;sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#10;..."></textarea>
+                        <button class="paste-btn" id="pasteBtn" title="粘贴">📋</button>
+                    </div>
                 </div>
                 
                 <div class="alert">
@@ -1853,6 +1931,7 @@
         let currentConcurrency = 5;
         let currentRetryCount = 3;
         let isTestingInProgress = false;
+        let shouldCancelTesting = false;
         let completedCount = 0;
         let totalCount = 0;
         let updateTimer = null;
@@ -1916,6 +1995,7 @@
                 'usage-7': '• 智能重试机制可提高检测准确性，减少误判',
                 'detect-models': '检测模型',
                 'start-test': '开始测试',
+                'cancel-test': '取消测试',
                 'dedupe-keys': '去重密钥',
                 'clear': '清空',
                 'testing': '正在测试 API 密钥...',
@@ -1976,6 +2056,7 @@
                 'usage-7': '• Smart retry mechanism improves detection accuracy and reduces false negatives',
                 'detect-models': 'Detect Models',
                 'start-test': 'Start Test',
+                'cancel-test': 'Cancel Test',
                 'dedupe-keys': 'Dedupe Keys',
                 'clear': 'Clear',
                 'testing': 'Testing API keys...',
@@ -2086,6 +2167,12 @@
 
         // 修复后的主测试函数
         async function startTesting() {
+            // 如果正在测试，则取消测试
+            if (isTestingInProgress) {
+                shouldCancelTesting = true;
+                return;
+            }
+            
             const apiType = document.getElementById('apiType').value;
             const apiKeysText = document.getElementById('apiKeys').value.trim();
             const selectedModel = getSelectedModel();
@@ -2097,11 +2184,6 @@
 
             if (!selectedModel) {
                 alert(currentLang === 'zh' ? '请选择或输入模型名！' : 'Please select or enter model name!');
-                return;
-            }
-
-            if (isTestingInProgress) {
-                alert(currentLang === 'zh' ? '测试正在进行中，请等待完成！' : 'Testing in progress, please wait for completion!');
                 return;
             }
             
@@ -2125,8 +2207,12 @@
             
             // 设置测试状态
             isTestingInProgress = true;
+            shouldCancelTesting = false;
             completedCount = 0;
             totalCount = uniqueKeys.length;
+            
+            // 更新按钮文本
+            updateStartButtonText();
             
             // 重置数据
             allKeysData = [];
@@ -2159,15 +2245,21 @@
             } finally {
                 // 确保测试完成后清理状态
                 isTestingInProgress = false;
+                shouldCancelTesting = false;
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('progressBar').classList.add('hidden');
+                
+                // 更新按钮文本
+                updateStartButtonText();
                 
                 // 最终更新统计和列表
                 updateStats();
                 updateKeyLists();
                 
                 // 显示测试完成提示
-                showCompletionMessage();
+                if (!shouldCancelTesting) {
+                    showCompletionMessage();
+                }
             }
         }
 
@@ -2185,8 +2277,8 @@
                 nextKeyIndex++;
             }
             
-            // 持续处理直到所有密钥完成
-            while (activeSlots.some(slot => slot !== null)) {
+            // 持续处理直到所有密钥完成或被取消
+            while (activeSlots.some(slot => slot !== null) && !shouldCancelTesting) {
                 // 等待任意一个槽位完成
                 const completedIndex = await waitForAnySlotCompletion(activeSlots);
                 
@@ -2194,7 +2286,10 @@
                 completedCount++;
                 updateProgress();
                 
-                // 更新进度
+                // 检查是否应该取消
+                if (shouldCancelTesting) {
+                    break;
+                }
                 
                 // 如果还有待测试的密钥，启动新的测试占用这个槽位
                 if (nextKeyIndex < keyQueue.length) {
@@ -2207,6 +2302,18 @@
             }
             
             // 测试完成
+        }
+        
+        // 更新开始按钮文本
+        function updateStartButtonText() {
+            const startBtn = document.getElementById('startBtn');
+            if (isTestingInProgress) {
+                startBtn.textContent = translations[currentLang]['cancel-test'];
+                startBtn.setAttribute('data-lang-key', 'cancel-test');
+            } else {
+                startBtn.textContent = translations[currentLang]['start-test'];
+                startBtn.setAttribute('data-lang-key', 'start-test');
+            }
         }
 
         // 启动单个密钥测试
@@ -3297,6 +3404,27 @@
             showTab('all');
         }
 
+        // 粘贴功能
+        async function pasteFromClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                const apiKeysTextarea = document.getElementById('apiKeys');
+                const currentValue = apiKeysTextarea.value;
+                
+                // 如果当前有内容，添加换行符
+                if (currentValue.trim()) {
+                    apiKeysTextarea.value = currentValue + '\n' + text;
+                } else {
+                    apiKeysTextarea.value = text;
+                }
+                
+                // 触发事件，让其他监听器知道内容已改变
+                apiKeysTextarea.dispatchEvent(new Event('input'));
+            } catch (err) {
+                alert(currentLang === 'zh' ? '无法读取剪贴板内容，请确保已授权访问剪贴板' : 'Cannot read clipboard content, please ensure clipboard access is authorized');
+            }
+        }
+
         function initializeEventListeners() {
             document.getElementById('langBtn').addEventListener('click', toggleLanguage);
             document.getElementById('themeBtn').addEventListener('click', toggleTheme);
@@ -3307,6 +3435,7 @@
             document.getElementById('startBtn').addEventListener('click', startTesting);
             document.getElementById('dedupeBtn').addEventListener('click', deduplicateKeys);
             document.getElementById('clearBtn').addEventListener('click', clearAll);
+            document.getElementById('pasteBtn').addEventListener('click', pasteFromClipboard);
             
             document.querySelectorAll('[data-tab]').forEach(tab => {
                 tab.addEventListener('click', (e) => {
