@@ -1728,6 +1728,44 @@
             background: #323556;
             border-color: #4c63d2;
         }
+
+        /* 标签和导入按钮样式 */
+        .label-with-import {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .import-btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .import-btn:hover {
+            background: #e9ecef;
+            border-color: #adb5bd;
+        }
+
+        .import-btn:active {
+            transform: scale(0.95);
+        }
+
+        .dark-theme .import-btn {
+            background: #2a2d47;
+            border-color: #3c4269;
+            color: #e8eaed;
+        }
+
+        .dark-theme .import-btn:hover {
+            background: #323556;
+            border-color: #4c63d2;
+        }
     </style>
 </head>
 <body>
@@ -1828,11 +1866,15 @@
                 </div>
                 
                 <div class="input-group">
-                    <label for="apiKeys" data-lang-key="api-keys">API 密钥列表 (每行一个)</label>
+                    <div class="label-with-import">
+                        <label for="apiKeys" data-lang-key="api-keys">API 密钥列表 (每行一个)</label>
+                        <button class="import-btn" id="importBtn" title="导入文件">📁</button>
+                    </div>
                     <div class="textarea-wrapper">
                         <textarea id="apiKeys" class="form-control textarea" data-lang-key="api-keys-placeholder" placeholder="请输入API密钥，每行一个：&#10;sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#10;sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#10;..."></textarea>
                         <button class="paste-btn" id="pasteBtn" title="粘贴">📋</button>
                     </div>
+                    <input type="file" id="fileInput" accept=".txt" style="display: none;">
                 </div>
                 
                 <div class="alert">
@@ -3425,6 +3467,193 @@
             }
         }
 
+        // 导入文件功能
+        function importFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        // 处理文件选择
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // 检查文件扩展名和类型
+            const fileName = file.name.toLowerCase();
+            const isTextFile = fileName.endsWith('.txt') || file.type === 'text/plain' || file.type === '';
+            
+            if (!isTextFile) {
+                alert(currentLang === 'zh' ? '请选择一个.txt文件' : 'Please select a .txt file');
+                event.target.value = '';
+                return;
+            }
+            
+            // 检查文件大小 (限制为10MB)
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (file.size > maxSize) {
+                alert(currentLang === 'zh' ? '文件过大，请选择小于10MB的文件' : 'File too large, please select a file smaller than 10MB');
+                event.target.value = '';
+                return;
+            }
+            
+            // 显示loading状态
+            const importBtn = document.getElementById('importBtn');
+            const originalText = importBtn.textContent;
+            importBtn.textContent = currentLang === 'zh' ? '导入中...' : 'Importing...';
+            importBtn.disabled = true;
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    const extractedKeys = extractApiKeys(content);
+                    
+                    if (extractedKeys.length > 0) {
+                        const apiKeysTextarea = document.getElementById('apiKeys');
+                        const currentValue = apiKeysTextarea.value;
+                        
+                        // 如果当前有内容，添加换行符
+                        if (currentValue.trim()) {
+                            apiKeysTextarea.value = currentValue + '\n' + extractedKeys.join('\n');
+                        } else {
+                            apiKeysTextarea.value = extractedKeys.join('\n');
+                        }
+                        
+                        // 触发事件，让其他监听器知道内容已改变
+                        apiKeysTextarea.dispatchEvent(new Event('input'));
+                        
+                        const message = currentLang === 'zh' ? 
+                            `成功导入 ${extractedKeys.length} 个API密钥` : 
+                            `Successfully imported ${extractedKeys.length} API keys`;
+                        alert(message);
+                    } else {
+                        alert(currentLang === 'zh' ? '未找到有效的API密钥' : 'No valid API keys found');
+                    }
+                } catch (error) {
+                    alert(currentLang === 'zh' ? '文件读取失败，请检查文件格式' : 'File reading failed, please check file format');
+                } finally {
+                    // 恢复按钮状态
+                    importBtn.textContent = originalText;
+                    importBtn.disabled = false;
+                }
+            };
+            
+            reader.onerror = function() {
+                alert(currentLang === 'zh' ? '文件读取失败' : 'File reading failed');
+                importBtn.textContent = originalText;
+                importBtn.disabled = false;
+            };
+            
+            reader.readAsText(file, 'UTF-8');
+            
+            // 清空file input以便重复选择同一文件
+            event.target.value = '';
+        }
+
+        // 提取API密钥
+        function extractApiKeys(content) {
+            const keys = [];
+            
+            // 直接从原始内容中提取API密钥，不要预先清理
+            const extractedKeys = extractKeysFromContent(content);
+            
+            // 对每个提取的密钥进行清理和验证
+            for (let key of extractedKeys) {
+                const cleanedKey = cleanApiKey(key);
+                if (cleanedKey && cleanedKey.length >= 15) {
+                    keys.push(cleanedKey);
+                }
+            }
+            
+            // 去重并返回
+            const uniqueKeys = [...new Set(keys)];
+            
+            // 按长度排序，长的密钥优先 (通常更可能是有效的)
+            return uniqueKeys.sort((a, b) => b.length - a.length);
+        }
+
+        // 从内容中提取API密钥
+        function extractKeysFromContent(content) {
+            const keys = [];
+            
+            // OpenAI/Claude API密钥模式: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+            // 允许中间有任意字符，包括Claude的sk-ant-sid01-格式
+            const openaiPattern = /sk-[a-zA-Z0-9\u4e00-\u9fff\-_]{30,}/g;
+            
+            // Gemini API密钥模式: AIzaSyxxxxxxxxxxxxxxxxxxxxxxx
+            // 允许中间有任意字符
+            const geminiPattern = /AIzaSy[a-zA-Z0-9\u4e00-\u9fff_\-]{30,}/g;
+            
+            // Cohere API密钥模式
+            const coherePattern = /[a-zA-Z0-9\u4e00-\u9fff\-_]{40,}/g;
+            
+            // Anthropic API密钥模式 (除了sk-ant-sid01-之外的格式)
+            const anthropicPattern = /[a-zA-Z0-9\u4e00-\u9fff\-_]{32,}/g;
+            
+            // 通用API密钥模式
+            const genericPattern = /(?:sk-|gsk_|api_|key_|token_|pk-)[a-zA-Z0-9\u4e00-\u9fff\-_]{20,}/g;
+            
+            let matches;
+            
+            // 检查OpenAI/Claude密钥 (sk-开头) - 优先级最高
+            matches = content.match(openaiPattern);
+            if (matches) {
+                keys.push(...matches);
+            }
+            
+            // 检查Gemini密钥
+            matches = content.match(geminiPattern);
+            if (matches) {
+                keys.push(...matches);
+            }
+            
+            // 如果没有找到特定格式的密钥，尝试通用模式
+            if (keys.length === 0) {
+                matches = content.match(genericPattern);
+                if (matches) {
+                    keys.push(...matches);
+                }
+            }
+            
+            // 最后尝试匹配长字符串 (兜底方案)
+            if (keys.length === 0) {
+                const longStringPattern = /[a-zA-Z0-9\u4e00-\u9fff\-_]{25,}/g;
+                matches = content.match(longStringPattern);
+                if (matches) {
+                    // 过滤掉可能的误匹配
+                    const filteredMatches = matches.filter(match => {
+                        // 排除纯数字或纯字母的字符串
+                        return !/^[0-9]+$/.test(match.replace(/[\u4e00-\u9fff]/g, '')) && 
+                               !/^[a-zA-Z]+$/.test(match.replace(/[\u4e00-\u9fff]/g, ''));
+                    });
+                    keys.push(...filteredMatches);
+                }
+            }
+            
+            return keys;
+        }
+
+        // 清理单个API密钥中的干扰字符
+        function cleanApiKey(key) {
+            // 移除中文字符和特殊符号，只保留英文字母、数字、短横线、下划线
+            let cleaned = key.replace(/[^\w\-]/g, '');
+            
+            // 进一步验证清理后的密钥
+            if (cleaned.length < 15) {
+                return null; // 太短的密钥可能不是有效的API密钥
+            }
+            
+            // 检查是否包含足够的字母数字组合
+            const hasLetters = /[a-zA-Z]/.test(cleaned);
+            const hasNumbers = /[0-9]/.test(cleaned);
+            
+            if (!hasLetters || !hasNumbers) {
+                return null; // API密钥通常包含字母和数字
+            }
+            
+            return cleaned;
+        }
+
         function initializeEventListeners() {
             document.getElementById('langBtn').addEventListener('click', toggleLanguage);
             document.getElementById('themeBtn').addEventListener('click', toggleTheme);
@@ -3436,6 +3665,8 @@
             document.getElementById('dedupeBtn').addEventListener('click', deduplicateKeys);
             document.getElementById('clearBtn').addEventListener('click', clearAll);
             document.getElementById('pasteBtn').addEventListener('click', pasteFromClipboard);
+            document.getElementById('importBtn').addEventListener('click', importFile);
+            document.getElementById('fileInput').addEventListener('change', handleFileSelect);
             
             document.querySelectorAll('[data-tab]').forEach(tab => {
                 tab.addEventListener('click', (e) => {
