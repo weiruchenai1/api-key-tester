@@ -1,0 +1,1914 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0">
+    <title>API Key 测活工具</title>
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 暗色主题样式 */
+        .dark-theme {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        .dark-theme .container {
+            background: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
+            color: #e8eaed;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .header {
+            background: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
+        }
+
+        .dark-theme .input-section {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .input-section:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            box-shadow: 0 4px 20px rgba(76, 99, 210, 0.15);
+        }
+
+        .dark-theme .form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #e8eaed;
+            border-color: #3c4269;
+        }
+
+        .dark-theme .form-control:focus {
+            border-color: #4c63d2;
+            box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+        }
+
+        .dark-theme .form-control:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #252849 0%, #2a2d47 100%);
+        }
+
+        .dark-theme select.form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #e8eaed;
+        }
+
+        .dark-theme select.form-control option {
+            background: #232741;
+            color: #e8eaed;
+        }
+
+        .dark-theme input.form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #e8eaed;
+        }
+
+        .dark-theme textarea.form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #e8eaed;
+        }
+
+        .dark-theme .stat-card {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .stat-card:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(76, 99, 210, 0.2);
+        }
+
+        .dark-theme .key-list {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .key-list:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            box-shadow: 0 2px 12px rgba(76, 99, 210, 0.15);
+        }
+
+        .dark-theme .empty-state {
+            color: #b0b3c1;
+        }
+
+        .dark-theme .empty-icon {
+            opacity: 0.5;
+        }
+
+        .dark-theme .empty-text {
+            opacity: 0.7;
+        }
+
+        .dark-theme .key-item {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .key-item:hover {
+            background: linear-gradient(135deg, #2a2d47 0%, #1e1e2e 100%);
+            border-color: #4c63d2;
+            transform: translateX(2px);
+            box-shadow: 0 2px 8px rgba(76, 99, 210, 0.15);
+        }
+
+        .dark-theme .tab {
+            color: #b0b3c1;
+        }
+
+        .dark-theme .tab.active {
+            color: #4c63d2;
+        }
+
+        .dark-theme .alert {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+            color: #e8eaed;
+        }
+
+        .dark-theme .alert:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
+        }
+
+        .dark-theme .btn-secondary {
+            background: linear-gradient(135deg, #3c4269 0%, #2a2d47 100%);
+        }
+
+        .dark-theme .btn-secondary:hover {
+            background: linear-gradient(135deg, #4a5079 0%, #3c4269 100%);
+        }
+
+        .dark-theme .form-help {
+            color: #b0b3c1;
+        }
+
+        .dark-theme .stat-label {
+            color: #b0b3c1;
+        }
+
+        .dark-theme .input-group label {
+            color: #e8eaed;
+        }
+
+        .dark-theme .detected-models {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .detected-models:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
+        }
+
+        .dark-theme .detected-models-header {
+            border-bottom-color: #3c4269;
+        }
+
+        .dark-theme .detected-models-header:hover {
+            background: rgba(76, 99, 210, 0.1);
+        }
+
+        .dark-theme .detected-models-header h4 {
+            color: #4c63d2;
+        }
+
+        .dark-theme .collapse-icon {
+            color: #4c63d2;
+        }
+
+        .dark-theme .model-tag {
+            background: #4c63d2;
+        }
+
+        .dark-theme .model-tag:hover {
+            background: #3c52d2;
+        }
+
+        .dark-theme .model-toggle-btn {
+            background: #3c4269;
+        }
+
+        .dark-theme .model-toggle-btn:hover {
+            background: #4a5079;
+        }
+
+        .dark-theme .model-toggle-btn.active {
+            background: #4c63d2;
+        }
+
+        .dark-theme .concurrency-container {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .concurrency-container:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+        }
+
+        .dark-theme .concurrency-input-section .form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #4c63d2;
+            border-color: #3c4269;
+        }
+
+        .dark-theme .concurrency-input-section .form-control:focus {
+            border-color: #4c63d2;
+            box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+        }
+
+        .dark-theme .slider {
+            background: #3c4269;
+        }
+
+        .dark-theme .slider::-webkit-slider-thumb {
+            background: #4c63d2;
+        }
+
+        .dark-theme .slider::-webkit-slider-thumb:hover {
+            background: #3c52d2;
+        }
+
+        .dark-theme .slider::-moz-range-thumb {
+            background: #4c63d2;
+        }
+
+        .dark-theme .slider-value {
+            color: #4c63d2;
+            background: #232741;
+            border-color: #3c4269;
+        }
+
+        .dark-theme .preset-btn {
+            border-color: #4c63d2;
+            color: #4c63d2;
+            background: #232741;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .preset-btn:hover {
+            background: #4c63d2;
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 99, 210, 0.3);
+        }
+
+        .dark-theme .preset-btn.active {
+            background: #4c63d2;
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 99, 210, 0.4);
+        }
+
+        /* 深色主题重试相关样式 */
+        .dark-theme .retry-container {
+            background: linear-gradient(135deg, #3d3314 0%, #2d2a1a 100%);
+            border-color: #5d4e23;
+        }
+
+        .dark-theme .retry-container:hover {
+            border-color: #d68910;
+            background: linear-gradient(135deg, #4d4024 0%, #3d3314 100%);
+        }
+
+        .dark-theme .retry-input-section .form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #d68910;
+            border-color: #5d4e23;
+        }
+
+        .dark-theme .retry-input-section .form-control:focus {
+            border-color: #d68910;
+            box-shadow: 0 0 0 3px rgba(214, 137, 16, 0.1);
+        }
+
+        .dark-theme .retry-slider {
+            background: #5d4e23;
+        }
+
+        .dark-theme .retry-slider::-webkit-slider-thumb {
+            background: #d68910;
+        }
+
+        .dark-theme .retry-slider::-webkit-slider-thumb:hover {
+            background: #b7791f;
+        }
+
+        .dark-theme .retry-slider::-moz-range-thumb {
+            background: #d68910;
+        }
+
+        .dark-theme .retry-slider-value {
+            color: #d68910;
+            background: #232741;
+            border-color: #5d4e23;
+        }
+
+        .dark-theme .retry-preset-btn {
+            border-color: #d68910;
+            color: #d68910;
+            background: #232741;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .retry-preset-btn:hover {
+            background: #d68910;
+            color: white;
+            box-shadow: 0 4px 12px rgba(214, 137, 16, 0.3);
+        }
+
+        .dark-theme .retry-preset-btn.active {
+            background: #d68910;
+            color: white;
+            box-shadow: 0 4px 12px rgba(214, 137, 16, 0.4);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            line-height: 1.5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            margin-bottom: 8px;
+            font-weight: 700;
+            word-break: break-word;
+        }
+        
+        .header p {
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+        
+        .main-content {
+            padding: 20px;
+        }
+        
+        .input-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .input-section:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.1);
+        }
+        
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #495057;
+            font-size: clamp(0.9rem, 2vw, 1rem);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: clamp(14px, 2.5vw, 16px);
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control:hover {
+            border-color: #667eea;
+            background: #fafbff;
+        }
+        
+        .form-control.textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: 'Courier New', monospace;
+            font-size: clamp(12px, 2vw, 14px);
+        }
+        
+        .form-help {
+            color: #6c757d;
+            font-size: clamp(10px, 1.8vw, 12px);
+            margin-top: 4px;
+            display: block;
+            line-height: 1.3;
+        }
+
+        .model-input-group {
+            display: flex;
+            gap: 8px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .model-input-group .form-control {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .model-toggle-btn {
+            padding: 12px 12px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: clamp(12px, 2vw, 14px);
+            white-space: nowrap;
+            transition: background 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .model-toggle-btn:hover {
+            background: #5a6268;
+        }
+
+        .model-toggle-btn.active {
+            background: #667eea;
+        }
+
+        .detected-models {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        .detected-models:hover {
+            border-color: #2196f3;
+            background: #e1f5fe;
+            box-shadow: 0 2px 12px rgba(33, 150, 243, 0.15);
+        }
+
+        .detected-models-header {
+            padding: 12px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #bbdefb;
+            transition: background 0.3s ease;
+        }
+
+        .detected-models-header:hover {
+            background: rgba(33, 150, 243, 0.1);
+        }
+
+        .detected-models-header h4 {
+            margin: 0;
+            color: #1976d2;
+            font-size: clamp(12px, 2vw, 14px);
+        }
+
+        .collapse-icon {
+            color: #1976d2;
+            font-size: 14px;
+            transition: transform 0.3s ease;
+        }
+
+        .collapse-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .model-list-container {
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .model-list-container.expanded {
+            display: block;
+        }
+
+        .model-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .model-tag {
+            background: #2196f3;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: clamp(10px, 1.8vw, 12px);
+            cursor: pointer;
+            transition: background 0.3s ease;
+            word-break: break-all;
+        }
+
+        .model-tag:hover {
+            background: #1976d2;
+        }
+
+        /* 并发设置样式 - 移动端优化 */
+        .concurrency-container {
+            display: flex;
+            flex-direction: row;
+            gap: 16px;
+            align-items: center;
+            margin-top: 12px;
+            padding: 16px;
+            background: #f1f3f5;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .concurrency-container:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .concurrency-input-section {
+            flex-shrink: 0;
+            min-width: 80px;
+        }
+
+        .concurrency-input-section .form-control {
+            width: 80px;
+            text-align: center;
+            font-weight: 600;
+            color: #667eea;
+            background: white;
+            border: 2px solid #dee2e6;
+        }
+
+        .concurrency-input-section .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .slider-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #dee2e6;
+            outline: none;
+            transition: background 0.3s ease;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+        }
+
+        .slider::-webkit-slider-thumb:hover {
+            background: #5a67d8;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+        }
+
+        .slider-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: 700;
+            color: #667eea;
+            font-size: clamp(14px, 2.5vw, 18px);
+            background: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+            flex-shrink: 0;
+        }
+
+        .preset-buttons {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 8px 12px;
+            border: 1px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: clamp(11px, 2vw, 13px);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 50px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            max-width: 80px;
+        }
+
+        .preset-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .preset-btn.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        /* 重试设置样式 */
+        .retry-container {
+            display: flex;
+            flex-direction: row;
+            gap: 16px;
+            align-items: center;
+            margin-top: 12px;
+            padding: 16px;
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .retry-container:hover {
+            border-color: #f39c12;
+            background: #fef9e7;
+        }
+
+        .retry-input-section {
+            flex-shrink: 0;
+            min-width: 80px;
+        }
+
+        .retry-input-section .form-control {
+            width: 80px;
+            text-align: center;
+            font-weight: 600;
+            color: #f39c12;
+            background: white;
+            border: 2px solid #ffeaa7;
+        }
+
+        .retry-input-section .form-control:focus {
+            border-color: #f39c12;
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+        }
+
+        .retry-slider-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .retry-slider-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .retry-slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #ffeaa7;
+            outline: none;
+            transition: background 0.3s ease;
+        }
+
+        .retry-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #f39c12;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            box-shadow: 0 2px 6px rgba(243, 156, 18, 0.3);
+        }
+
+        .retry-slider::-webkit-slider-thumb:hover {
+            background: #e67e22;
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+        }
+
+        .retry-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #f39c12;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(243, 156, 18, 0.3);
+        }
+
+        .retry-slider-value {
+            min-width: 30px;
+            text-align: center;
+            font-weight: 700;
+            color: #f39c12;
+            font-size: clamp(14px, 2.5vw, 18px);
+            background: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #ffeaa7;
+            flex-shrink: 0;
+        }
+
+        .retry-preset-buttons {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .retry-preset-btn {
+            padding: 8px 12px;
+            border: 1px solid #f39c12;
+            background: white;
+            color: #f39c12;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: clamp(11px, 2vw, 13px);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            min-width: 50px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            max-width: 80px;
+        }
+
+        .retry-preset-btn:hover {
+            background: #f39c12;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+        }
+
+        .retry-preset-btn.active {
+            background: #f39c12;
+            color: white;
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: clamp(14px, 2.5vw, 16px);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-detect {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-detect:hover {
+            background: #218838;
+        }
+        
+        .results-section {
+            margin-top: 20px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 16px 12px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+        }
+        
+        .stat-number {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+        }
+        
+        .valid { color: #28a745; }
+        .invalid { color: #dc3545; }
+        .rate-limited { color: #ffc107; }
+        .testing { color: #6f42c1; }
+        .retrying { color: #fd7e14; }
+        .total { color: #6f42c1; }
+        
+        .results-tabs {
+            display: flex;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e9ecef;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .tab {
+            padding: 10px 16px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: clamp(12px, 2.2vw, 16px);
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .key-list {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 16px;
+            max-height: 350px;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+            -webkit-overflow-scrolling: touch;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .key-list:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            box-shadow: 0 2px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            min-height: 80px;
+            color: #6c757d;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .empty-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            opacity: 0.6;
+        }
+
+        .empty-text {
+            font-size: clamp(14px, 2.5vw, 16px);
+            font-weight: 500;
+            opacity: 0.8;
+        }
+        
+        .key-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s ease;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .key-item:hover {
+            border-color: #667eea;
+            background: #fafbff;
+            transform: translateX(2px);
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+        }
+        
+        .key-text {
+            font-family: 'Courier New', monospace;
+            font-size: clamp(11px, 2vw, 14px);
+            color: #495057;
+            flex: 1;
+            margin-right: 8px;
+            word-break: break-all;
+            line-height: 1.4;
+            min-width: 0;
+        }
+        
+        .key-status {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: clamp(10px, 1.8vw, 12px);
+            font-weight: 600;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+        
+        .status-valid {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-invalid {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-rate-limited {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-testing {
+            background: #e2e3e5;
+            color: #6c757d;
+        }
+
+        .status-retrying {
+            background: #ffeaa7;
+            color: #d68910;
+            animation: pulse 1.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            from { opacity: 0.6; }
+            to { opacity: 1; }
+        }
+        
+        .copy-btn {
+            padding: 10px 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: clamp(12px, 2vw, 14px);
+            margin-top: 12px;
+            width: 100%;
+            transition: background 0.3s ease;
+        }
+        
+        .copy-btn:hover {
+            background: #0056b3;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        .alert {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 12px;
+            color: #0c5460;
+            transition: all 0.3s ease;
+            font-size: clamp(12px, 2vw, 14px);
+            line-height: 1.4;
+        }
+
+        .alert:hover {
+            border-color: #17a2b8;
+            background: #c3e6ea;
+            box-shadow: 0 2px 12px rgba(23, 162, 184, 0.15);
+        }
+
+        /* 主题切换按钮 */
+        .theme-controls {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 8px;
+            z-index: 1000;
+        }
+
+        .control-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* 移动端特殊优化 */
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+            }
+            
+            .container {
+                border-radius: 15px;
+                margin: 0;
+            }
+            
+            .header {
+                padding: 16px;
+            }
+            
+            .main-content {
+                padding: 16px;
+            }
+            
+            .input-section {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+            
+            .model-input-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .model-toggle-btn {
+                width: 100%;
+                margin-top: 8px;
+            }
+            
+            .concurrency-container, .retry-container {
+                flex-direction: column;
+                gap: 12px;
+                padding: 12px;
+                align-items: stretch;
+            }
+            
+            .concurrency-input-section, .retry-input-section {
+                align-self: center;
+                min-width: auto;
+            }
+            
+            .concurrency-input-section .form-control, .retry-input-section .form-control {
+                width: 100px;
+                margin: 0 auto;
+            }
+            
+            .slider-section, .retry-slider-section {
+                width: 100%;
+            }
+            
+            .preset-buttons, .retry-preset-buttons {
+                gap: 4px;
+                margin-top: 8px;
+            }
+            
+            .preset-btn, .retry-preset-btn {
+                min-width: 60px;
+                max-width: none;
+                flex: 1;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .btn {
+                min-width: auto;
+                width: 100%;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            
+            .stat-card {
+                padding: 12px 8px;
+            }
+            
+            .results-tabs {
+                gap: 4px;
+            }
+            
+            .tab {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            .key-list {
+                padding: 12px;
+                max-height: 300px;
+            }
+            
+            .key-item {
+                padding: 10px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+            }
+            
+            .key-text {
+                margin-right: 0;
+                width: 100%;
+            }
+            
+            .key-status {
+                align-self: flex-end;
+            }
+            
+            .theme-controls {
+                top: 8px;
+                right: 8px;
+                gap: 6px;
+            }
+            
+            .control-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            
+            .alert {
+                padding: 10px;
+                font-size: 12px;
+            }
+        }
+
+        /* 深色主题 */
+        .dark-theme {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+
+        .dark-theme .container {
+            background: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
+            color: #e8eaed;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .header {
+            background: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
+        }
+
+        .dark-theme .input-section {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .input-section:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            box-shadow: 0 4px 20px rgba(76, 99, 210, 0.15);
+        }
+
+        .dark-theme .form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #e8eaed;
+            border-color: #3c4269;
+        }
+
+        .dark-theme .form-control:focus {
+            border-color: #4c63d2;
+            box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+        }
+
+        .dark-theme .form-control:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #252849 0%, #2a2d47 100%);
+        }
+
+        .dark-theme select.form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #e8eaed;
+        }
+
+        .dark-theme select.form-control option {
+            background: #232741;
+            color: #e8eaed;
+        }
+
+        .dark-theme input.form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #e8eaed;
+        }
+
+        .dark-theme textarea.form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #e8eaed;
+        }
+
+        .dark-theme .form-help {
+            color: #b0b3c1;
+        }
+
+        .dark-theme .stat-label {
+            color: #b0b3c1;
+        }
+
+        .dark-theme .input-group label {
+            color: #e8eaed;
+        }
+
+        .dark-theme .stat-card {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .stat-card:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(76, 99, 210, 0.2);
+        }
+
+        .dark-theme .key-list {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .key-list:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            box-shadow: 0 2px 12px rgba(76, 99, 210, 0.15);
+        }
+
+        .dark-theme .empty-state {
+            color: #b0b3c1;
+        }
+
+        .dark-theme .empty-icon {
+            opacity: 0.5;
+        }
+
+        .dark-theme .empty-text {
+            opacity: 0.7;
+        }
+
+        .dark-theme .key-item {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .key-item:hover {
+            background: linear-gradient(135deg, #2a2d47 0%, #1e1e2e 100%);
+            border-color: #4c63d2;
+            transform: translateX(2px);
+            box-shadow: 0 2px 8px rgba(76, 99, 210, 0.15);
+        }
+
+        .dark-theme .tab {
+            color: #b0b3c1;
+        }
+
+        .dark-theme .tab.active {
+            color: #4c63d2;
+        }
+
+        .dark-theme .results-tabs {
+            border-bottom-color: #3c4269;
+        }
+
+        .dark-theme .alert {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+            color: #e8eaed;
+        }
+
+        .dark-theme .alert:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
+        }
+
+        .dark-theme .btn-secondary {
+            background: linear-gradient(135deg, #3c4269 0%, #2a2d47 100%);
+        }
+
+        .dark-theme .btn-secondary:hover {
+            background: linear-gradient(135deg, #4a5079 0%, #3c4269 100%);
+        }
+
+        .dark-theme .detected-models {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .detected-models:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+            box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
+        }
+
+        .dark-theme .detected-models-header {
+            border-bottom-color: #3c4269;
+        }
+
+        .dark-theme .detected-models-header:hover {
+            background: rgba(76, 99, 210, 0.1);
+        }
+
+        .dark-theme .detected-models-header h4 {
+            color: #4c63d2;
+        }
+
+        .dark-theme .collapse-icon {
+            color: #4c63d2;
+        }
+
+        .dark-theme .model-tag {
+            background: #4c63d2;
+        }
+
+        .dark-theme .model-tag:hover {
+            background: #3c52d2;
+        }
+
+        .dark-theme .model-toggle-btn {
+            background: #3c4269;
+        }
+
+        .dark-theme .model-toggle-btn:hover {
+            background: #4a5079;
+        }
+
+        .dark-theme .model-toggle-btn.active {
+            background: #4c63d2;
+        }
+
+        .dark-theme .concurrency-container {
+            background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+            border-color: #3c4269;
+        }
+
+        .dark-theme .concurrency-container:hover {
+            border-color: #4c63d2;
+            background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+        }
+
+        .dark-theme .concurrency-input-section .form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #4c63d2;
+            border-color: #3c4269;
+        }
+
+        .dark-theme .concurrency-input-section .form-control:focus {
+            border-color: #4c63d2;
+            box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+        }
+
+        .dark-theme .slider {
+            background: #3c4269;
+        }
+
+        .dark-theme .slider::-webkit-slider-thumb {
+            background: #4c63d2;
+        }
+
+        .dark-theme .slider::-webkit-slider-thumb:hover {
+            background: #3c52d2;
+        }
+
+        .dark-theme .slider::-moz-range-thumb {
+            background: #4c63d2;
+        }
+
+        .dark-theme .slider-value {
+            color: #4c63d2;
+            background: #232741;
+            border-color: #3c4269;
+        }
+
+        .dark-theme .preset-btn {
+            border-color: #4c63d2;
+            color: #4c63d2;
+            background: #232741;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .preset-btn:hover {
+            background: #4c63d2;
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 99, 210, 0.3);
+        }
+
+        .dark-theme .preset-btn.active {
+            background: #4c63d2;
+            color: white;
+            box-shadow: 0 4px 12px rgba(76, 99, 210, 0.4);
+        }
+
+        /* 深色主题重试相关样式 */
+        .dark-theme .retry-container {
+            background: linear-gradient(135deg, #3d3314 0%, #2d2a1a 100%);
+            border-color: #5d4e23;
+        }
+
+        .dark-theme .retry-container:hover {
+            border-color: #d68910;
+            background: linear-gradient(135deg, #4d4024 0%, #3d3314 100%);
+        }
+
+        .dark-theme .retry-input-section .form-control {
+            background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+            color: #d68910;
+            border-color: #5d4e23;
+        }
+
+        .dark-theme .retry-input-section .form-control:focus {
+            border-color: #d68910;
+            box-shadow: 0 0 0 3px rgba(214, 137, 16, 0.1);
+        }
+
+        .dark-theme .retry-slider {
+            background: #5d4e23;
+        }
+
+        .dark-theme .retry-slider::-webkit-slider-thumb {
+            background: #d68910;
+        }
+
+        .dark-theme .retry-slider::-webkit-slider-thumb:hover {
+            background: #b7791f;
+        }
+
+        .dark-theme .retry-slider::-moz-range-thumb {
+            background: #d68910;
+        }
+
+        .dark-theme .retry-slider-value {
+            color: #d68910;
+            background: #232741;
+            border-color: #5d4e23;
+        }
+
+        .dark-theme .retry-preset-btn {
+            border-color: #d68910;
+            color: #d68910;
+            background: #232741;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .dark-theme .retry-preset-btn:hover {
+            background: #d68910;
+            color: white;
+            box-shadow: 0 4px 12px rgba(214, 137, 16, 0.3);
+        }
+
+        .dark-theme .retry-preset-btn.active {
+            background: #d68910;
+            color: white;
+            box-shadow: 0 4px 12px rgba(214, 137, 16, 0.4);
+        }
+
+        /* 滚动条样式已迁移至外链 CSS */
+
+        /* 深色主题滚动条样式 */
+        .dark-theme .model-list-container::-webkit-scrollbar,
+        .dark-theme .results-tabs::-webkit-scrollbar,
+        .dark-theme .key-list::-webkit-scrollbar,
+        .dark-theme #apiKeys::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .dark-theme .model-list-container::-webkit-scrollbar-track,
+        .dark-theme .results-tabs::-webkit-scrollbar-track,
+        .dark-theme .key-list::-webkit-scrollbar-track,
+        .dark-theme #apiKeys::-webkit-scrollbar-track {
+            background: #1e1e2e;
+            border-radius: 4px;
+        }
+
+        .dark-theme .model-list-container::-webkit-scrollbar-thumb,
+        .dark-theme .results-tabs::-webkit-scrollbar-thumb,
+        .dark-theme .key-list::-webkit-scrollbar-thumb,
+        .dark-theme #apiKeys::-webkit-scrollbar-thumb {
+            background: #4c63d2;
+            border-radius: 4px;
+        }
+
+        .dark-theme .model-list-container::-webkit-scrollbar-thumb:hover,
+        .dark-theme .results-tabs::-webkit-scrollbar-thumb:hover,
+        .dark-theme .key-list::-webkit-scrollbar-thumb:hover,
+        .dark-theme #apiKeys::-webkit-scrollbar-thumb:hover {
+            background: #5a73e0;
+        }
+
+        /* 粘贴按钮与导入按钮样式已迁移至外链 CSS */
+
+        /* 见 css/base.css 与 css/theme.css */
+    </style>
+</head>
+<body>
+    <!-- 主题切换控制按钮 -->
+    <div class="theme-controls">
+        <button class="control-btn" id="langBtn" title="切换语言">🌐</button>
+        <button class="control-btn" id="themeBtn" title="切换主题">🌙</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-lang-key="title">🔑 API Key 测活工具</h1>
+            <p data-lang-key="subtitle">批量检测 Gemini、Claude、GPT API 密钥有效性</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <div class="input-group">
+                    <label for="apiType" data-lang-key="select-api">选择 API 类型</label>
+                    <select id="apiType" class="form-control">
+                        <option value="openai">OpenAI GPT</option>
+                        <option value="claude">Claude</option>
+                        <option value="gemini">Google Gemini</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="modelInput" data-lang-key="select-model">测试模型</label>
+                    <div class="model-input-group">
+                        <select id="modelSelect" class="form-control">
+                            <!-- 模型选项会根据API类型动态更新 -->
+                        </select>
+                        <input type="text" id="modelInput" class="form-control hidden" data-lang-key="model-input-placeholder" placeholder="输入自定义模型名">
+                        <button type="button" class="model-toggle-btn" id="modelToggleBtn" data-lang-key="custom-model">自定义</button>
+                    </div>
+                    <small class="form-help" data-lang-key="model-help">可以选择预设模型或输入自定义模型名</small>
+                </div>
+
+                <div class="detected-models" id="detectedModels">
+                    <div class="detected-models-header" id="detectedModelsHeader">
+                        <h4 data-lang-key="detected-models-title">检测到的可用模型</h4>
+                        <span class="collapse-icon collapsed" id="collapseIcon">▼</span>
+                    </div>
+                    <div class="model-list-container" id="modelListContainer">
+                        <div class="model-list" id="modelList"></div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="proxyUrl" data-lang-key="proxy-url">代理服务器 URL (可选)</label>
+                    <input type="text" id="proxyUrl" class="form-control" placeholder="https://your-proxy.com">
+                    <small class="form-help" data-lang-key="proxy-help">留空使用默认代理，建议使用自己的反向代理以提高成功率</small>
+                </div>
+
+                <!-- 并发控制 -->
+                <div class="input-group">
+                    <label data-lang-key="concurrency-control">并发控制</label>
+                    <div class="concurrency-container">
+                        <div class="concurrency-input-section">
+                            <input type="number" id="concurrencyInput" class="form-control" value="5" min="1">
+                        </div>
+                        <div class="slider-section">
+                            <div class="slider-container">
+                                <input type="range" id="concurrencySlider" class="slider" min="1" max="50" value="5">
+                                <span class="slider-value" id="sliderValue">5</span>
+                            </div>
+                            <div class="preset-buttons">
+                                <button type="button" class="preset-btn" data-concurrency="1" data-lang-key="slow">慢速</button>
+                                <button type="button" class="preset-btn active" data-concurrency="5" data-lang-key="normal">正常</button>
+                                <button type="button" class="preset-btn" data-concurrency="10" data-lang-key="fast">快速</button>
+                                <button type="button" class="preset-btn" data-concurrency="20" data-lang-key="ultra">极速</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 重试控制 -->
+                <div class="input-group">
+                    <label data-lang-key="retry-control">重试控制</label>
+                    <div class="retry-container">
+                        <div class="retry-input-section">
+                            <input type="number" id="retryInput" class="form-control" value="3" min="0" max="10">
+                        </div>
+                        <div class="retry-slider-section">
+                            <div class="retry-slider-container">
+                                <input type="range" id="retrySlider" class="retry-slider" min="0" max="10" value="3">
+                                <span class="retry-slider-value" id="retrySliderValue">3</span>
+                            </div>
+                            <div class="retry-preset-buttons">
+                                <button type="button" class="retry-preset-btn" data-retry="0" data-lang-key="no-retry">不重试</button>
+                                <button type="button" class="retry-preset-btn" data-retry="2" data-lang-key="light-retry">轻度</button>
+                                <button type="button" class="retry-preset-btn active" data-retry="3" data-lang-key="normal-retry">正常</button>
+                                <button type="button" class="retry-preset-btn" data-retry="5" data-lang-key="heavy-retry">重度</button>
+                            </div>
+                        </div>
+                    </div>
+                    <small class="form-help" data-lang-key="retry-help">遇到临时错误(如403)时重试次数，有助于提高检测准确性</small>
+                </div>
+                
+                <div class="input-group">
+                    <div class="label-with-import">
+                        <label for="apiKeys" data-lang-key="api-keys">API 密钥列表 (每行一个)</label>
+                        <button class="import-btn" id="importBtn" title="导入文件">📁</button>
+                    </div>
+                    <div class="textarea-wrapper">
+                        <textarea id="apiKeys" class="form-control textarea" data-lang-key="api-keys-placeholder" placeholder="请输入API密钥，每行一个：&#10;sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#10;sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&#10;..."></textarea>
+                        <button class="paste-btn" id="pasteBtn" title="粘贴">📋</button>
+                    </div>
+                    <input type="file" id="fileInput" accept=".txt" style="display: none;">
+                </div>
+                
+                <div class="alert">
+                    <strong data-lang-key="usage-title">💡 使用说明：</strong> 
+                    <br><span data-lang-key="usage-1">• 强烈建议使用自定义代理URL，公共代理可能不稳定</span>
+                    <br><span data-lang-key="usage-2">• Gemini代理示例: https://gemini.weiruchenai.me/v1beta</span>
+<br><span data-lang-key="usage-3">• OpenAI代理示例: https://openai.weiruchenai.me/v1</span>
+<br><span data-lang-key="usage-4">• Claude代理示例: https://claude.weiruchenai.me/v1</span>
+                    <br><span data-lang-key="usage-5">• 直接访问官方API会因CORS限制失败</span>
+                    <br><span data-lang-key="usage-6">• 测试过程中密钥仅用于验证，不会被存储</span>
+                    <br><span data-lang-key="usage-7">• 智能重试机制可提高检测准确性，减少误判</span>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-detect" id="detectBtn" data-lang-key="detect-models">检测模型</button>
+                    <button class="btn btn-primary" id="startBtn" data-lang-key="start-test">开始测试</button>
+                    <button class="btn btn-secondary" id="dedupeBtn" data-lang-key="dedupe-keys">去重密钥</button>
+                    <button class="btn btn-secondary" id="clearBtn" data-lang-key="clear">清空</button>
+                </div>
+            </div>
+            
+            <div class="progress-bar hidden" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="loading hidden" id="loading">
+                <div class="spinner"></div>
+                <p data-lang-key="testing">正在测试 API 密钥...</p>
+            </div>
+            
+            <div class="results-section hidden" id="resultsSection">
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number total" id="totalCount">0</div>
+                        <div class="stat-label" data-lang-key="total">总计</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number valid" id="validCount">0</div>
+                        <div class="stat-label" data-lang-key="valid">有效</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number invalid" id="invalidCount">0</div>
+                        <div class="stat-label" data-lang-key="invalid">无效</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number rate-limited" id="rateLimitedCount">0</div>
+                        <div class="stat-label" data-lang-key="rate-limited">速率限制</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number testing" id="testingCount">0</div>
+                        <div class="stat-label" data-lang-key="testing-label">测试中</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number retrying" id="retryingCount">0</div>
+                        <div class="stat-label" data-lang-key="retrying">重试中</div>
+                    </div>
+                </div>
+                
+                <div class="results-tabs">
+                    <button class="tab active" data-tab="all" data-lang-key="all">全部</button>
+                    <button class="tab" data-tab="valid" data-lang-key="valid-keys">有效密钥</button>
+                    <button class="tab" data-tab="invalid" data-lang-key="invalid-keys">无效密钥</button>
+                    <button class="tab" data-tab="rate-limited" data-lang-key="rate-limited-keys">速率限制</button>
+                </div>
+                
+                <div class="tab-content active" id="allTab">
+                    <div class="key-list" id="allKeys"></div>
+                    <button class="copy-btn" data-copy="all" data-lang-key="copy-all">复制全部</button>
+                </div>
+                
+                <div class="tab-content" id="validTab">
+                    <div class="key-list" id="validKeys"></div>
+                    <button class="copy-btn" data-copy="valid" data-lang-key="copy-valid">复制有效密钥</button>
+                </div>
+                
+                <div class="tab-content" id="invalidTab">
+                    <div class="key-list" id="invalidKeys"></div>
+                    <button class="copy-btn" data-copy="invalid" data-lang-key="copy-invalid">复制无效密钥</button>
+                </div>
+                
+                <div class="tab-content" id="rateLimitedTab">
+                    <div class="key-list" id="rateLimitedKeys"></div>
+                    <button class="copy-btn" data-copy="rate-limited" data-lang-key="copy-rate-limited">复制速率限制密钥</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/services/apiUrl.js"></script>
+    <script src="js/core/retry.js"></script>
+    <script src="js/core/concurrency.js"></script>
+    <script src="js/core/tester.js"></script>
+    <script src="js/config/modelOptions.js"></script>
+    <script src="js/utils/keys.js"></script>
+    <script src="js/utils/clipboard.js"></script>
+    <script src="js/i18n/translations.js"></script>
+    <script src="js/i18n/i18n.js"></script>
+    <script src="js/ui/controls.js"></script>
+    <script src="js/services/modelsService.js"></script>
+    <script src="js/ui/results.js"></script>
+    <script src="js/ui/models.js"></script>
+    <script src="js/ui/theme.js"></script>
+    <script src="js/app/bootstrap.js"></script>
+    <script src="js/services/openaiService.js"></script>
+    <script src="js/services/claudeService.js"></script>
+    <script src="js/services/geminiService.js"></script>
+    <script src="js/services/router.js"></script>
+    <script>
+        // 全局变量
+        let allKeysData = [];
+        let currentLang = 'zh';
+        let isDarkTheme = false;
+        let isCustomModel = false;
+        let detectedModels = new Set();
+        let currentConcurrency = 5;
+        let currentRetryCount = 3;
+        let isTestingInProgress = false;
+        let shouldCancelTesting = false;
+        let completedCount = 0;
+        let totalCount = 0;
+        let updateTimer = null;
+
+        // 显示完成消息
+        function showCompletionMessage() {
+            const validCount = allKeysData.filter(k => k.status === 'valid').length;
+            const invalidCount = allKeysData.filter(k => k.status === 'invalid').length;
+            const rateLimitedCount = allKeysData.filter(k => k.status === 'rate-limited').length;
+            
+            const message = currentLang === 'zh' ? 
+                `测试完成！有效密钥: ${validCount}，无效密钥: ${invalidCount}，速率限制: ${rateLimitedCount}` :
+                `Test completed! Valid keys: ${validCount}, Invalid keys: ${invalidCount}, Rate limited: ${rateLimitedCount}`;
+            alert(message);
+        }
+
+    </script>
+</body>
+</html>

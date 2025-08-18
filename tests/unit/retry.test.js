@@ -30,6 +30,13 @@ describe('retry.extractStatusCode / shouldRetry', () => {
     expect(window.shouldRetry('fetch failed', null)).toBe(true);
     expect(window.shouldRetry('other', 400)).toBe(false);
   });
+
+  test('shouldRetry 不匹配时返回 false，extractStatusCode 非字符串返回 null', () => {
+    expect(window.shouldRetry('plain error', 400)).toBe(false);
+    expect(window.extractStatusCode(null)).toBe(null);
+    expect(window.extractStatusCode(123)).toBe(null);
+    expect(window.extractStatusCode('')).toBe(null);
+  });
 });
 
 describe('retry.testApiKeyWithRetry', () => {
@@ -81,6 +88,32 @@ describe('retry.testApiKeyWithRetry', () => {
     expect(result.valid).toBe(false);
     expect(result.error?.startsWith('测试异常:')).toBe(true);
     expect(global.allKeysData[0].retryCount).toBe(0);
+  });
+
+  test('非可重试错误立即 finalize，不进行后续重试', async () => {
+    global.allKeysData = [{ key: 'k1', status: 'pending', retryCount: 0 }];
+    let calls = 0;
+    global.testApiKey = async () => {
+      calls += 1;
+      return { valid: false, error: 'HTTP 400', isRateLimit: false };
+    };
+    const r = await window.testApiKeyWithRetry('k1', 'openai', 2);
+    expect(calls).toBe(1);
+    expect(global.allKeysData[0].retryCount).toBe(0);
+    expect(r).toEqual({ valid: false, error: 'HTTP 400', isRateLimit: false });
+  });
+
+  test('第一次抛异常进入 retrying，第二次成功', async () => {
+    global.allKeysData = [{ key: 'k1', status: 'pending', retryCount: 0 }];
+    let calls = 0;
+    global.testApiKey = async () => {
+      calls += 1;
+      if (calls === 1) throw new Error('temp');
+      return { valid: true, error: null, isRateLimit: false };
+    };
+    const r = await window.testApiKeyWithRetry('k1', 'openai', 2);
+    expect(r).toEqual({ valid: true, error: null, isRateLimit: false });
+    expect(global.allKeysData[0].retryCount).toBeGreaterThanOrEqual(1);
   });
 });
 
