@@ -132,24 +132,25 @@ api-key-tester/
 #### 9.1 模块/依赖图
 ```mermaid
 graph LR
-  subgraph App[App & Entry]
+  subgraph App["App & Entry"]
     BOOT[js/app/bootstrap.js]
   end
 
-  subgraph UI[UI Layer]
+  subgraph UI_LAYER["UI Layer"]
+    UI_ROOT((UI))
     CTRL[js/ui/controls.js]
     RES[js/ui/results.js]
     MODELS[js/ui/models.js]
     THEME[js/ui/theme.js]
   end
 
-  subgraph Core[Core]
+  subgraph Core["Core"]
     TEST[js/core/tester.js]
     CONC[js/core/concurrency.js]
     RETRY[js/core/retry.js]
   end
 
-  subgraph Services[Services]
+  subgraph Services["Services"]
     ROUTER[js/services/router.js]
     OA[js/services/openaiService.js]
     CL[js/services/claudeService.js]
@@ -158,17 +159,17 @@ graph LR
     API[js/services/apiUrl.js]
   end
 
-  subgraph I18N[I18N]
+  subgraph I18N_GROUP["I18N"]
     TR[js/i18n/translations.js]
-    I18N[js/i18n/i18n.js]
+    I18NJS[js/i18n/i18n.js]
   end
 
-  subgraph Utils[Utils]
+  subgraph Utils["Utils"]
     KEYS[js/utils/keys.js]
     CB[js/utils/clipboard.js]
   end
 
-  subgraph CSS[CSS]
+  subgraph CSS["CSS"]
     BASE[css/base.css]
     THEME_CSS[css/theme.css]
   end
@@ -186,13 +187,13 @@ graph LR
   ROUTER --> GM
   TEST --> RES
   CONC --> RES
-  RES --> I18N
-  CTRL --> I18N
+  RES --> I18NJS
+  CTRL --> I18NJS
   CTRL --> KEYS
   CTRL --> CB
   API -. 提供端点 .- ROUTER
-  BASE -. 样式 .- UI
-  THEME_CSS -. 深色覆写 .- UI
+  BASE -. 样式 .- UI_ROOT
+  THEME_CSS -. 深色覆写 .- UI_ROOT
 ```
 
 #### 9.2 核心流程时序图（开始测试）
@@ -224,7 +225,7 @@ sequenceDiagram
 ```mermaid
 flowchart TD
   A[收到结果/异常] -->|有效/无效| END1[返回结果]
-  A -->|可重试条件: 5xx/网络/超时/403(临时)| B{是否超过最大重试}
+  A -->|可重试条件 5xx / 网络 / 超时 / 403-临时| B{是否超过最大重试}
   B -- 是 --> END2[返回最终失败]
   B -- 否 --> C[指数退避等待]
   C --> D[再次调用 Service]
