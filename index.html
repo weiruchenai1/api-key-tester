@@ -1963,6 +1963,12 @@
         </div>
     </div>
 
+    <script src="js/services/apiUrl.js"></script>
+    <script src="js/core/retry.js"></script>
+    <script src="js/core/concurrency.js"></script>
+    <script src="js/services/openaiService.js"></script>
+    <script src="js/services/claudeService.js"></script>
+    <script src="js/services/geminiService.js"></script>
     <script>
         // 全局变量
         let allKeysData = [];
@@ -2126,69 +2132,7 @@
             }
         };
 
-        async function testApiKeyWithRetry(apiKey, apiType, maxRetries = 0) {
-            const keyData = allKeysData.find(k => k.key === apiKey);
-            
-            for (let attempt = 0; attempt <= maxRetries; attempt++) {
-                try {
-                    // 更新状态和UI
-                    if (keyData) {
-                        if (attempt === 0) {
-                            keyData.status = 'testing';
-                            keyData.retryCount = 0;
-                        } else {
-                            keyData.status = 'retrying';
-                            keyData.retryCount = attempt;
-                            // 优化重试延迟
-                            await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 500));
-                        }
-                        updateUIAsync();
-                    }
-                    
-                    // 执行实际测试
-                    const result = await testApiKey(apiKey, apiType);
-                    
-                    // 成功或速率限制：直接返回，不重试
-                    if (result.valid || result.isRateLimit) {
-                        return finalizeResult(keyData, result, attempt);
-                    }
-                    
-                    // 最后一次尝试：无论结果如何都返回
-                    if (attempt === maxRetries) {
-                        return finalizeResult(keyData, result, attempt);
-                    }
-                    
-                    // 检查是否需要重试
-                    const statusCode = extractStatusCode(result.error);
-                    if (!shouldRetry(result.error, statusCode)) {
-                        // 不需要重试的错误直接返回
-                        return finalizeResult(keyData, result, attempt);
-                    }
-                    
-                    // 继续下一次重试...
-                    // 重试逻辑
-                    
-                } catch (error) {
-                    console.error(`测试密钥 ${apiKey.substring(0, 10)}... 第 ${attempt + 1} 次尝试异常:`, error);
-                    
-                    if (attempt === maxRetries) {
-                        const errorResult = { 
-                            valid: false, 
-                            error: '测试异常: ' + error.message, 
-                            isRateLimit: false 
-                        };
-                        return finalizeResult(keyData, errorResult, attempt);
-                    }
-                    
-                    // 异常也可以重试
-                    if (keyData) {
-                        keyData.status = 'retrying';
-                        keyData.retryCount = attempt + 1;
-                        updateUIAsync();
-                    }
-                }
-            }
-        }
+        
 
         // 完成测试结果处理
         function finalizeResult(keyData, result, retryCount) {
@@ -2305,47 +2249,6 @@
             }
         }
 
-        // 正确的固定并发处理逻辑
-        async function processWithFixedConcurrency(apiKeys, apiType) {
-            const keyQueue = [...apiKeys];
-            const activeSlots = new Array(currentConcurrency).fill(null);
-            let nextKeyIndex = 0;
-            
-            // 开始测试处理
-            
-            // 初始填满所有并发槽位
-            for (let i = 0; i < currentConcurrency && i < keyQueue.length; i++) {
-                activeSlots[i] = startKeyTest(keyQueue[nextKeyIndex], apiType, i);
-                nextKeyIndex++;
-            }
-            
-            // 持续处理直到所有密钥完成或被取消
-            while (activeSlots.some(slot => slot !== null) && !shouldCancelTesting) {
-                // 等待任意一个槽位完成
-                const completedIndex = await waitForAnySlotCompletion(activeSlots);
-                
-                // 更新进度
-                completedCount++;
-                updateProgress();
-                
-                // 检查是否应该取消
-                if (shouldCancelTesting) {
-                    break;
-                }
-                
-                // 如果还有待测试的密钥，启动新的测试占用这个槽位
-                if (nextKeyIndex < keyQueue.length) {
-                    activeSlots[completedIndex] = startKeyTest(keyQueue[nextKeyIndex], apiType, completedIndex);
-                    nextKeyIndex++;
-                } else {
-                    // 没有新密钥了，释放槽位
-                    activeSlots[completedIndex] = null;
-                }
-            }
-            
-            // 测试完成
-        }
-        
         // 更新开始按钮文本
         function updateStartButtonText() {
             const startBtn = document.getElementById('startBtn');
@@ -2356,42 +2259,6 @@
                 startBtn.textContent = translations[currentLang]['start-test'];
                 startBtn.setAttribute('data-lang-key', 'start-test');
             }
-        }
-
-        // 启动单个密钥测试
-        async function startKeyTest(apiKey, apiType, slotIndex) {
-            // 开始测试密钥
-            
-            try {
-                const result = await testApiKeyWithRetry(apiKey, apiType, currentRetryCount);
-                // 测试完成
-                return result;
-            } catch (error) {
-                // 处理测试异常
-                
-                // 处理测试异常
-                const keyData = allKeysData.find(k => k.key === apiKey);
-                if (keyData) {
-                    keyData.status = 'invalid';
-                    keyData.error = '测试异常: ' + error.message;
-                }
-                return { valid: false, error: error.message, isRateLimit: false };
-            } finally {
-                updateUIAsync();
-            }
-        }
-
-        // 等待任意槽位完成
-        async function waitForAnySlotCompletion(activeSlots) {
-            const activePromises = activeSlots
-                .map((promise, index) => promise ? promise.then(() => index) : null)
-                .filter(p => p !== null);
-            
-            if (activePromises.length === 0) {
-                throw new Error('没有活跃的测试任务');
-            }
-            
-            return await Promise.race(activePromises);
         }
 
         // 异步更新UI
@@ -2412,43 +2279,10 @@
         }
 
         // 判断是否需要重试
-        function shouldRetry(error, statusCode) {
-            // 403、502、503、504 等临时错误需要重试
-            if ([403, 502, 503, 504].includes(statusCode)) {
-                return true;
-            }
-            
-            if (error && typeof error === 'string') {
-                const errorLower = error.toLowerCase();
-                if (errorLower.includes('timeout') || 
-                    errorLower.includes('network') || 
-                    errorLower.includes('连接') ||
-                    errorLower.includes('fetch')) {
-                    return true;
-                }
-            }
-            
-            return false;
-        }
+        
 
         // 提取HTTP状态码
-        function extractStatusCode(error) {
-            if (!error || typeof error !== 'string') return null;
-            
-            const match = error.match(/\((\d{3})\)/);
-            if (match) {
-                return parseInt(match[1]);
-            }
-            
-            if (error.includes('HTTP ')) {
-                const httpMatch = error.match(/HTTP (\d{3})/);
-                if (httpMatch) {
-                    return parseInt(httpMatch[1]);
-                }
-            }
-            
-            return null;
-        }
+        
 
         // 显示完成消息
         function showCompletionMessage() {
@@ -2704,42 +2538,7 @@
             }
         }
 
-        function getApiUrl(apiType, endpoint) {
-            const proxyUrl = document.getElementById('proxyUrl').value.trim();
-            
-            if (proxyUrl) {
-                const baseUrl = proxyUrl.endsWith('/') ? proxyUrl.slice(0, -1) : proxyUrl;
-                return baseUrl + endpoint;
-            } else {
-                switch (apiType) {
-                    case 'openai':
-                        return 'https://openai.weiruchenai.me/v1' + endpoint;
-                    case 'claude':
-                        return 'https://claude.weiruchenai.me/v1' + endpoint;
-                    case 'gemini':
-                        return 'https://gemini.weiruchenai.me/v1beta' + endpoint;
-                }
-            }
-        }
         
-        function updateProxyPlaceholder() {
-            const apiType = document.getElementById('apiType').value;
-            const proxyInput = document.getElementById('proxyUrl');
-            
-            switch (apiType) {
-                case 'openai':
-                    proxyInput.placeholder = 'https://openai.weiruchenai.me/v1';
-                    break;
-                case 'claude':
-                    proxyInput.placeholder = 'https://claude.weiruchenai.me/v1';
-                    break;
-                case 'gemini':
-                    proxyInput.placeholder = 'https://gemini.weiruchenai.me/v1beta';
-                    break;
-            }
-            
-            updateModelOptions();
-        }
 
         async function detectModels() {
             const apiType = document.getElementById('apiType').value;
@@ -2802,305 +2601,7 @@
             }
         }
 
-        async function getOpenAIModels(apiKey) {
-            try {
-                const apiUrl = getApiUrl('openai', '/models');
-                
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + apiKey,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    if (response.status === 401 || response.status === 403) {
-                        return [];
-                    }
-                    return [];
-                }
-                
-                const data = await response.json();
-                
-                if (data && data.data && Array.isArray(data.data)) {
-                    const models = data.data
-                        .filter(model => {
-                            const id = model.id.toLowerCase();
-                            return !id.includes('embed') && 
-                                   !id.includes('whisper') && 
-                                   !id.includes('tts') &&
-                                   !id.includes('dall-e') &&
-                                   !id.includes('moderation') &&
-                                   !id.includes('search') &&
-                                   !id.includes('similarity');
-                        })
-                        .map(model => model.id)
-                        .sort();
-                    
-                    return models;
-                }
-                return [];
-            } catch (error) {
-                return [];
-            }
-        }
-
-        async function getClaudeModels(apiKey) {
-            const commonModels = [
-                'claude-3-5-sonnet-20241022',
-                'claude-3-5-sonnet-20240620', 
-                'claude-3-5-haiku-20241022',
-                'claude-3-opus-20240229',
-                'claude-3-sonnet-20240229',
-                'claude-3-haiku-20240307',
-            ];
-            
-            const availableModels = [];
-            
-            for (const model of commonModels) {
-                try {
-                    const result = await testClaudeKey(apiKey, model);
-                    if (result.valid) {
-                        availableModels.push(model);
-                    }
-                } catch (error) {
-                    continue;
-                }
-            }
-            
-            return availableModels;
-        }
-
-        async function getGeminiModels(apiKey) {
-            try {
-                const apiUrl = getApiUrl('gemini', '/models?key=' + apiKey);
-                
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    if (response.status === 400 || response.status === 401 || response.status === 403) {
-                        return [];
-                    }
-                    return [];
-                }
-                
-                const data = await response.json();
-                
-                if (data && data.models && Array.isArray(data.models)) {
-                    const models = data.models
-                        .filter(model => {
-                            return model.supportedGenerationMethods && 
-                                   model.supportedGenerationMethods.includes('generateContent');
-                        })
-                        .map(model => {
-                            return model.name.replace('models/', '');
-                        })
-                        .sort();
-                    
-                    return models;
-                }
-                return [];
-            } catch (error) {
-                return [];
-            }
-        }
-
-        async function testOpenAIKey(apiKey, model = null) {
-            try {
-                const selectedModel = model || getSelectedModel();
-                if (!selectedModel) {
-                    return { valid: false, error: '未指定模型', isRateLimit: false };
-                }
-                
-                const apiUrl = getApiUrl('openai', '/chat/completions');
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + apiKey,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: selectedModel,
-                        messages: [{ role: 'user', content: 'Hi' }],
-                        max_tokens: 1
-                    })
-                });
-                
-                if (!response.ok) {
-                    if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
-                    if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
-                    if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
-                    return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429 };
-                }
-                
-                const responseText = await response.text();
-                if (!responseText || responseText.trim() === '') {
-                    return { valid: false, error: '空响应', isRateLimit: false };
-                }
-                
-                let data;
-                try {
-                    data = JSON.parse(responseText);
-                } catch (parseError) {
-                    return { valid: false, error: 'JSON解析失败', isRateLimit: false };
-                }
-                
-                if (data && data.error) {
-                    const errorMessage = data.error.message || data.error.toString();
-                    if (errorMessage.toLowerCase().includes('rate limit') || 
-                        errorMessage.toLowerCase().includes('too many requests') ||
-                        errorMessage.toLowerCase().includes('quota exceeded')) {
-                        return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true };
-                    }
-                }
-                
-                if (data && data.choices && Array.isArray(data.choices)) {
-                    return { valid: true, error: null, isRateLimit: false };
-                } else {
-                    return { valid: false, error: '响应格式错误', isRateLimit: false };
-                }
-            } catch (error) {
-                if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                    return { valid: false, error: '网络连接失败', isRateLimit: false };
-                }
-                return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
-            }
-        }
         
-        async function testClaudeKey(apiKey, model = null) {
-            try {
-                const selectedModel = model || getSelectedModel();
-                if (!selectedModel) {
-                    return { valid: false, error: '未指定模型', isRateLimit: false };
-                }
-                
-                const apiUrl = getApiUrl('claude', '/messages');
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'x-api-key': apiKey,
-                        'Content-Type': 'application/json',
-                        'anthropic-version': '2023-06-01'
-                    },
-                    body: JSON.stringify({
-                        model: selectedModel,
-                        max_tokens: 1,
-                        messages: [{ role: 'user', content: 'Hi' }]
-                    })
-                });
-                
-                if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
-                if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
-                if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
-                
-                const responseText = await response.text();
-                
-                if (response.status === 400) {
-                    try {
-                        const errorData = JSON.parse(responseText);
-                        if (errorData.error && errorData.error.type === 'authentication_error') {
-                            return { valid: false, error: '认证错误', isRateLimit: false };
-                        }
-                        if (errorData.error && errorData.error.type === 'rate_limit_error') {
-                            return { valid: false, error: 'Rate Limit Error', isRateLimit: true };
-                        }
-                        if (errorData.error && errorData.error.type === 'invalid_request_error') {
-                            return { valid: true, error: null, isRateLimit: false };
-                        }
-                        return { valid: false, error: 'API错误: ' + (errorData.error.type || 'unknown'), isRateLimit: false };
-                    } catch {
-                        return { valid: false, error: 'JSON解析失败', isRateLimit: false };
-                    }
-                }
-                
-                if (response.ok) {
-                    return { valid: true, error: null, isRateLimit: false };
-                } else {
-                    return { valid: false, error: 'HTTP ' + response.status, isRateLimit: false };
-                }
-            } catch (error) {
-                if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                    return { valid: false, error: '网络连接失败', isRateLimit: false };
-                }
-                return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
-            }
-        }
-        
-        async function testGeminiKey(apiKey, model = null) {
-            try {
-                const selectedModel = model || getSelectedModel();
-                if (!selectedModel) {
-                    return { valid: false, error: '未指定模型', isRateLimit: false };
-                }
-                
-                const apiUrl = getApiUrl('gemini', '/models/' + selectedModel + ':generateContent?key=' + apiKey);
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        contents: [
-                            {
-                                parts: [
-                                    {
-                                        text: "Hi"
-                                    }
-                                ]
-                            }
-                        ]
-                    })
-                });
-                
-                if (!response.ok) {
-                    if (response.status === 400) return { valid: false, error: 'API密钥无效 (400)', isRateLimit: false };
-                    if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
-                    if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
-                    if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
-                    return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429 };
-                }
-                
-                const responseText = await response.text();
-                if (!responseText || responseText.trim() === '') {
-                    return { valid: false, error: '空响应', isRateLimit: false };
-                }
-                
-                let data;
-                try {
-                    data = JSON.parse(responseText);
-                } catch (parseError) {
-                    return { valid: false, error: 'JSON解析失败', isRateLimit: false };
-                }
-                
-                if (data && data.candidates && Array.isArray(data.candidates) && data.candidates.length > 0) {
-                    return { valid: true, error: null, isRateLimit: false };
-                } else if (data && data.error) {
-                    const errorMessage = data.error.message || data.error.toString();
-                    if (errorMessage.toLowerCase().includes('quota exceeded') || 
-                        errorMessage.toLowerCase().includes('rate limit') ||
-                        errorMessage.toLowerCase().includes('too many requests')) {
-                        return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true };
-                    }
-                    return { valid: false, error: 'API错误: ' + errorMessage, isRateLimit: false };
-                } else {
-                    return { valid: false, error: '响应格式错误', isRateLimit: false };
-                }
-            } catch (error) {
-                if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                    return { valid: false, error: '网络连接失败', isRateLimit: false };
-                }
-                if (error.name === 'SyntaxError' && error.message.includes('JSON')) {
-                    return { valid: false, error: 'JSON解析失败', isRateLimit: false };
-                }
-                return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
-            }
-        }
 
         async function testApiKey(apiKey, apiType) {
             let result;

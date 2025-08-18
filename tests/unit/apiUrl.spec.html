@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8" />
+	<title>apiUrl unit tests</title>
+</head>
+<body>
+	<div>
+		<label>API Type</label>
+		<select id="apiType">
+			<option value="openai">OpenAI</option>
+			<option value="claude">Claude</option>
+			<option value="gemini">Gemini</option>
+		</select>
+	</div>
+	<input id="proxyUrl" value="" />
+
+	<script src="../../tests/unit/_testUtils.js"></script>
+	<script src="../../js/services/apiUrl.js"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', () => {
+			test('getApiUrl uses default when proxy empty', () => {
+				document.getElementById('proxyUrl').value = '';
+				expectEqual(getApiUrl('openai', '/models'), 'https://openai.weiruchenai.me/v1/models');
+				expectEqual(getApiUrl('claude', '/messages'), 'https://claude.weiruchenai.me/v1/messages');
+				expectEqual(getApiUrl('gemini', '/models'), 'https://gemini.weiruchenai.me/v1beta/models');
+			});
+
+			test('getApiUrl respects proxy without trailing slash', () => {
+				document.getElementById('proxyUrl').value = 'https://proxy.example.com/api';
+				expectEqual(getApiUrl('openai', '/models'), 'https://proxy.example.com/api/models');
+			});
+
+			test('getApiUrl respects proxy with trailing slash', () => {
+				document.getElementById('proxyUrl').value = 'https://proxy.example.com/api/';
+				expectEqual(getApiUrl('gemini', '/x'), 'https://proxy.example.com/api/x');
+			});
+
+			test('updateProxyPlaceholder updates placeholder per apiType', () => {
+				const proxy = document.getElementById('proxyUrl');
+				document.getElementById('apiType').value = 'openai';
+				updateProxyPlaceholder();
+				expectEqual(proxy.placeholder, 'https://openai.weiruchenai.me/v1');
+				document.getElementById('apiType').value = 'claude';
+				updateProxyPlaceholder();
+				expectEqual(proxy.placeholder, 'https://claude.weiruchenai.me/v1');
+				document.getElementById('apiType').value = 'gemini';
+				updateProxyPlaceholder();
+				expectEqual(proxy.placeholder, 'https://gemini.weiruchenai.me/v1beta');
+			});
+
+			finish();
+		});
+	</script>
+</body>
+</html>
+
+
