@@ -86,11 +86,11 @@ describe('core/tester.startTesting', () => {
     expect(kd.status).toBe('paid');
   });
 
-  test('already testing sets cancel flag and returns', async () => {
+  test('already testing ignores re-entry and does not set cancel flag', async () => {
     global.isTestingInProgress = true;
     global.shouldCancelTesting = false;
     await window.startTesting();
-    expect(global.shouldCancelTesting).toBe(true);
+    expect(global.shouldCancelTesting).toBe(false);
   });
 });
 

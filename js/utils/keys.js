@@ -1,3 +1,5 @@
+const MAX_KEY_LENGTH = 128;
+
 function deduplicateAndCleanKeys(keys) {
 	const seen = new Set();
 	const uniqueKeys = [];
@@ -16,36 +18,48 @@ function deduplicateAndCleanKeys(keys) {
 
 function extractKeysFromContent(content) {
 	const keys = [];
-	const openaiPattern = /sk-[a-zA-Z0-9\u4e00-\u9fff\-_]{30,}/g;
-	const geminiPattern = /AIzaSy[a-zA-Z0-9\u4e00-\u9fff_\-]{30,}/g;
-	const coherePattern = /[a-zA-Z0-9\u4e00-\u9fff\-_]{40,}/g;
-	const anthropicPattern = /[a-zA-Z0-9\u4e00-\u9fff\-_]{32,}/g;
-	const genericPattern = /(?:sk-|gsk_|api_|key_|token_|pk-)[a-zA-Z0-9\u4e00-\u9fff\-_]{20,}/g;
+	const openaiPattern = /sk-[A-Za-z0-9_-]{30,128}/g;
+	const geminiPattern = /AIzaSy[A-Za-z0-9_-]{30,128}/g;
+	const coherePattern = /(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{40,128}(?![A-Za-z0-9_-])/g;
+	const anthropicPattern = /(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{32,128}(?![A-Za-z0-9_-])/g;
+	const genericPattern = /(?:sk-|gsk_|api_|key_|token_|pk-)[A-Za-z0-9_-]{20,128}/g;
 
 	let matches = content.match(openaiPattern);
 	if (matches) keys.push(...matches);
 	matches = content.match(geminiPattern);
+	if (matches) keys.push(...matches);
+	// 引入 cohere / anthropic 进入同层匹配
+	matches = content.match(coherePattern);
+	if (matches) keys.push(...matches);
+	matches = content.match(anthropicPattern);
 	if (matches) keys.push(...matches);
 	if (keys.length === 0) {
 		matches = content.match(genericPattern);
 		if (matches) keys.push(...matches);
 	}
 	if (keys.length === 0) {
-		const longStringPattern = /[a-zA-Z0-9\u4e00-\u9fff\-_]{25,}/g;
+		// 边界受限的兜底：两侧均非 [A-Za-z0-9_-]，避免命中更长标识符的子串
+		const longStringPattern = /(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{25,128}(?![A-Za-z0-9_-])/g;
 		matches = content.match(longStringPattern);
 		if (matches) {
 			const filteredMatches = matches.filter(match => {
-				return !/^[0-9]+$/.test(match.replace(/[\u4e00-\u9fff]/g, '')) && !/^[a-zA-Z]+$/.test(match.replace(/[\u4e00-\u9fff]/g, ''));
+				// 必须同时包含至少 3 个字母与 3 个数字，进一步抑制账号/标识类串
+				const letterCount = (match.match(/[A-Za-z]/g) || []).length;
+				const digitCount = (match.match(/\d/g) || []).length;
+				return letterCount >= 3 && digitCount >= 3;
 			});
 			keys.push(...filteredMatches);
 		}
 	}
-	return keys;
+	// 先根据总长度裁剪（包含前缀），再去重并保序，避免超长分片被保留
+	const trimmed = keys.filter(k => k.length <= MAX_KEY_LENGTH);
+	return [...new Set(trimmed)];
 }
 
 function cleanApiKey(key) {
 	let cleaned = key.replace(/[^\w\-]/g, '');
 	if (cleaned.length < 15) return null;
+	if (cleaned.length > MAX_KEY_LENGTH) return null;
 	const hasLetters = /[a-zA-Z]/.test(cleaned);
 	const hasNumbers = /[0-9]/.test(cleaned);
 	if (!hasLetters || !hasNumbers) return null;
