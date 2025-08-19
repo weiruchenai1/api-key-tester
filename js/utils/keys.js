@@ -18,11 +18,11 @@ function deduplicateAndCleanKeys(keys) {
 
 function extractKeysFromContent(content) {
 	const keys = [];
-	const openaiPattern = /sk-[A-Za-z0-9_-]{30,128}/g;
-	const geminiPattern = /AIzaSy[A-Za-z0-9_-]{30,128}/g;
+	const openaiPattern = /(?<![A-Za-z0-9_-])sk-[A-Za-z0-9_-]{30,128}(?![A-Za-z0-9_-])/g;
+	const geminiPattern = /(?<![A-Za-z0-9_-])AIzaSy[A-Za-z0-9_-]{30,128}(?![A-Za-z0-9_-])/g;
 	const coherePattern = /(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{40,128}(?![A-Za-z0-9_-])/g;
 	const anthropicPattern = /(?<![A-Za-z0-9_-])[A-Za-z0-9_-]{32,128}(?![A-Za-z0-9_-])/g;
-	const genericPattern = /(?:sk-|gsk_|api_|key_|token_|pk-)[A-Za-z0-9_-]{20,128}/g;
+	const genericPattern = /(?<![A-Za-z0-9_-])(?:sk-|gsk_|api_|key_|token_|pk-)[A-Za-z0-9_-]{20,128}(?![A-Za-z0-9_-])/g;
 
 	let matches = content.match(openaiPattern);
 	if (matches) keys.push(...matches);
