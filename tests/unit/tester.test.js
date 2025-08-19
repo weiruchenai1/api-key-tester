@@ -80,6 +80,12 @@ describe('core/tester.startTesting', () => {
     alertSpy.mockRestore();
   });
 
+  test('finalizeResult maps paid for gemini when result.isPaid', () => {
+    const kd = { type: 'gemini', status: 'pending', retryCount: 0, error: null };
+    const r = window.finalizeResult(kd, { valid: true, error: null, isRateLimit: false, isPaid: true }, 0);
+    expect(kd.status).toBe('paid');
+  });
+
   test('already testing sets cancel flag and returns', async () => {
     global.isTestingInProgress = true;
     global.shouldCancelTesting = false;

@@ -113,6 +113,13 @@
 	box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
 }
 
+/* 深色主题-付费样式 */
+.dark-theme .status-paid {
+	background: linear-gradient(135deg, #2d5a2d 0%, #1e3a1e 100%);
+	color: #90ee90;
+	border-color: #4a6b4a;
+}
+
 .dark-theme .btn-secondary { background: linear-gradient(135deg, #3c4269 0%, #2a2d47 100%); }
 .dark-theme .btn-secondary:hover { background: linear-gradient(135deg, #4a5079 0%, #3c4269 100%); }
 

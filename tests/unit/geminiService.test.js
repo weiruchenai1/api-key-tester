@@ -11,13 +11,13 @@ describe('geminiService', () => {
   beforeEach(() => { global.fetch = vi.fn(); });
   afterEach(() => { global.fetch = originalFetch; window.getSelectedModel = originalGetSelectedModel; });
 
-  test('testGeminiKey ok with candidates', async () => {
+  test('testGeminiKey ok with candidates (paidDetection off by default)', async () => {
     global.fetch.mockResolvedValueOnce({
       ok: true,
       text: async () => JSON.stringify({ candidates: [{}] })
     });
     const r = await window.testGeminiKey('AIzaSy-xxx');
-    expect(r).toEqual({ valid: true, error: null, isRateLimit: false });
+    expect(r).toEqual({ valid: true, error: null, isRateLimit: false, isPaid: undefined });
   });
 
   test('testGeminiKey 429 rate limit', async () => {

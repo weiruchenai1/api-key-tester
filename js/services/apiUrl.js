@@ -20,15 +20,21 @@ function updateProxyPlaceholder() {
 	const apiType = document.getElementById('apiType').value;
 	const proxyInput = document.getElementById('proxyUrl');
 
+	// Gemini 专用元素控制
+	const geminiOnlyElements = document.querySelectorAll('.gemini-only');
+
 	switch (apiType) {
 		case 'openai':
 			proxyInput.placeholder = 'https://openai.weiruchenai.me/v1';
+			geminiOnlyElements.forEach(el => el.classList.add('hidden'));
 			break;
 		case 'claude':
 			proxyInput.placeholder = 'https://claude.weiruchenai.me/v1';
+			geminiOnlyElements.forEach(el => el.classList.add('hidden'));
 			break;
 		case 'gemini':
 			proxyInput.placeholder = 'https://gemini.weiruchenai.me/v1beta';
+			geminiOnlyElements.forEach(el => el.classList.remove('hidden'));
 			break;
 	}
 

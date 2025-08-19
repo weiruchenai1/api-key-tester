@@ -69,6 +69,7 @@ body {
 .status-valid { background: #e6ffed; color: #1e7e34; }
 .status-invalid { background: #fdecea; color: #dc3545; }
 .status-rate-limited { background: #fff3cd; color: #856404; }
+.status-paid { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
 .status-testing { background: #e2e3e5; color: #6c757d; }
 .status-retrying { background: #fff3cd; color: #d39e00; }
 
@@ -161,6 +162,8 @@ body {
 .copy-btn { padding: 10px 16px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: clamp(12px, 2vw, 14px); margin-top: 12px; width: 100%; transition: background .3s ease; }
 .copy-btn:hover { background: #0056b3; }
 .hidden { display: none; }
+.gemini-only { transition: all 0.3s ease; }
+.gemini-only.hidden { display: none !important; }
 
 /* Textarea variant */
 .form-control.textarea { resize: vertical; min-height: 100px; font-family: 'Courier New', monospace; font-size: clamp(12px, 2vw, 14px); }
@@ -370,6 +373,7 @@ body {
 .valid { color: #28a745; }
 .invalid { color: #dc3545; }
 .rate-limited { color: #ffc107; }
+.paid { color: #28a745; }
 .testing { color: #6f42c1; }
 .retrying { color: #fd7e14; }
 .total { color: #6f42c1; }

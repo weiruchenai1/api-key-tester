@@ -157,6 +157,10 @@
                         <div class="stat-number valid" id="validCount">0</div>
                         <div class="stat-label" data-lang-key="valid">有效</div>
                     </div>
+                    <div class="stat-card gemini-only hidden">
+                        <div class="stat-number paid" id="paidCount">0</div>
+                        <div class="stat-label" data-lang-key="paid">付费</div>
+                    </div>
                     <div class="stat-card">
                         <div class="stat-number invalid" id="invalidCount">0</div>
                         <div class="stat-label" data-lang-key="invalid">无效</div>
@@ -180,6 +184,7 @@
                     <button class="tab" data-tab="valid" data-lang-key="valid-keys">有效密钥</button>
                     <button class="tab" data-tab="invalid" data-lang-key="invalid-keys">无效密钥</button>
                     <button class="tab" data-tab="rate-limited" data-lang-key="rate-limited-keys">速率限制</button>
+                    <button class="tab gemini-only hidden" data-tab="paid" data-lang-key="paid-keys">付费密钥</button>
                 </div>
                 
                 <div class="tab-content active" id="allTab">
@@ -200,6 +205,11 @@
                 <div class="tab-content" id="rateLimitedTab">
                     <div class="key-list" id="rateLimitedKeys"></div>
                     <button class="copy-btn" data-copy="rate-limited" data-lang-key="copy-rate-limited">复制速率限制密钥</button>
+                </div>
+                
+                <div class="tab-content" id="paidTab">
+                    <div class="key-list" id="paidKeys"></div>
+                    <button class="copy-btn" data-copy="paid" data-lang-key="copy-paid">复制付费密钥</button>
                 </div>
             </div>
         </div>
@@ -223,6 +233,7 @@
     <script src="js/services/openaiService.js"></script>
     <script src="js/services/claudeService.js"></script>
     <script src="js/services/geminiService.js"></script>
+    <script src="js/services/geminiPaidService.js"></script>
     <script src="js/services/router.js"></script>
     <script>
         // 全局变量

@@ -3,7 +3,11 @@ function finalizeResult(keyData, result, retryCount) {
 		keyData.retryCount = retryCount;
 		keyData.error = result.error;
 		if (result.valid) {
-			keyData.status = 'valid';
+			if (keyData && keyData.type === 'gemini' && result.isPaid) {
+				keyData.status = 'paid';
+			} else {
+				keyData.status = 'valid';
+			}
 		} else if (result.isRateLimit) {
 			keyData.status = 'rate-limited';
 		} else {

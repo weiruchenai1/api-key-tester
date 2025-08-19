@@ -57,7 +57,14 @@ async function testGeminiKey(apiKey, model = null) {
 			return { valid: false, error: 'JSON解析失败', isRateLimit: false };
 		}
 		if (data && data.candidates && Array.isArray(data.candidates) && data.candidates.length > 0) {
-			return { valid: true, error: null, isRateLimit: false };
+			let isPaid;
+			try {
+				if (typeof featureFlags !== 'undefined' && featureFlags.paidDetection && typeof testGeminiContextCaching === 'function') {
+					const paidRes = await testGeminiContextCaching(apiKey);
+					isPaid = !!(paidRes && paidRes.isPaid);
+				}
+			} catch (_) {}
+			return { valid: true, error: null, isRateLimit: false, isPaid };
 		} else if (data && data.error) {
 			const errorMessage = data.error.message || data.error.toString();
 			if (errorMessage.toLowerCase().includes('quota exceeded') || errorMessage.toLowerCase().includes('rate limit') || errorMessage.toLowerCase().includes('too many requests')) {
