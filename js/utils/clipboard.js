@@ -9,6 +9,8 @@ function copyKeys(type) {
 			keysToCopy = allKeysData.filter(k => k.status === 'invalid').map(k => k.key); break;
 		case 'rate-limited':
 			keysToCopy = allKeysData.filter(k => k.status === 'rate-limited').map(k => k.key); break;
+		case 'paid':
+			keysToCopy = allKeysData.filter(k => k.status === 'paid').map(k => k.key); break;
 	}
 	if (keysToCopy.length === 0) {
 		const message = currentLang === 'zh' ? '没有可复制的密钥！' : 'No keys to copy!';

@@ -11,7 +11,8 @@ describe('utils/clipboard', () => {
 		window.allKeysData = [
 			{ key: 'k-valid', status: 'valid' },
 			{ key: 'k-invalid', status: 'invalid' },
-			{ key: 'k-rate', status: 'rate-limited' }
+			{ key: 'k-rate', status: 'rate-limited' },
+			{ key: 'k-paid', status: 'paid' }
 		];
 		vi.stubGlobal('alert', vi.fn());
 	});
@@ -22,7 +23,7 @@ describe('utils/clipboard', () => {
 		const writeText = vi.fn().mockResolvedValueOnce();
 		Object.assign(navigator, { clipboard: { writeText } });
 		await copyKeys('all');
-		expect(writeText).toHaveBeenCalledWith('k-valid\nk-invalid\nk-rate');
+		expect(writeText).toHaveBeenCalledWith('k-valid\nk-invalid\nk-rate\nk-paid');
 		// fallback
 		const writeFail = vi.fn().mockRejectedValueOnce(new Error('fail'));
 		Object.assign(navigator, { clipboard: { writeText: writeFail } });
@@ -42,6 +43,9 @@ describe('utils/clipboard', () => {
 		// rate-limited
 		await copyKeys('rate-limited');
 		expect(writeText).toHaveBeenCalledWith('k-rate');
+		// paid
+		await copyKeys('paid');
+		expect(writeText).toHaveBeenCalledWith('k-paid');
 		// 空集 -> 提示
 		writeText.mockClear();
 		window.allKeysData = [];

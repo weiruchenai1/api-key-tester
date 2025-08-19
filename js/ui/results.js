@@ -2,12 +2,16 @@ function updateStats() {
 	const validKeys = allKeysData.filter(k => k.status === 'valid');
 	const invalidKeys = allKeysData.filter(k => k.status === 'invalid');
 	const rateLimitedKeys = allKeysData.filter(k => k.status === 'rate-limited');
+	const paidKeys = allKeysData.filter(k => k.status === 'paid');
 	const testingKeys = allKeysData.filter(k => k.status === 'testing');
 	const retryingKeys = allKeysData.filter(k => k.status === 'retrying');
 	const pendingKeys = allKeysData.filter(k => k.status === 'pending');
 
 	document.getElementById('totalCount').textContent = allKeysData.length;
 	document.getElementById('validCount').textContent = validKeys.length;
+	if (document.getElementById('paidCount')) {
+		document.getElementById('paidCount').textContent = paidKeys.length;
+	}
 	document.getElementById('invalidCount').textContent = invalidKeys.length;
 	document.getElementById('rateLimitedCount').textContent = rateLimitedKeys.length;
 	document.getElementById('testingCount').textContent = testingKeys.length + pendingKeys.length;
@@ -18,10 +22,14 @@ function updateKeyLists() {
 	const validKeys = allKeysData.filter(k => k.status === 'valid');
 	const invalidKeys = allKeysData.filter(k => k.status === 'invalid');
 	const rateLimitedKeys = allKeysData.filter(k => k.status === 'rate-limited');
+	const paidKeys = allKeysData.filter(k => k.status === 'paid');
 	updateKeyList('allKeys', allKeysData);
 	updateKeyList('validKeys', validKeys);
 	updateKeyList('invalidKeys', invalidKeys);
 	updateKeyList('rateLimitedKeys', rateLimitedKeys);
+	if (document.getElementById('paidKeys')) {
+		updateKeyList('paidKeys', paidKeys);
+	}
 }
 
 function updateKeyList(elementId, keys) {
@@ -38,6 +46,9 @@ function updateKeyList(elementId, keys) {
 				break;
 			case 'validKeys':
 				emptyMessage = currentLang === 'zh' ? '暂无有效密钥' : 'No valid keys';
+				break;
+			case 'paidKeys':
+				emptyMessage = currentLang === 'zh' ? '暂无付费密钥' : 'No paid keys';
 				break;
 			case 'invalidKeys':
 				emptyMessage = currentLang === 'zh' ? '暂无无效密钥' : 'No invalid keys';
@@ -56,6 +67,7 @@ function updateKeyList(elementId, keys) {
 		const keyItem = document.createElement('div');
 		keyItem.className = 'key-item';
 		const statusClass = keyData.status === 'valid' ? 'status-valid' :
+			keyData.status === 'paid' ? 'status-paid' :
 			keyData.status === 'invalid' ? 'status-invalid' :
 			keyData.status === 'rate-limited' ? 'status-rate-limited' :
 			keyData.status === 'retrying' ? 'status-retrying' : 'status-testing';
