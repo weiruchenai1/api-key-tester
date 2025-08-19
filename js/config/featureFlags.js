@@ -7,7 +7,10 @@ const featureFlags = {
 		maxMs: 8000,
 		retries: 2
 	},
-	paidDetectionMinTextLen: 8000
+	paidDetectionMinTextLen: 8000,
+	// 调试与看门狗
+	debugQueue: false,
+	queueWatchdogMs: 10000
 };
 
 try {

@@ -21,6 +21,10 @@ function _withPaidLimiter(task) {
 	return new Promise((resolve) => {
 		const run = () => {
 			_paidInFlight++;
+			// Debug 日志
+			if (typeof featureFlags !== 'undefined' && featureFlags.debugQueue) {
+				console.debug('[geminiPaid] start task, inFlight:', _paidInFlight, 'queue:', _paidQueue.length);
+			}
 			Promise.resolve()
 				.then(task)
 				.then(resolve)
@@ -34,12 +38,19 @@ function _withPaidLimiter(task) {
 				.finally(() => {
 					_paidInFlight--;
 					_startNextIfPossible();
+					// Debug 日志
+					if (typeof featureFlags !== 'undefined' && featureFlags.debugQueue) {
+						console.debug('[geminiPaid] task done, inFlight:', _paidInFlight, 'queue:', _paidQueue.length);
+					}
 				});
 		};
 		const { max } = _getPaidLimits();
 		if (_paidInFlight < max) {
 			run();
 		} else {
+			if (typeof featureFlags !== 'undefined' && featureFlags.debugQueue) {
+				console.debug('[geminiPaid] queued, inFlight:', _paidInFlight, 'queue:', _paidQueue.length + 1);
+			}
 			_paidQueue.push(run);
 		}
 	});

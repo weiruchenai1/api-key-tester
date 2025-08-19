@@ -19,7 +19,7 @@ function finalizeResult(keyData, result, retryCount) {
 
 async function startTesting() {
 	if (isTestingInProgress) {
-		shouldCancelTesting = true;
+		// 正在测试中时的重入：忽略额外的开始请求，避免误触导致取消
 		return;
 	}
 
@@ -72,6 +72,8 @@ async function startTesting() {
 
 	if (typeof updateStats === 'function') updateStats();
 	if (typeof updateKeyLists === 'function') updateKeyLists();
+	// 初始化进度条到 0%
+	if (typeof updateProgress === 'function') updateProgress();
 
 	try {
 		await processWithFixedConcurrency(uniqueKeys, apiType);
