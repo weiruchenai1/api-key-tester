@@ -30,15 +30,22 @@ describe('apiUrl', () => {
 
   test('占位符随 API 类型变化', () => {
     const proxy = document.getElementById('proxyUrl');
+    // 动态插入一个 gemini-only 元素以验证显隐
+    const gemOnly = document.createElement('div');
+    gemOnly.className = 'gemini-only hidden';
+    document.body.appendChild(gemOnly);
     document.getElementById('apiType').value = 'openai';
     window.updateProxyPlaceholder();
     expect(proxy.placeholder).toBe('https://openai.weiruchenai.me/v1');
+    expect(gemOnly.classList.contains('hidden')).toBe(true);
     document.getElementById('apiType').value = 'claude';
     window.updateProxyPlaceholder();
     expect(proxy.placeholder).toBe('https://claude.weiruchenai.me/v1');
+    expect(gemOnly.classList.contains('hidden')).toBe(true);
     document.getElementById('apiType').value = 'gemini';
     window.updateProxyPlaceholder();
     expect(proxy.placeholder).toBe('https://gemini.weiruchenai.me/v1beta');
+    expect(gemOnly.classList.contains('hidden')).toBe(false);
   });
 });
 
