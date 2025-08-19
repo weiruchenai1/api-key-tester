@@ -54,6 +54,10 @@ body {
 .tab { padding: 10px 16px; border: none; background: none; cursor: pointer; font-size: clamp(12px, 2.2vw, 16px); font-weight: 600; color: #6c757d; border-bottom: 3px solid transparent; transition: all 0.3s ease; white-space: nowrap; flex-shrink: 0; }
 .tab.active { color: #667eea; border-bottom-color: #667eea; }
 
+/* Tab content visibility */
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 20px; }
 .stat-card { background: #f8f9fa; padding: 16px 12px; border-radius: 12px; text-align: center; border: 2px solid #e9ecef; transition: all 0.3s ease; }
 .stat-card:hover { border-color: #667eea; background: #f0f4ff; transform: translateY(-2px); box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15); }

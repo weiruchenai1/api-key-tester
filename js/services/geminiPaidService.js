@@ -24,6 +24,13 @@ function _withPaidLimiter(task) {
 			Promise.resolve()
 				.then(task)
 				.then(resolve)
+				.catch((err) => {
+					try {
+						resolve({ isPaid: false, reason: 'limiter_error:' + (err && err.message ? err.message : 'error') });
+					} catch (_) {
+						resolve({ isPaid: false, reason: 'limiter_error' });
+					}
+				})
 				.finally(() => {
 					_paidInFlight--;
 					_startNextIfPossible();
