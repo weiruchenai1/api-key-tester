@@ -67,17 +67,18 @@
                     <label data-lang-key="concurrency-control">并发控制</label>
                     <div class="concurrency-container">
                         <div class="concurrency-input-section">
-                            <input type="number" id="concurrencyInput" class="form-control" value="5" min="1">
+                            <input type="number" id="concurrencyInput" class="form-control" value="15" min="1">
                         </div>
                         <div class="slider-section">
                             <div class="slider-container">
-                                <input type="range" id="concurrencySlider" class="slider" min="1" max="50" value="5">
-                                <span class="slider-value" id="sliderValue">5</span>
+                                <input type="range" id="concurrencySlider" class="slider" min="1" max="50" value="15">
+                                <span class="slider-value" id="sliderValue">15</span>
                             </div>
                             <div class="preset-buttons">
                                 <button type="button" class="preset-btn" data-concurrency="1" data-lang-key="slow">慢速</button>
-                                <button type="button" class="preset-btn active" data-concurrency="5" data-lang-key="normal">正常</button>
+                                <button type="button" class="preset-btn" data-concurrency="5" data-lang-key="normal">正常</button>
                                 <button type="button" class="preset-btn" data-concurrency="10" data-lang-key="fast">快速</button>
+                                <button type="button" class="preset-btn active" data-concurrency="15" data-lang-key="optimized">优化</button>
                                 <button type="button" class="preset-btn" data-concurrency="20" data-lang-key="ultra">极速</button>
                             </div>
                         </div>
@@ -243,6 +244,9 @@
     <script src="js/ui/performanceOptimized.js"></script>
     <script src="js/core/memoryManager.js"></script>
     <script src="js/core/progressiveLoader.js"></script>
+    <script src="js/core/globalConcurrencyManager.js"></script>
+    <script src="js/core/unifiedFetch.js"></script>
+    <script src="js/ui/uiHealthOptimizer.js"></script>
     
     <script>
         // 全局变量
@@ -251,7 +255,86 @@
         let isDarkTheme = false;
         let isCustomModel = false;
         let detectedModels = new Set();
-        let currentConcurrency = 5;
+        let currentConcurrency = 15;
+        
+        // 初始化全局并发管理器
+        document.addEventListener('DOMContentLoaded', function() {
+            // 延迟检查，确保所有脚本都已加载
+            setTimeout(function() {
+                if (typeof globalConcurrencyManager !== 'undefined') {
+                    // 重置统计数据，清除可能的错误历史
+                    if (typeof globalConcurrencyManager.resetStats === 'function') {
+                        globalConcurrencyManager.resetStats();
+                        console.log('[Init] 统计数据已重置');
+                    }
+                    
+                    // 设置初始并发数为15（相比原来的5有显著提升）
+                    globalConcurrencyManager.maxGlobalConcurrency = 15;
+                    console.log(`[Init] 全局并发管理器已启用，初始并发数: ${globalConcurrencyManager.maxGlobalConcurrency}`);
+                    console.log('[Init] 自适应并发控制已禁用（避免误判）');
+                    
+                    // 确保UI控制器已初始化并同步
+                    if (typeof updateConcurrency === 'function') {
+                        updateConcurrency(15); // 同步UI显示和全局管理器
+                        console.log('[Init] UI并发控制已同步');
+                    }
+                } else {
+                    console.warn('[Init] 全局并发管理器未加载，尝试创建简化版本...');
+                    
+                    // 创建简化的并发管理器作为后备方案
+                    try {
+                        window.globalConcurrencyManager = {
+                            maxGlobalConcurrency: 15,
+                            currentRunning: 0,
+                            waitingQueue: [],
+                            
+                            async acquireSlot() {
+                                this.currentRunning++;
+                                const slot = {
+                                    id: `slot-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
+                                    acquireTime: Date.now(),
+                                    releaseSlot: () => {
+                                        this.currentRunning--;
+                                    }
+                                };
+                                console.log(`[Fallback] 获取槽位: ${slot.id}, 当前并发: ${this.currentRunning}`);
+                                return slot;
+                            },
+                            
+                            releaseSlot(slot, result = {}) {
+                                if (slot && typeof slot.releaseSlot === 'function') {
+                                    slot.releaseSlot();
+                                    console.log(`[Fallback] 释放槽位: ${slot.id}, 当前并发: ${this.currentRunning}`);
+                                }
+                            },
+                            
+                            getMetrics() {
+                                return {
+                                    totalRequests: 0,
+                                    completedRequests: 0,
+                                    currentRunning: this.currentRunning,
+                                    maxGlobalConcurrency: this.maxGlobalConcurrency,
+                                    peakConcurrency: this.currentRunning
+                                };
+                            }
+                        };
+                        
+                        console.log('[Init] 简化版并发管理器已创建，并发数: 15');
+                        console.log('[Init] 注意: 使用的是后备版本，已禁用自适应功能');
+                        
+                        // 同步UI控制器
+                        if (typeof updateConcurrency === 'function') {
+                            updateConcurrency(15);
+                            console.log('[Init] UI并发控制已同步（后备版本）');
+                        }
+                        
+                    } catch (error) {
+                        console.error('[Init] 创建后备并发管理器失败:', error);
+                        console.warn('[Init] 将使用固定并发数:', currentConcurrency);
+                    }
+                }
+            }, 100); // 延迟100ms确保脚本加载完成
+        });
         let currentRetryCount = 3;
         let isTestingInProgress = false;
         let shouldCancelTesting = false;
@@ -264,10 +347,24 @@
             const validCount = allKeysData.filter(k => k.status === 'valid').length;
             const invalidCount = allKeysData.filter(k => k.status === 'invalid').length;
             const rateLimitedCount = allKeysData.filter(k => k.status === 'rate-limited').length;
+            const paidCount = allKeysData.filter(k => k.status === 'paid').length;
             
-            const message = currentLang === 'zh' ? 
-                `测试完成！有效密钥: ${validCount}，无效密钥: ${invalidCount}，速率限制: ${rateLimitedCount}` :
-                `Test completed! Valid keys: ${validCount}, Invalid keys: ${invalidCount}, Rate limited: ${rateLimitedCount}`;
+            // 检查是否是Gemini类型的测试
+            const apiType = document.getElementById('apiType')?.value;
+            const isGemini = apiType === 'gemini';
+            
+            let message;
+            if (currentLang === 'zh') {
+                message = `测试完成！有效密钥: ${validCount}，无效密钥: ${invalidCount}，速率限制: ${rateLimitedCount}`;
+                if (isGemini) {
+                    message += `，付费密钥: ${paidCount}`;
+                }
+            } else {
+                message = `Test completed! Valid keys: ${validCount}, Invalid keys: ${invalidCount}, Rate limited: ${rateLimitedCount}`;
+                if (isGemini) {
+                    message += `, Paid keys: ${paidCount}`;
+                }
+            }
             alert(message);
         }
 

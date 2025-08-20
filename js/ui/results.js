@@ -1,4 +1,13 @@
 function updateStats() {
+	// 使用UI健康度优化的节流更新
+	if (typeof uiHealthOptimizer !== 'undefined') {
+		uiHealthOptimizer.throttleStatsUpdate(() => updateStatsImmediate());
+	} else {
+		updateStatsImmediate();
+	}
+}
+
+function updateStatsImmediate() {
 	const validKeys = allKeysData.filter(k => k.status === 'valid');
 	const invalidKeys = allKeysData.filter(k => k.status === 'invalid');
 	const rateLimitedKeys = allKeysData.filter(k => k.status === 'rate-limited');
@@ -19,17 +28,59 @@ function updateStats() {
 }
 
 function updateKeyLists() {
+	// 使用UI健康度优化的节流更新
+	if (typeof uiHealthOptimizer !== 'undefined') {
+		uiHealthOptimizer.throttleListUpdate('all', () => updateKeyListsImmediate());
+	} else {
+		updateKeyListsImmediate();
+	}
+}
+
+function updateKeyListsImmediate() {
 	const validKeys = allKeysData.filter(k => k.status === 'valid');
 	const invalidKeys = allKeysData.filter(k => k.status === 'invalid');
 	const rateLimitedKeys = allKeysData.filter(k => k.status === 'rate-limited');
 	const paidKeys = allKeysData.filter(k => k.status === 'paid');
-	updateKeyList('allKeys', allKeysData);
+	
+	// 对大列表使用虚拟化
+	if (typeof uiHealthOptimizer !== 'undefined' && allKeysData.length > 500) {
+		uiHealthOptimizer.createVirtualList('allKeys', allKeysData, createKeyItemElement);
+	} else {
+		updateKeyList('allKeys', allKeysData);
+	}
+	
+	// 其他列表正常更新（通常较小）
 	updateKeyList('validKeys', validKeys);
 	updateKeyList('invalidKeys', invalidKeys);
 	updateKeyList('rateLimitedKeys', rateLimitedKeys);
 	if (document.getElementById('paidKeys')) {
 		updateKeyList('paidKeys', paidKeys);
 	}
+}
+
+/**
+ * 创建密钥项元素（用于虚拟列表）
+ */
+function createKeyItemElement(keyData) {
+	const div = document.createElement('div');
+	div.className = 'key-item';
+	
+	const statusClass = keyData.status === 'valid' ? 'status-valid' :
+		keyData.status === 'paid' ? 'status-paid' :
+		keyData.status === 'invalid' ? 'status-invalid' :
+		keyData.status === 'rate-limited' ? 'status-rate-limited' :
+		keyData.status === 'retrying' ? 'status-retrying' : 'status-testing';
+	
+	const retryText = keyData.retryCount > 0 ? ` (重试: ${keyData.retryCount})` : '';
+	const errorText = keyData.error ? ` - ${keyData.error}` : '';
+	
+	div.innerHTML = `
+		<div class="key-preview">${keyData.key}</div>
+		<div class="key-status ${statusClass}">${keyData.status}${retryText}</div>
+		${errorText ? `<div class="key-error">${errorText}</div>` : ''}
+	`;
+	
+	return div;
 }
 
 function updateKeyList(elementId, keys) {

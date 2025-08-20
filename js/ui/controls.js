@@ -41,6 +41,8 @@ function initRetryControls() {
 
 function updateConcurrency(value) {
 	currentConcurrency = parseInt(value);
+	
+	// 同步更新UI显示
 	document.getElementById('concurrencyInput').value = currentConcurrency;
 	document.getElementById('concurrencySlider').value = Math.min(currentConcurrency, 50);
 	document.getElementById('sliderValue').textContent = currentConcurrency;
@@ -50,6 +52,20 @@ function updateConcurrency(value) {
 			btn.classList.add('active');
 		}
 	});
+	
+	// 同步更新全局并发管理器
+	if (typeof globalConcurrencyManager !== 'undefined') {
+		globalConcurrencyManager.maxGlobalConcurrency = currentConcurrency;
+		console.log(`[UI] 并发数已更新: ${currentConcurrency} (全局管理器已同步)`);
+		
+		// 如果有获取指标的方法，显示当前状态
+		if (typeof globalConcurrencyManager.getMetrics === 'function') {
+			const metrics = globalConcurrencyManager.getMetrics();
+			console.log(`[UI] 当前运行: ${metrics.currentRunning}/${currentConcurrency}`);
+		}
+	} else {
+		console.log(`[UI] 并发数已更新: ${currentConcurrency} (仅UI，全局管理器不可用)`);
+	}
 }
 
 function initConcurrencyControls() {
