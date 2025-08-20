@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>并发模块调试</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            margin: 20px;
+            background: #f0f0f0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        
+        .log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 3px;
+            height: 500px;
+            overflow-y: auto;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+        
+        .button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        
+        .error {
+            background: #ff4444;
+            color: white;
+            padding: 10px;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 并发模块调试工具</h1>
+        
+        <button class="button" onclick="debugStep1()">1. 检查文件路径</button>
+        <button class="button" onclick="debugStep2()">2. 手动加载脚本</button>
+        <button class="button" onclick="debugStep3()">3. 创建实例</button>
+        <button class="button" onclick="clearLog()">清除日志</button>
+        
+        <div id="errorDisplay" class="error" style="display: none;"></div>
+        <div id="debugLog" class="log"></div>
+    </div>
+
+    <script>
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('debugLog');
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function showError(message) {
+            const errorDisplay = document.getElementById('errorDisplay');
+            errorDisplay.textContent = message;
+            errorDisplay.style.display = 'block';
+            log(`❌ ERROR: ${message}`);
+        }
+        
+        function clearLog() {
+            document.getElementById('debugLog').innerHTML = '';
+            document.getElementById('errorDisplay').style.display = 'none';
+        }
+        
+        function debugStep1() {
+            log('🔍 步骤1: 检查文件路径和网络请求...');
+            
+            const scriptPath = '../../js/core/globalConcurrencyManager.js';
+            
+            fetch(scriptPath)
+                .then(response => {
+                    if (response.ok) {
+                        log(`✅ 文件路径正确: ${scriptPath}`);
+                        log(`📊 文件大小: ${response.headers.get('content-length')} bytes`);
+                        return response.text();
+                    } else {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+                })
+                .then(content => {
+                    log(`📄 文件内容长度: ${content.length} 字符`);
+                    log(`🔍 检查关键类定义...`);
+                    
+                    if (content.includes('class GlobalConcurrencyManager')) {
+                        log('✅ 找到 GlobalConcurrencyManager 类定义');
+                    } else {
+                        log('❌ 未找到 GlobalConcurrencyManager 类定义');
+                    }
+                    
+                    if (content.includes('new GlobalConcurrencyManager()')) {
+                        log('✅ 找到实例创建代码');
+                    } else {
+                        log('❌ 未找到实例创建代码');
+                    }
+                    
+                    if (content.includes('window.globalConcurrencyManager')) {
+                        log('✅ 找到全局暴露代码');
+                    } else {
+                        log('❌ 未找到全局暴露代码');
+                    }
+                })
+                .catch(error => {
+                    showError(`文件加载失败: ${error.message}`);
+                });
+        }
+        
+        function debugStep2() {
+            log('🔧 步骤2: 手动加载脚本...');
+            
+            // 移除已存在的脚本（如果有）
+            const existingScript = document.querySelector('script[src*="globalConcurrencyManager"]');
+            if (existingScript) {
+                existingScript.remove();
+                log('🗑️ 移除已存在的脚本标签');
+            }
+            
+            // 创建新的脚本标签
+            const script = document.createElement('script');
+            script.src = '../../js/core/globalConcurrencyManager.js';
+            
+            script.onload = function() {
+                log('✅ 脚本加载成功');
+                
+                // 立即检查全局对象
+                setTimeout(() => {
+                    if (typeof window.globalConcurrencyManager !== 'undefined') {
+                        log('✅ globalConcurrencyManager 已在全局作用域中');
+                        const manager = window.globalConcurrencyManager;
+                        log(`📊 实例类型: ${typeof manager}`);
+                        log(`📊 最大并发数: ${manager.maxGlobalConcurrency}`);
+                        log(`📊 当前运行数: ${manager.currentRunning}`);
+                        
+                        // 检查关键方法
+                        const methods = ['acquireSlot', 'releaseSlot', 'getMetrics'];
+                        methods.forEach(method => {
+                            if (typeof manager[method] === 'function') {
+                                log(`✅ 方法 ${method} 可用`);
+                            } else {
+                                log(`❌ 方法 ${method} 不可用`);
+                            }
+                        });
+                        
+                    } else {
+                        log('❌ globalConcurrencyManager 未在全局作用域中');
+                        
+                        // 检查是否有其他全局变量
+                        log('🔍 检查全局作用域中的相关对象...');
+                        for (const key in window) {
+                            if (key.toLowerCase().includes('concurrency') || key.toLowerCase().includes('manager')) {
+                                log(`🔍 发现相关对象: ${key} = ${typeof window[key]}`);
+                            }
+                        }
+                    }
+                }, 100);
+            };
+            
+            script.onerror = function(event) {
+                showError(`脚本加载错误: ${event.message || '未知错误'}`);
+            };
+            
+            document.head.appendChild(script);
+            log('📤 添加脚本标签到页面');
+        }
+        
+        function debugStep3() {
+            log('🏗️ 步骤3: 手动创建实例...');
+            
+            try {
+                // 检查是否有构造函数
+                if (typeof window.GlobalConcurrencyManager !== 'undefined') {
+                    log('✅ 找到 GlobalConcurrencyManager 构造函数');
+                    
+                    const manager = new window.GlobalConcurrencyManager(15);
+                    window.globalConcurrencyManager = manager;
+                    
+                    log('✅ 手动创建实例成功');
+                    log(`📊 实例配置: maxGlobalConcurrency = ${manager.maxGlobalConcurrency}`);
+                    
+                    // 测试基本功能
+                    manager.acquireSlot().then(slot => {
+                        log(`✅ 槽位获取测试成功: ${slot.id}`);
+                        manager.releaseSlot(slot, { success: true, latency: 100 });
+                        log('✅ 槽位释放测试成功');
+                    }).catch(error => {
+                        log(`❌ 槽位测试失败: ${error.message}`);
+                    });
+                    
+                } else {
+                    // 尝试直接定义类
+                    log('⚠️ 构造函数不可用，尝试直接定义...');
+                    
+                    window.eval(`
+                        class GlobalConcurrencyManager {
+                            constructor(maxGlobalConcurrency = 15) {
+                                this.maxGlobalConcurrency = maxGlobalConcurrency;
+                                this.currentRunning = 0;
+                                this.waitingQueue = [];
+                            }
+                            
+                            async acquireSlot() {
+                                this.currentRunning++;
+                                return {
+                                    id: 'slot-' + Date.now(),
+                                    acquireTime: Date.now(),
+                                    releaseSlot: () => {
+                                        this.currentRunning--;
+                                    }
+                                };
+                            }
+                            
+                            releaseSlot(slot, result = {}) {
+                                if (slot && typeof slot.releaseSlot === 'function') {
+                                    slot.releaseSlot();
+                                }
+                            }
+                            
+                            getMetrics() {
+                                return {
+                                    totalRequests: 0,
+                                    completedRequests: 0,
+                                    currentRunning: this.currentRunning,
+                                    maxGlobalConcurrency: this.maxGlobalConcurrency
+                                };
+                            }
+                        }
+                        
+                        window.globalConcurrencyManager = new GlobalConcurrencyManager(15);
+                    `);
+                    
+                    log('✅ 简化版实例创建成功');
+                }
+                
+            } catch (error) {
+                showError(`实例创建失败: ${error.message}`);
+            }
+        }
+        
+        // 监听全局错误
+        window.addEventListener('error', function(event) {
+            showError(`JavaScript错误: ${event.message} (文件: ${event.filename}, 行: ${event.lineno})`);
+        });
+        
+        // 初始化
+        log('🔧 并发模块调试工具已加载');
+        log('💡 按步骤点击按钮进行调试：');
+        log('   1. 检查文件路径');
+        log('   2. 手动加载脚本');
+        log('   3. 创建实例');
+    </script>
+</body>
+</html>

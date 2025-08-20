@@ -1,0 +1,213 @@
+/* Theme-only overrides */
+
+.dark-theme {
+	background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.dark-theme .container {
+	background: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
+	color: #e8eaed;
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .header {
+	background: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
+}
+
+.dark-theme .input-section {
+	background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+	border-color: #3c4269;
+}
+
+.dark-theme .input-section:hover {
+	border-color: #4c63d2;
+	background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+	box-shadow: 0 4px 20px rgba(76, 99, 210, 0.15);
+}
+
+.dark-theme .form-control {
+	background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+	color: #e8eaed;
+	border-color: #3c4269;
+}
+
+.dark-theme .form-control:focus {
+	border-color: #4c63d2;
+	box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+}
+
+.dark-theme .form-control:hover {
+	border-color: #4c63d2;
+	background: linear-gradient(135deg, #252849 0%, #2a2d47 100%);
+}
+
+.dark-theme select.form-control {
+	background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+	color: #e8eaed;
+}
+
+.dark-theme select.form-control option {
+	background: #232741;
+	color: #e8eaed;
+}
+
+.dark-theme input.form-control {
+	background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+	color: #e8eaed;
+}
+
+.dark-theme textarea.form-control {
+	background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+	color: #e8eaed;
+}
+
+.dark-theme .stat-card {
+	background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+	border-color: #3c4269;
+}
+
+.dark-theme .stat-card:hover {
+	border-color: #4c63d2;
+	background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 20px rgba(76, 99, 210, 0.2);
+}
+
+.dark-theme .key-list {
+	background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+	border-color: #3c4269;
+}
+
+.dark-theme .key-list:hover {
+	border-color: #4c63d2;
+	background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+	box-shadow: 0 2px 12px rgba(76, 99, 210, 0.15);
+}
+
+.dark-theme .empty-state { color: #b0b3c1; }
+.dark-theme .empty-icon { opacity: 0.5; }
+.dark-theme .empty-text { opacity: 0.7; }
+
+.dark-theme .key-item {
+	background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+	border-color: #3c4269;
+}
+.dark-theme .key-item:hover {
+	background: linear-gradient(135deg, #2a2d47 0%, #1e1e2e 100%);
+	border-color: #4c63d2;
+	transform: translateX(2px);
+	box-shadow: 0 2px 8px rgba(76, 99, 210, 0.15);
+}
+
+.dark-theme .tab { color: #b0b3c1; }
+.dark-theme .tab.active { color: #4c63d2; }
+
+.dark-theme .alert {
+	background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+	border-color: #3c4269;
+	color: #e8eaed;
+}
+.dark-theme .alert:hover {
+	border-color: #4c63d2;
+	background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+	box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
+}
+
+/* 深色主题-付费样式 */
+.dark-theme .status-paid {
+	background: linear-gradient(135deg, #2d5a2d 0%, #1e3a1e 100%);
+	color: #90ee90;
+	border-color: #4a6b4a;
+}
+
+.dark-theme .btn-secondary { background: linear-gradient(135deg, #3c4269 0%, #2a2d47 100%); }
+.dark-theme .btn-secondary:hover { background: linear-gradient(135deg, #4a5079 0%, #3c4269 100%); }
+
+.dark-theme .form-help { color: #b0b3c1; }
+.dark-theme .stat-label { color: #b0b3c1; }
+.dark-theme .input-group label { color: #e8eaed; }
+
+.dark-theme .detected-models {
+	background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+	border-color: #3c4269;
+}
+.dark-theme .detected-models:hover {
+	border-color: #4c63d2;
+	background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+	box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
+}
+.dark-theme .detected-models-header { border-bottom-color: #3c4269; }
+.dark-theme .detected-models-header:hover { background: rgba(76, 99, 210, 0.1); }
+.dark-theme .detected-models-header h4 { color: #4c63d2; }
+.dark-theme .collapse-icon { color: #4c63d2; }
+.dark-theme .model-tag { background: #4c63d2; }
+.dark-theme .model-tag:hover { background: #3c52d2; }
+.dark-theme .model-toggle-btn { background: #3c4269; }
+.dark-theme .model-toggle-btn:hover { background: #4a5079; }
+.dark-theme .model-toggle-btn.active { background: #4c63d2; }
+
+.dark-theme .concurrency-container {
+	background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+	border-color: #3c4269;
+}
+.dark-theme .concurrency-container:hover {
+	border-color: #4c63d2;
+	background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+}
+.dark-theme .concurrency-input-section .form-control {
+	background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+	color: #4c63d2;
+	border-color: #3c4269;
+}
+.dark-theme .concurrency-input-section .form-control:focus {
+	border-color: #4c63d2;
+	box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+}
+.dark-theme .slider { background: #3c4269; }
+.dark-theme .slider::-webkit-slider-thumb { background: #4c63d2; }
+.dark-theme .slider::-webkit-slider-thumb:hover { background: #3c52d2; }
+.dark-theme .slider::-moz-range-thumb { background: #4c63d2; }
+.dark-theme .slider-value { color: #4c63d2; background: #232741; border-color: #3c4269; }
+
+.dark-theme .preset-btn { border-color: #4c63d2; color: #4c63d2; background: #232741; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
+.dark-theme .preset-btn:hover { background: #4c63d2; color: white; box-shadow: 0 4px 12px rgba(76, 99, 210, 0.3); }
+.dark-theme .preset-btn.active { background: #4c63d2; color: white; box-shadow: 0 4px 12px rgba(76, 99, 210, 0.4); }
+
+/* 深色主题重试相关样式 */
+.dark-theme .retry-container { background: linear-gradient(135deg, #3d3314 0%, #2d2a1a 100%); border-color: #5d4e23; }
+.dark-theme .retry-container:hover { border-color: #d68910; background: linear-gradient(135deg, #4d4024 0%, #3d3314 100%); }
+.dark-theme .retry-input-section .form-control { background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%); color: #d68910; border-color: #5d4e23; }
+.dark-theme .retry-input-section .form-control:focus { border-color: #d68910; box-shadow: 0 0 0 3px rgba(214, 137, 16, 0.1); }
+.dark-theme .retry-slider { background: #5d4e23; }
+.dark-theme .retry-slider::-webkit-slider-thumb { background: #d68910; }
+.dark-theme .retry-slider::-webkit-slider-thumb:hover { background: #b7791f; }
+.dark-theme .retry-slider::-moz-range-thumb { background: #d68910; }
+.dark-theme .retry-slider-value { color: #d68910; background: #232741; border-color: #5d4e23; }
+.dark-theme .retry-preset-btn { border-color: #d68910; color: #d68910; background: #232741; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
+.dark-theme .retry-preset-btn:hover { background: #d68910; color: white; box-shadow: 0 4px 12px rgba(214, 137, 16, 0.3); }
+.dark-theme .retry-preset-btn.active { background: #d68910; color: white; box-shadow: 0 4px 12px rgba(214, 137, 16, 0.4); }
+
+/* 深色主题滚动条样式 */
+.dark-theme .model-list-container::-webkit-scrollbar,
+.dark-theme .results-tabs::-webkit-scrollbar,
+.dark-theme .key-list::-webkit-scrollbar,
+.dark-theme #apiKeys::-webkit-scrollbar { width: 8px; }
+.dark-theme .model-list-container::-webkit-scrollbar-track,
+.dark-theme .results-tabs::-webkit-scrollbar-track,
+.dark-theme .key-list::-webkit-scrollbar-track,
+.dark-theme #apiKeys::-webkit-scrollbar-track { background: #1e1e2e; border-radius: 4px; }
+.dark-theme .model-list-container::-webkit-scrollbar-thumb,
+.dark-theme .results-tabs::-webkit-scrollbar-thumb,
+.dark-theme .key-list::-webkit-scrollbar-thumb,
+.dark-theme #apiKeys::-webkit-scrollbar-thumb { background: #4c63d2; border-radius: 4px; }
+.dark-theme .model-list-container::-webkit-scrollbar-thumb:hover,
+.dark-theme .results-tabs::-webkit-scrollbar-thumb:hover,
+.dark-theme .key-list::-webkit-scrollbar-thumb:hover,
+.dark-theme #apiKeys::-webkit-scrollbar-thumb:hover { background: #5a73e0; }
+
+.dark-theme .paste-btn { background: #2a2d47; border-color: #3c4269; color: #e8eaed; }
+.dark-theme .paste-btn:hover { background: #323556; border-color: #4c63d2; }
+.dark-theme .import-btn { background: #2a2d47; border-color: #3c4269; color: #e8eaed; }
+.dark-theme .import-btn:hover { background: #323556; border-color: #4c63d2; }
+
+

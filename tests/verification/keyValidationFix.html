@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>密钥验证修复测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 密钥验证修复测试</h1>
+        
+        <div class="test-section">
+            <h3>1. 全局并发管理器状态</h3>
+            <button onclick="checkGlobalManager()">检查管理器状态</button>
+            <div id="managerResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>2. 并发配置测试</h3>
+            <button onclick="testConcurrencyConfig()">测试并发配置</button>
+            <div id="concurrencyResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>3. 模拟密钥测试</h3>
+            <button onclick="simulateKeyTest()">模拟测试流程</button>
+            <div id="simulationResult" class="result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>4. 重置并清理</h3>
+            <button onclick="resetAndClean()">重置管理器</button>
+            <div id="resetResult" class="result"></div>
+        </div>
+    </div>
+
+    <!-- 加载必要的模块 -->
+    <script src="../../js/core/globalConcurrencyManager.js"></script>
+    <script src="../../js/core/concurrency.js"></script>
+    
+    <script>
+        function checkGlobalManager() {
+            const result = document.getElementById('managerResult');
+            
+            try {
+                if (typeof globalConcurrencyManager === 'undefined') {
+                    result.className = 'result error';
+                    result.textContent = '❌ globalConcurrencyManager 未找到';
+                    return;
+                }
+                
+                const manager = globalConcurrencyManager;
+                const metrics = manager.getMetrics ? manager.getMetrics() : {};
+                
+                const status = `✅ 全局并发管理器状态:
+📊 最大并发数: ${manager.maxGlobalConcurrency}
+🔄 当前运行: ${manager.currentRunning}
+🎯 自适应启用: ${manager.adaptiveConfig?.enabled || false}
+📈 总请求数: ${metrics.totalRequests || 0}
+✅ 完成请求: ${metrics.completedRequests || 0}
+❌ 错误请求: ${metrics.errorRequests || 0}
+
+🔧 错误阈值设置:
+- 429错误率阈值: ${(manager.monitoring?.error429Threshold || 0) * 100}%
+- 总错误率阈值: ${(manager.monitoring?.totalErrorThreshold || 0) * 100}%`;
+                
+                result.className = 'result success';
+                result.textContent = status;
+                
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ 检查失败: ${error.message}`;
+            }
+        }
+        
+        function testConcurrencyConfig() {
+            const result = document.getElementById('concurrencyResult');
+            
+            try {
+                if (typeof globalConcurrencyManager === 'undefined') {
+                    result.className = 'result error';
+                    result.textContent = '❌ globalConcurrencyManager 未找到';
+                    return;
+                }
+                
+                const manager = globalConcurrencyManager;
+                const oldConcurrency = manager.maxGlobalConcurrency;
+                
+                // 测试设置不同的并发数
+                const testValues = [5, 15, 30, 50];
+                let testResults = '🧪 并发配置测试结果:\n\n';
+                
+                for (const value of testValues) {
+                    manager.maxGlobalConcurrency = value;
+                    const actual = manager.maxGlobalConcurrency;
+                    const success = actual === value;
+                    testResults += `${success ? '✅' : '❌'} 设置 ${value} → 实际 ${actual}\n`;
+                }
+                
+                // 恢复原值
+                manager.maxGlobalConcurrency = oldConcurrency;
+                testResults += `\n🔄 已恢复到原值: ${oldConcurrency}`;
+                
+                result.className = 'result success';
+                result.textContent = testResults;
+                
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ 测试失败: ${error.message}`;
+            }
+        }
+        
+        async function simulateKeyTest() {
+            const result = document.getElementById('simulationResult');
+            result.className = 'result info';
+            result.textContent = '🔄 正在模拟密钥测试...';
+            
+            try {
+                if (typeof globalConcurrencyManager === 'undefined') {
+                    result.className = 'result error';
+                    result.textContent = '❌ globalConcurrencyManager 未找到';
+                    return;
+                }
+                
+                const manager = globalConcurrencyManager;
+                let simulationResults = '🎭 模拟密钥测试结果:\n\n';
+                
+                // 模拟获取5个槽位
+                const slots = [];
+                for (let i = 0; i < 5; i++) {
+                    try {
+                        const slot = await manager.acquireSlot();
+                        slots.push(slot);
+                        simulationResults += `✅ 槽位 ${i+1}: ${slot.id}\n`;
+                    } catch (error) {
+                        simulationResults += `❌ 槽位 ${i+1}: 获取失败 - ${error.message}\n`;
+                    }
+                }
+                
+                simulationResults += `\n📊 当前状态: ${manager.currentRunning}/${manager.maxGlobalConcurrency}\n\n`;
+                
+                // 模拟不同的结果并释放槽位
+                for (let i = 0; i < slots.length; i++) {
+                    const slot = slots[i];
+                    const isSuccess = Math.random() > 0.3; // 70% 成功率
+                    const latency = 1000 + Math.random() * 3000;
+                    
+                    manager.releaseSlot(slot, {
+                        success: isSuccess,
+                        latency: Math.round(latency),
+                        status: isSuccess ? 200 : (Math.random() > 0.5 ? 403 : 429)
+                    });
+                    
+                    simulationResults += `🔄 释放槽位 ${i+1}: ${isSuccess ? '成功' : '失败'} (${Math.round(latency)}ms)\n`;
+                }
+                
+                const finalMetrics = manager.getMetrics ? manager.getMetrics() : {};
+                simulationResults += `\n📈 最终指标:
+- 总请求: ${finalMetrics.totalRequests}
+- 完成请求: ${finalMetrics.completedRequests}
+- 错误请求: ${finalMetrics.errorRequests}
+- 当前并发: ${finalMetrics.currentRunning}`;
+                
+                result.className = 'result success';
+                result.textContent = simulationResults;
+                
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ 模拟失败: ${error.message}`;
+            }
+        }
+        
+        function resetAndClean() {
+            const result = document.getElementById('resetResult');
+            
+            try {
+                if (typeof globalConcurrencyManager === 'undefined') {
+                    result.className = 'result error';
+                    result.textContent = '❌ globalConcurrencyManager 未找到';
+                    return;
+                }
+                
+                const manager = globalConcurrencyManager;
+                const oldMetrics = manager.getMetrics ? manager.getMetrics() : {};
+                
+                // 重置统计数据
+                if (typeof manager.resetStats === 'function') {
+                    manager.resetStats();
+                }
+                
+                const newMetrics = manager.getMetrics ? manager.getMetrics() : {};
+                
+                const resetResults = `🧹 重置操作完成:
+
+重置前:
+- 总请求: ${oldMetrics.totalRequests || 0}
+- 完成请求: ${oldMetrics.completedRequests || 0}
+- 错误请求: ${oldMetrics.errorRequests || 0}
+
+重置后:
+- 总请求: ${newMetrics.totalRequests || 0}
+- 完成请求: ${newMetrics.completedRequests || 0}
+- 错误请求: ${newMetrics.errorRequests || 0}
+
+✅ 并发管理器已重置，可以重新开始测试`;
+                
+                result.className = 'result success';
+                result.textContent = resetResults;
+                
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ 重置失败: ${error.message}`;
+            }
+        }
+        
+        // 页面加载时自动检查
+        window.addEventListener('load', function() {
+            setTimeout(checkGlobalManager, 500);
+        });
+    </script>
+</body>
+</html>

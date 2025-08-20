@@ -1,0 +1,25 @@
+# Dependencies and build artifacts
+node_modules/
+dist/
+coverage/
+.cache/
+.vite/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.log
+
+# System/IDE files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Environment files
+.env
+.env.*.local
+
+# Do not track analysis docs
+项目分析/

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>简单并发检查</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        
+        .button:hover { background: #45a049; }
+        
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            height: 400px;
+            overflow-y: auto;
+            margin: 20px 0;
+        }
+        
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .result-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .result-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 简单并发检查工具</h1>
+        <p>快速检查正式程序是否应用了并发控制</p>
+        
+        <div class="controls">
+            <button class="button" onclick="checkMainProgram()">🔍 检查主程序</button>
+            <button class="button" onclick="testConcurrency()">🚀 测试并发</button>
+            <button class="button" onclick="clearLog()">🗑️ 清除日志</button>
+        </div>
+        
+        <div id="statusDisplay" class="status hidden"></div>
+        
+        <div id="results" class="results hidden">
+            <div class="result-card">
+                <div id="moduleStatus" class="result-value">-</div>
+                <div class="result-label">模块状态</div>
+            </div>
+            <div class="result-card">
+                <div id="concurrencyConfig" class="result-value">-</div>
+                <div class="result-label">并发配置</div>
+            </div>
+            <div class="result-card">
+                <div id="currentRunning" class="result-value">-</div>
+                <div class="result-label">当前运行</div>
+            </div>
+        </div>
+        
+        <div id="testLog" class="log"></div>
+    </div>
+
+    <!-- 加载主程序核心模块进行检查 -->
+    <script src="../../js/core/globalConcurrencyManager.js"></script>
+    <script src="../../js/core/concurrency.js"></script>
+    
+    <script>
+        function log(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('testLog');
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            document.getElementById('testLog').innerHTML = '';
+        }
+        
+        function showStatus(message, level = 'success') {
+            const statusDisplay = document.getElementById('statusDisplay');
+            statusDisplay.className = `status ${level}`;
+            statusDisplay.textContent = message;
+            statusDisplay.classList.remove('hidden');
+        }
+        
+        function updateResults(moduleOk, concurrency, running) {
+            document.getElementById('moduleStatus').textContent = moduleOk ? '✅' : '❌';
+            document.getElementById('concurrencyConfig').textContent = concurrency || '未配置';
+            document.getElementById('currentRunning').textContent = running || '0';
+            document.getElementById('results').classList.remove('hidden');
+        }
+        
+        function checkMainProgram() {
+            log('🔍 开始检查主程序并发状态...');
+            
+            // 检查关键模块
+            const hasGlobalManager = typeof window.globalConcurrencyManager !== 'undefined';
+            const hasProcessFunction = typeof window.processWithFixedConcurrency === 'function';
+            const hasStartKeyTest = typeof window.startKeyTest === 'function';
+            
+            log(`📋 globalConcurrencyManager: ${hasGlobalManager ? '✅ 已加载' : '❌ 未加载'}`);
+            log(`📋 processWithFixedConcurrency: ${hasProcessFunction ? '✅ 已加载' : '❌ 未加载'}`);
+            log(`📋 startKeyTest: ${hasStartKeyTest ? '✅ 已加载' : '❌ 未加载'}`);
+            
+            let concurrencyConfig = '未配置';
+            let currentRunning = '0';
+            
+            if (hasGlobalManager) {
+                const manager = window.globalConcurrencyManager;
+                concurrencyConfig = manager.maxGlobalConcurrency || '未设置';
+                currentRunning = manager.currentRunning || '0';
+                
+                log(`📊 最大并发数: ${concurrencyConfig}`);
+                log(`🔄 当前运行数: ${currentRunning}`);
+                log(`🧠 自适应策略: ${manager.adaptiveConfig?.enabled ? '启用' : '禁用'}`);
+                
+                // 获取详细指标
+                if (manager.getMetrics) {
+                    const metrics = manager.getMetrics();
+                    log(`📈 总请求数: ${metrics.totalRequests || 0}`);
+                    log(`✅ 完成请求数: ${metrics.completedRequests || 0}`);
+                    log(`📊 峰值并发: ${metrics.peakConcurrency || 0}`);
+                }
+            }
+            
+            // 综合评判
+            const moduleOk = hasGlobalManager && hasProcessFunction;
+            const isConfigured = concurrencyConfig > 5;
+            
+            if (moduleOk && isConfigured) {
+                showStatus('✅ 并发控制已正确配置并加载', 'success');
+                log('✅ 检查通过：并发控制已应用');
+            } else if (moduleOk) {
+                showStatus('⚠️ 模块已加载但配置可能有问题', 'warning');
+                log('⚠️ 检查警告：模块已加载但配置需要验证');
+            } else {
+                showStatus('❌ 并发控制模块未正确加载', 'error');
+                log('❌ 检查失败：关键模块缺失');
+            }
+            
+            updateResults(moduleOk, concurrencyConfig, currentRunning);
+        }
+        
+        async function testConcurrency() {
+            log('🚀 开始并发测试...');
+            
+            if (typeof window.globalConcurrencyManager === 'undefined') {
+                log('❌ 全局并发管理器不可用，无法测试');
+                showStatus('❌ 无法测试：并发管理器未加载', 'error');
+                return;
+            }
+            
+            const manager = window.globalConcurrencyManager;
+            const testCount = 10;
+            
+            log(`🎯 测试 ${testCount} 个并发任务...`);
+            
+            // 监控并发状态
+            let maxObserved = 0;
+            const startTime = Date.now();
+            
+            const monitor = setInterval(() => {
+                const current = manager.currentRunning;
+                maxObserved = Math.max(maxObserved, current);
+                updateResults(true, manager.maxGlobalConcurrency, current);
+                
+                if (current > 0) {
+                    log(`📊 当前并发: ${current}`);
+                }
+            }, 200);
+            
+            // 创建测试任务
+            const tasks = [];
+            for (let i = 0; i < testCount; i++) {
+                tasks.push(testSingleTask(i));
+            }
+            
+            try {
+                await Promise.all(tasks);
+                const endTime = Date.now();
+                const duration = endTime - startTime;
+                
+                clearInterval(monitor);
+                
+                log(`✅ 测试完成！`);
+                log(`⏱️ 总耗时: ${duration}ms`);
+                log(`🔥 最大并发数: ${maxObserved}`);
+                log(`🚀 吞吐量: ${(testCount / (duration / 1000)).toFixed(1)} tasks/sec`);
+                
+                if (maxObserved >= Math.min(manager.maxGlobalConcurrency, testCount)) {
+                    showStatus('✅ 并发测试通过 - 观察到预期的并发行为', 'success');
+                } else {
+                    showStatus('⚠️ 并发测试警告 - 并发数低于预期', 'warning');
+                }
+                
+            } catch (error) {
+                clearInterval(monitor);
+                log(`❌ 测试失败: ${error.message}`);
+                showStatus('❌ 并发测试失败', 'error');
+            }
+        }
+        
+        async function testSingleTask(taskId) {
+            const manager = window.globalConcurrencyManager;
+            
+            try {
+                // 获取槽位
+                const slot = await manager.acquireSlot();
+                log(`📋 任务 ${taskId}: 获取槽位 ${slot.id}`);
+                
+                // 模拟工作
+                const workTime = 300 + Math.random() * 200; // 300-500ms
+                await new Promise(resolve => setTimeout(resolve, workTime));
+                
+                // 释放槽位
+                manager.releaseSlot(slot, {
+                    success: true,
+                    latency: workTime
+                });
+                
+                log(`✅ 任务 ${taskId}: 完成 (${workTime.toFixed(0)}ms)`);
+                
+            } catch (error) {
+                log(`❌ 任务 ${taskId}: 失败 - ${error.message}`);
+                throw error;
+            }
+        }
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🧪 简单并发检查工具已加载');
+            
+            // 尝试初始化并发管理器（模拟主程序环境）
+            if (typeof window.globalConcurrencyManager !== 'undefined') {
+                window.globalConcurrencyManager.maxGlobalConcurrency = 15;
+                log('⚙️ 模拟主程序环境：设置并发数为 15');
+            }
+            
+            log('💡 点击"检查主程序"查看模块状态，或"测试并发"验证并发行为');
+        });
+    </script>
+</body>
+</html>
