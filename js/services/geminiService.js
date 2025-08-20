@@ -59,7 +59,7 @@ async function testGeminiKey(apiKey, model = null) {
 		if (data && data.candidates && Array.isArray(data.candidates) && data.candidates.length > 0) {
 			let isPaid;
 			try {
-				if (typeof featureFlags !== 'undefined' && featureFlags.paidDetection && typeof testGeminiContextCaching === 'function') {
+				if (typeof testGeminiContextCaching === 'function') {
 					const paidRes = await testGeminiContextCaching(apiKey);
 					isPaid = !!(paidRes && paidRes.isPaid);
 				}

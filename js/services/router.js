@@ -2,13 +2,25 @@ async function testApiKey(apiKey, apiType) {
 	let result;
 	switch (apiType) {
 		case 'openai':
-			result = await testOpenAIKey(apiKey);
+			if (typeof window !== 'undefined' && window.testOpenAIKey) {
+				result = await window.testOpenAIKey(apiKey);
+			} else {
+				result = { valid: false, error: 'OpenAI service not loaded', isRateLimit: false };
+			}
 			break;
 		case 'claude':
-			result = await testClaudeKey(apiKey);
+			if (typeof window !== 'undefined' && window.testClaudeKey) {
+				result = await window.testClaudeKey(apiKey);
+			} else {
+				result = { valid: false, error: 'Claude service not loaded', isRateLimit: false };
+			}
 			break;
 		case 'gemini':
-			result = await testGeminiKey(apiKey);
+			if (typeof window !== 'undefined' && window.testGeminiKey) {
+				result = await window.testGeminiKey(apiKey);
+			} else {
+				result = { valid: false, error: 'Gemini service not loaded', isRateLimit: false };
+			}
 			break;
 		default:
 			result = { valid: false, error: '不支持的API类型', isRateLimit: false };

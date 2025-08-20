@@ -108,16 +108,8 @@ function bindPrimaryButtons() {
 		});
 		dedupeBtn.dataset.bound = '1';
 	}
-	if (startBtn && !startBtn.dataset.bound) {
-		startBtn.addEventListener('click', () => {
-			if (apiTextarea && !apiTextarea.value.trim()) {
-				window.alert(getCurrentLang() === 'zh' ? '请先输入api密匙！' : 'Please enter API keys first!');
-				return;
-			}
-			if (typeof window.startTesting === 'function') window.startTesting();
-		});
-		startBtn.dataset.bound = '1';
-	}
+	// startBtn 事件绑定已移至 bootstrap.js，避免重复绑定
+	// 这里不再绑定 startBtn 事件
 	if (clearBtn && !clearBtn.dataset.bound) {
 		clearBtn.addEventListener('click', () => {
 			if (typeof window.clearAll === 'function') window.clearAll();

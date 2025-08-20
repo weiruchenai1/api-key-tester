@@ -1,4 +1,5 @@
 const featureFlags = {
+	// 付费检测默认开启
 	paidDetection: true,
 	paidDetectionMaxConcurrency: 5,
 	paidDetectionBackoff: {
@@ -9,7 +10,7 @@ const featureFlags = {
 	},
 	paidDetectionMinTextLen: 8000,  // ~2048 tokens for gemini-2.5-flash-lite, ~1024 tokens for gemini-2.5-flash
 	// 调试与看门狗
-	debugQueue: true,
+	debugQueue: false,
 	queueWatchdogMs: 10000
 };
 

@@ -17,6 +17,13 @@ function finalizeResult(keyData, result, retryCount) {
 	return result;
 }
 
+function cancelTesting() {
+	if (isTestingInProgress) {
+		shouldCancelTesting = true;
+		console.log('User requested to cancel testing');
+	}
+}
+
 async function startTesting() {
 	if (isTestingInProgress) {
 		// 正在测试中时的重入：忽略额外的开始请求，避免误触导致取消
@@ -96,6 +103,7 @@ async function startTesting() {
 try {
 	if (typeof window !== 'undefined') {
 		window.startTesting = startTesting;
+		window.cancelTesting = cancelTesting;
 		window.finalizeResult = finalizeResult;
 	}
 } catch (_) {}

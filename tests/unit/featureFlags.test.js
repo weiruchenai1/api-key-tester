@@ -5,7 +5,7 @@ describe('featureFlags config', () => {
 		const mod = await import('../../js/config/featureFlags.js');
 		const flags = (globalThis.window && window.featureFlags) || (mod && mod.featureFlags) || globalThis.featureFlags;
 		expect(flags).toBeTruthy();
-		expect(flags.paidDetection).toBe(false);
+		  expect(flags.paidDetection).toBe(true); // 默认开启付费检测
 		expect(flags.paidDetectionMaxConcurrency).toBeGreaterThan(0);
 		expect(flags.paidDetectionBackoff).toBeTruthy();
 		expect(flags.paidDetectionBackoff.baseMs).toBeGreaterThan(0);

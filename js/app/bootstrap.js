@@ -5,7 +5,22 @@ function initializeEventListeners() {
 	document.getElementById('modelToggleBtn').addEventListener('click', toggleModelInput);
 	document.getElementById('detectedModelsHeader').addEventListener('click', toggleModelList);
 	document.getElementById('detectBtn').addEventListener('click', detectModels);
-	document.getElementById('startBtn').addEventListener('click', startTesting);
+	document.getElementById('startBtn').addEventListener('click', () => {
+		// 检查当前是否在测试中
+		if (typeof isTestingInProgress !== 'undefined' && isTestingInProgress) {
+			// 正在测试中，执行取消操作
+			if (typeof cancelTesting === 'function') cancelTesting();
+		} else {
+			// 未在测试中，执行开始测试操作
+			const apiTextarea = document.getElementById('apiKeys');
+			if (apiTextarea && !apiTextarea.value.trim()) {
+				const lang = (typeof currentLang !== 'undefined' && currentLang) || 'zh';
+				alert(lang === 'zh' ? '请先输入api密匙！' : 'Please enter API keys first!');
+				return;
+			}
+			if (typeof startTesting === 'function') startTesting();
+		}
+	});
 	document.getElementById('dedupeBtn').addEventListener('click', deduplicateKeys);
 	document.getElementById('clearBtn').addEventListener('click', clearAll);
 	document.getElementById('pasteBtn').addEventListener('click', pasteFromClipboard);
@@ -50,7 +65,6 @@ function initialize() {
 		const ensureNotice = () => {
 			if (!apiTypeSelect || !tipEl) return;
 			const isGemini = apiTypeSelect.value === 'gemini';
-			const paidOn = typeof featureFlags !== 'undefined' && !!featureFlags.paidDetection;
 			const hasFn = typeof window.testGeminiContextCaching === 'function';
 			let notice = document.querySelector('[data-lang-key="paid-detection-unavailable"]');
 			if (!notice) {
@@ -60,8 +74,8 @@ function initialize() {
 				notice.textContent = translations[currentLang]['paid-detection-unavailable'] || 'Paid detection unavailable';
 				tipEl.parentNode.insertBefore(notice, tipEl.nextSibling);
 			}
-			// 显示/隐藏
-			if (isGemini && paidOn && !hasFn) {
+			// 显示/隐藏 - 只有在 Gemini 模式下且缺少付费检测函数时才显示警告
+			if (isGemini && !hasFn) {
 				notice.classList.remove('hidden');
 			} else {
 				notice.classList.add('hidden');
