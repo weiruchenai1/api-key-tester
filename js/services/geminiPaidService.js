@@ -9,6 +9,11 @@ function _getPaidLimits() {
 	return { max, backoff, minTextLen };
 }
 
+// 估算字符数转 token 数（粗略估算：英文 ~4 字符 = 1 token）
+function _estimateTokens(text) {
+	return Math.ceil(text.length / 4);
+}
+
 function _startNextIfPossible() {
 	const { max } = _getPaidLimits();
 	while (_paidInFlight < max && _paidQueue.length > 0) {
@@ -63,9 +68,19 @@ function _sleep(ms) {
 async function _performCachedRequest(apiKey) {
 	const { minTextLen } = _getPaidLimits();
 	const url = getApiUrl('gemini', '/cachedContents') + '?key=' + encodeURIComponent(apiKey);
+	const baseText = "You are an expert at analyzing API key capabilities and testing system functionality.";
+	const repeatedText = baseText.repeat(Math.ceil(minTextLen / baseText.length));
+	const finalText = repeatedText.substring(0, minTextLen);
+	
+	// Debug 信息：显示估算的 token 数量
+	if (typeof featureFlags !== 'undefined' && featureFlags.debugQueue) {
+		const estimatedTokens = _estimateTokens(finalText);
+		console.debug('[geminiPaid] 生成测试文本:', finalText.length, '字符, 估算', estimatedTokens, 'tokens');
+	}
+	
 	const body = {
 		model: 'models/gemini-2.5-flash',
-		contents: [{ role: 'user', parts: [{ text: 'x'.repeat(minTextLen) }] }],
+		contents: [{ role: 'user', parts: [{ text: finalText }] }],
 		ttl: '30s'
 	};
 	try {
