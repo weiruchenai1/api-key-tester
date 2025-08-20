@@ -66,21 +66,20 @@
                 <div class="input-group">
                     <label data-lang-key="concurrency-control">并发控制</label>
                     <div class="concurrency-container">
-                        <div class="concurrency-input-section">
-                            <input type="number" id="concurrencyInput" class="form-control" value="15" min="1">
-                        </div>
-                        <div class="slider-section">
-                            <div class="slider-container">
-                                <input type="range" id="concurrencySlider" class="slider" min="1" max="50" value="15">
-                                <span class="slider-value" id="sliderValue">15</span>
-                            </div>
-                            <div class="preset-buttons">
-                                <button type="button" class="preset-btn" data-concurrency="1" data-lang-key="slow">慢速</button>
-                                <button type="button" class="preset-btn" data-concurrency="5" data-lang-key="normal">正常</button>
-                                <button type="button" class="preset-btn" data-concurrency="10" data-lang-key="fast">快速</button>
-                                <button type="button" class="preset-btn active" data-concurrency="15" data-lang-key="optimized">优化</button>
-                                <button type="button" class="preset-btn" data-concurrency="20" data-lang-key="ultra">极速</button>
-                            </div>
+                                                  <div class="concurrency-input-section">
+                             <input type="number" id="concurrencyInput" class="form-control" value="5" min="1">
+                          </div>
+                          <div class="slider-section">
+                              <div class="slider-container">
+                                 <input type="range" id="concurrencySlider" class="slider" min="1" max="50" value="5">
+                                 <span class="slider-value" id="sliderValue">5</span>
+                              </div>
+                                                          <div class="preset-buttons">
+                                  <button type="button" class="preset-btn" data-concurrency="1" data-lang-key="slow">慢速</button>
+                                  <button type="button" class="preset-btn active" data-concurrency="5" data-lang-key="normal">正常</button>
+                                  <button type="button" class="preset-btn" data-concurrency="10" data-lang-key="fast">快速</button>
+                                  <button type="button" class="preset-btn" data-concurrency="20" data-lang-key="ultra">极速</button>
+                              </div>
                         </div>
                     </div>
                 </div>
@@ -243,10 +242,8 @@
     <script src="js/ui/virtualList.js"></script>
     <script src="js/ui/performanceOptimized.js"></script>
     <script src="js/core/memoryManager.js"></script>
-    <script src="js/core/progressiveLoader.js"></script>
-    <script src="js/core/globalConcurrencyManager.js"></script>
-    <script src="js/core/unifiedFetch.js"></script>
-    <script src="js/ui/uiHealthOptimizer.js"></script>
+          <script src="js/core/progressiveLoader.js"></script>
+      <script src="js/core/globalConcurrencyManager.js"></script>
     
     <script>
         // 全局变量
@@ -255,27 +252,27 @@
         let isDarkTheme = false;
         let isCustomModel = false;
         let detectedModels = new Set();
-        let currentConcurrency = 15;
+                  let currentConcurrency = 5;
         
         // 初始化全局并发管理器
         document.addEventListener('DOMContentLoaded', function() {
             // 延迟检查，确保所有脚本都已加载
             setTimeout(function() {
                 if (typeof globalConcurrencyManager !== 'undefined') {
-                    // 重置统计数据，清除可能的错误历史
+                    // 重置统计数据
                     if (typeof globalConcurrencyManager.resetStats === 'function') {
                         globalConcurrencyManager.resetStats();
                         console.log('[Init] 统计数据已重置');
                     }
                     
-                    // 设置初始并发数为15（相比原来的5有显著提升）
-                    globalConcurrencyManager.maxGlobalConcurrency = 15;
+                    // 设置初始并发数为5
+                    globalConcurrencyManager.maxGlobalConcurrency = 5;
                     console.log(`[Init] 全局并发管理器已启用，初始并发数: ${globalConcurrencyManager.maxGlobalConcurrency}`);
-                    console.log('[Init] 自适应并发控制已禁用（避免误判）');
+                    console.log('[Init] 使用固定并发控制模式');
                     
                     // 确保UI控制器已初始化并同步
                     if (typeof updateConcurrency === 'function') {
-                        updateConcurrency(15); // 同步UI显示和全局管理器
+                        updateConcurrency(5); // 同步UI显示和全局管理器
                         console.log('[Init] UI并发控制已同步');
                     }
                 } else {
@@ -284,7 +281,7 @@
                     // 创建简化的并发管理器作为后备方案
                     try {
                         window.globalConcurrencyManager = {
-                            maxGlobalConcurrency: 15,
+                            maxGlobalConcurrency: 5,
                             currentRunning: 0,
                             waitingQueue: [],
                             
@@ -319,12 +316,12 @@
                             }
                         };
                         
-                        console.log('[Init] 简化版并发管理器已创建，并发数: 15');
-                        console.log('[Init] 注意: 使用的是后备版本，已禁用自适应功能');
+                        console.log('[Init] 简化版并发管理器已创建，并发数: 5');
+                        console.log('[Init] 注意: 使用的是后备版本，仅提供基本并发控制');
                         
                         // 同步UI控制器
                         if (typeof updateConcurrency === 'function') {
-                            updateConcurrency(15);
+                            updateConcurrency(5);
                             console.log('[Init] UI并发控制已同步（后备版本）');
                         }
                         
