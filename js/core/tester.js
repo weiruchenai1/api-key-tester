@@ -13,6 +13,11 @@ function finalizeResult(keyData, result, retryCount) {
 		} else {
 			keyData.status = 'invalid';
 		}
+		
+		// 标记完成时间，用于内存管理
+		if (typeof memoryManager !== 'undefined' && memoryManager.markKeyCompleted) {
+			memoryManager.markKeyCompleted(keyData);
+		}
 	}
 	return result;
 }
@@ -60,25 +65,40 @@ async function startTesting() {
 
 	if (typeof updateStartButtonText === 'function') updateStartButtonText();
 
+	// 清空现有数据
 	allKeysData = [];
-	uniqueKeys.forEach(apiKey => {
-		const keyData = {
-			key: apiKey,
-			status: 'pending',
-			error: null,
-			type: apiType,
-			model: selectedModel,
-			retryCount: 0
-		};
-		allKeysData.push(keyData);
-	});
+	
+	// 检查是否需要性能优化
+	if (uniqueKeys.length > 1000 && typeof initializeKeysProgressively === 'function') {
+		// 大量密钥时使用渐进式初始化
+		console.log(`[Performance] 大量密钥检测到 (${uniqueKeys.length})，启用性能优化模式`);
+		await initializeKeysProgressively(uniqueKeys, apiType, selectedModel);
+	} else {
+		// 少量密钥时使用传统方式
+		uniqueKeys.forEach(apiKey => {
+			const keyData = {
+				key: apiKey,
+				status: 'pending',
+				error: null,
+				type: apiType,
+				model: selectedModel,
+				retryCount: 0
+			};
+			allKeysData.push(keyData);
+		});
+	}
 
 	document.getElementById('loading').classList.remove('hidden');
 	document.getElementById('progressBar').classList.remove('hidden');
 	document.getElementById('resultsSection').classList.remove('hidden');
 
-	if (typeof updateStats === 'function') updateStats();
-	if (typeof updateKeyLists === 'function') updateKeyLists();
+	// 使用优化的UI更新
+	if (typeof updateUIProgressively === 'function') {
+		await updateUIProgressively();
+	} else {
+		if (typeof updateStats === 'function') updateStats();
+		if (typeof updateKeyLists === 'function') updateKeyLists();
+	}
 	// 初始化进度条到 0%
 	if (typeof updateProgress === 'function') updateProgress();
 
@@ -92,8 +112,14 @@ async function startTesting() {
 		document.getElementById('loading').classList.add('hidden');
 		document.getElementById('progressBar').classList.add('hidden');
 		if (typeof updateStartButtonText === 'function') updateStartButtonText();
-		if (typeof updateStats === 'function') updateStats();
-		if (typeof updateKeyLists === 'function') updateKeyLists();
+		
+		// 使用优化的UI更新
+		if (typeof updateUIProgressively === 'function') {
+			await updateUIProgressively();
+		} else {
+			if (typeof updateStats === 'function') updateStats();
+			if (typeof updateKeyLists === 'function') updateKeyLists();
+		}
 		if (!shouldCancelTesting && typeof showCompletionMessage === 'function') {
 			showCompletionMessage();
 		}
