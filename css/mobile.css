@@ -1,0 +1,510 @@
+/* 移动端专用样式优化 */
+
+/* 基础移动端优化 */
+@media (max-width: 768px) {
+    /* 容器优化 */
+    body {
+        padding: 5px;
+        font-size: 16px; /* 防止iOS缩放 */
+    }
+    
+    .container {
+        margin: 0;
+        border-radius: 12px;
+        min-height: calc(100vh - 10px);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* 头部优化 */
+    .header {
+        padding: 16px;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .header h1 {
+        font-size: clamp(1.2rem, 5vw, 1.8rem);
+        margin-bottom: 4px;
+    }
+    
+    .header p {
+        font-size: clamp(0.8rem, 3vw, 1rem);
+        line-height: 1.3;
+    }
+    
+    /* 主内容区域 */
+    .main-content {
+        padding: 12px;
+        flex: 1;
+    }
+    
+    /* 输入区域优化 */
+    .input-section {
+        padding: 16px;
+        margin-bottom: 16px;
+        border-radius: 12px;
+    }
+    
+    /* 表单控件触摸优化 */
+    .form-control {
+        padding: 14px 12px; /* 增加触摸面积 */
+        font-size: 16px; /* 防止iOS缩放 */
+        border-radius: 10px;
+        min-height: 44px; /* iOS推荐最小触摸尺寸 */
+    }
+    
+    /* 文本域优化 */
+    .form-control.textarea {
+        min-height: 120px;
+        resize: vertical;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+    
+    /* 按钮组优化 */
+    .button-group {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 16px;
+    }
+    
+    .btn {
+        min-height: 48px; /* 触摸友好 */
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 10px;
+        padding: 12px 16px;
+        transition: all 0.2s ease;
+    }
+    
+    /* 主要按钮占满宽度 */
+    .btn-primary,
+    .btn-detect {
+        grid-column: 1 / -1;
+    }
+    
+    /* 按钮按压效果 */
+    .btn:active {
+        transform: scale(0.98);
+    }
+    
+    /* 标签页优化 */
+    .results-tabs {
+        gap: 0;
+        border-bottom: 1px solid #e9ecef;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+    }
+    
+    .results-tabs::-webkit-scrollbar {
+        display: none;
+    }
+    
+    .tab {
+        padding: 12px 16px;
+        font-size: 14px;
+        min-width: 80px;
+        text-align: center;
+        border-bottom: 2px solid transparent;
+        white-space: nowrap;
+    }
+    
+    .tab.active {
+        border-bottom-color: #667eea;
+        background: rgba(102, 126, 234, 0.1);
+    }
+    
+    /* 统计卡片优化 */
+    .stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-bottom: 16px;
+    }
+    
+    .stat-card {
+        padding: 12px 8px;
+        border-radius: 10px;
+        min-height: 70px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .stat-number {
+        font-size: clamp(1.2rem, 4vw, 1.6rem);
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+    
+    .stat-label {
+        font-size: clamp(0.7rem, 2.5vw, 0.9rem);
+        opacity: 0.8;
+    }
+    
+    /* 密钥列表优化 */
+    .key-list {
+        max-height: 300px;
+        padding: 12px;
+        border-radius: 10px;
+    }
+    
+    .key-item {
+        padding: 12px;
+        margin-bottom: 8px;
+        border-radius: 8px;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    
+    .key-text {
+        font-size: 13px;
+        word-break: break-all;
+        line-height: 1.3;
+        margin: 0;
+    }
+    
+    .key-status {
+        align-self: flex-end;
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+    
+    /* 复制按钮优化 */
+    .copy-btn {
+        margin-top: 12px;
+        padding: 12px;
+        font-size: 14px;
+        border-radius: 10px;
+        min-height: 44px;
+    }
+    
+    /* 主题控制按钮优化 */
+    .theme-controls {
+        top: 8px;
+        right: 8px;
+        gap: 8px;
+    }
+    
+    .control-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+        border-radius: 50%;
+        backdrop-filter: blur(10px);
+    }
+    
+    /* 警告信息优化 */
+    .alert {
+        padding: 12px;
+        font-size: 13px;
+        line-height: 1.4;
+        border-radius: 10px;
+        margin-top: 12px;
+    }
+    
+    /* 进度条优化 */
+    .progress-bar {
+        height: 6px;
+        border-radius: 3px;
+        margin: 16px 0;
+    }
+    
+    /* 加载状态优化 */
+    .loading {
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .loading p {
+        font-size: 14px;
+        margin-top: 8px;
+    }
+}
+
+/* 小屏幕手机优化 (480px以下) */
+@media (max-width: 480px) {
+    body {
+        padding: 2px;
+    }
+    
+    .container {
+        border-radius: 8px;
+        min-height: calc(100vh - 4px);
+    }
+    
+    .header {
+        padding: 12px;
+        border-radius: 8px 8px 0 0;
+    }
+    
+    .main-content {
+        padding: 8px;
+    }
+    
+    .input-section {
+        padding: 12px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+    }
+    
+    /* 并发和重试控制优化 */
+    .concurrency-container,
+    .retry-container {
+        flex-direction: column;
+        gap: 12px;
+        padding: 12px;
+        align-items: stretch;
+    }
+    
+    .concurrency-input-section,
+    .retry-input-section {
+        align-self: center;
+        min-width: auto;
+    }
+    
+    .concurrency-input-section .form-control,
+    .retry-input-section .form-control {
+        width: 80px;
+        margin: 0 auto;
+    }
+    
+    .slider-section,
+    .retry-slider-section {
+        width: 100%;
+    }
+    
+    .preset-buttons,
+    .retry-preset-buttons {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+        margin-top: 8px;
+    }
+    
+    .preset-btn,
+    .retry-preset-btn {
+        padding: 8px 4px;
+        font-size: 11px;
+        min-height: 36px;
+        border-radius: 6px;
+    }
+    
+    /* 模型输入组优化 */
+    .model-input-group {
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+    }
+    
+    .model-toggle-btn {
+        width: 100%;
+        margin-top: 0;
+        min-height: 44px;
+    }
+    
+    /* 统计卡片进一步优化 */
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+    
+    .stat-card {
+        padding: 10px 6px;
+        min-height: 60px;
+    }
+    
+    .stat-number {
+        font-size: clamp(1rem, 4vw, 1.4rem);
+    }
+    
+    .stat-label {
+        font-size: clamp(0.6rem, 2.5vw, 0.8rem);
+    }
+    
+    /* 按钮组单列布局 */
+    .button-group {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    /* 标签页滚动指示 */
+    .results-tabs::after {
+        content: '→';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: linear-gradient(to left, white 0%, transparent 100%);
+        padding: 0 8px;
+        pointer-events: none;
+        opacity: 0.6;
+    }
+    
+    .dark-theme .results-tabs::after {
+        background: linear-gradient(to left, #232741 0%, transparent 100%);
+    }
+}
+
+/* 极小屏幕优化 (320px以下) */
+@media (max-width: 320px) {
+    .header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .header p {
+        font-size: 0.8rem;
+    }
+    
+    .input-section {
+        padding: 10px;
+    }
+    
+    .form-control {
+        padding: 12px 10px;
+        font-size: 15px;
+    }
+    
+    .btn {
+        min-height: 44px;
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+    
+    .preset-btn,
+    .retry-preset-btn {
+        padding: 6px 2px;
+        font-size: 10px;
+        min-height: 32px;
+    }
+    
+    .control-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+    
+    .stat-number {
+        font-size: 1.1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.65rem;
+    }
+}
+
+/* 横屏模式优化 */
+@media (max-width: 768px) and (orientation: landscape) {
+    .container {
+        min-height: calc(100vh - 10px);
+    }
+    
+    .header {
+        padding: 12px 16px;
+    }
+    
+    .header h1 {
+        font-size: 1.4rem;
+        margin-bottom: 2px;
+    }
+    
+    .header p {
+        font-size: 0.9rem;
+    }
+    
+    .main-content {
+        padding: 12px 16px;
+    }
+    
+    .stats {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 8px;
+    }
+    
+    .key-list {
+        max-height: 200px;
+    }
+}
+
+/* 触摸设备特定优化 */
+@media (pointer: coarse) {
+    /* 增加所有可点击元素的触摸面积 */
+    .btn,
+    .tab,
+    .preset-btn,
+    .retry-preset-btn,
+    .model-toggle-btn,
+    .control-btn,
+    .copy-btn,
+    .paste-btn,
+    .import-btn {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* 改善滚动体验 */
+    .key-list,
+    .results-tabs,
+    .model-list-container {
+        -webkit-overflow-scrolling: touch;
+        scroll-behavior: smooth;
+    }
+    
+    /* 移除悬停效果，避免触摸设备的粘滞 */
+    .btn:hover,
+    .form-control:hover,
+    .input-section:hover,
+    .stat-card:hover,
+    .key-list:hover,
+    .key-item:hover {
+        transform: none;
+    }
+    
+    /* 添加触摸反馈 */
+    .btn:active,
+    .tab:active,
+    .preset-btn:active,
+    .retry-preset-btn:active {
+        opacity: 0.8;
+        transform: scale(0.98);
+    }
+}
+
+/* 高分辨率屏幕优化 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .progress-bar {
+        height: 4px;
+    }
+    
+    .key-item {
+        border-width: 0.5px;
+    }
+    
+    .form-control {
+        border-width: 1.5px;
+    }
+}
+
+/* 减少动画的用户偏好支持 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* 深色模式移动端优化 */
+@media (max-width: 768px) {
+    .dark-theme .results-tabs::after {
+        background: linear-gradient(to left, #232741 0%, transparent 100%);
+    }
+    
+    .dark-theme .tab.active {
+        background: rgba(76, 99, 210, 0.2);
+    }
+}
