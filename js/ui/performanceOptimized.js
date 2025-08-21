@@ -292,7 +292,35 @@ function performanceCleanup() {
 }
 
 // 每5分钟清理一次缓存
-setInterval(performanceCleanup, 5 * 60 * 1000);
+let performanceCleanupInterval = setInterval(performanceCleanup, 5 * 60 * 1000);
+
+// 清理性能优化模块的资源
+function cleanupPerformanceOptimization() {
+    // 清理定时器
+    if (performanceCleanupInterval) {
+        clearInterval(performanceCleanupInterval);
+        performanceCleanupInterval = null;
+    }
+    
+    // 清理缓存
+    filterCache.clear();
+    
+    // 清理虚拟列表
+    Object.values(virtualLists).forEach(list => {
+        if (list && typeof list.destroy === 'function') {
+            list.destroy();
+        }
+    });
+    virtualLists = {};
+    
+    // 重置状态
+    cachedStats = null;
+    statsDirty = true;
+    lastUpdateTime = 0;
+    cacheVersion = 0;
+    
+    console.log('[PerformanceOptimized] 资源清理完成');
+}
 
 try {
     if (typeof window !== 'undefined') {
@@ -302,5 +330,6 @@ try {
         window.invalidateCache = invalidateCache;
         window.updateStatsOptimized = updateStatsOptimized;
         window.updateKeyListsOptimized = updateKeyListsOptimized;
+        window.cleanupPerformanceOptimization = cleanupPerformanceOptimization;
     }
 } catch (_) {}

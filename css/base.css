@@ -108,13 +108,26 @@ body {
 .preset-btn, .retry-preset-btn { flex: 0 0 auto; }
 
 @media (max-width: 768px) {
-	.preset-btn, .retry-preset-btn { flex: 1; }
+	.preset-btn, .retry-preset-btn { 
+		flex: 1; 
+		min-width: 0;
+		max-width: none;
+		font-size: 12px;
+		padding: 8px 4px;
+		white-space: nowrap;
+	}
 	.model-toggle-btn { width: 100%; margin-top: 8px; }
 	.concurrency-container, .retry-container { flex-direction: column; gap: 12px; padding: 12px; align-items: stretch; }
 	.concurrency-input-section, .retry-input-section { align-self: center; min-width: auto; }
 	.concurrency-input-section .form-control, .retry-input-section .form-control { width: 100px; margin: 0 auto; }
 	.slider-section, .retry-slider-section { width: 100%; }
-	.preset-buttons, .retry-preset-buttons { gap: 4px; margin-top: 8px; }
+	.preset-buttons, .retry-preset-buttons { 
+		gap: 4px; 
+		margin-top: 8px; 
+		display: flex;
+		flex-wrap: nowrap;
+		justify-content: space-between;
+	}
 	.button-group { flex-direction: column; gap: 12px; }
 	.btn { min-width: auto; width: 100%; }
 	.stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -128,6 +141,49 @@ body {
 	.theme-controls { top: 8px; right: 8px; gap: 6px; }
 	.control-btn { width: 32px; height: 32px; font-size: 14px; }
 	.alert { padding: 10px; font-size: 12px; }
+}
+
+/* 针对更小屏幕的额外优化 */
+@media (max-width: 480px) {
+	.concurrency-container, .retry-container {
+		padding: 8px;
+	}
+	.preset-buttons, .retry-preset-buttons {
+		gap: 4px;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		margin: 8px 0;
+		width: 100%;
+		box-sizing: border-box;
+	}
+	.preset-btn, .retry-preset-btn {
+		flex: 0 1 calc(50% - 2px);
+		max-width: calc(50% - 2px);
+		min-width: 0;
+		padding: 6px 2px;
+		font-size: 10px;
+		box-sizing: border-box;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+}
+
+/* 针对极小屏幕 */
+@media (max-width: 320px) {
+	.preset-buttons, .retry-preset-buttons {
+		gap: 2px;
+		margin: 6px 0;
+	}
+	.preset-btn, .retry-preset-btn {
+		flex: 0 1 calc(50% - 1px);
+		max-width: calc(50% - 1px);
+		padding: 5px 1px;
+		font-size: 9px;
+		min-height: 28px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
 }
 
 /* Theme controls (light/base) */
@@ -330,8 +386,7 @@ body {
 	flex-shrink: 0;
 }
 
-/* Preset buttons (light/base) */
-.preset-buttons, .retry-preset-buttons { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+/* Preset buttons (light/base) - base styles defined above */
 .preset-btn {
 	padding: 8px 12px;
 	border: 1px solid #667eea;
@@ -344,8 +399,7 @@ body {
 	transition: all 0.3s ease;
 	min-width: 50px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	flex: 1;
-	max-width: 80px;
+	flex: 0 0 auto;
 }
 .preset-btn:hover { background: #667eea; color: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(102,126,234,.3); }
 .preset-btn.active { background: #667eea; color: white; box-shadow: 0 4px 12px rgba(102,126,234,.4); }
@@ -361,8 +415,7 @@ body {
 	transition: all 0.3s ease;
 	min-width: 50px;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	flex: 1;
-	max-width: 80px;
+	flex: 0 0 auto;
 }
 .retry-preset-btn:hover { background: #f39c12; color: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(243,156,18,.3); }
 .retry-preset-btn.active { background: #f39c12; color: white; box-shadow: 0 4px 12px rgba(243,156,18,.4); }

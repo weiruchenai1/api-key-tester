@@ -41,8 +41,9 @@ class VirtualList {
         this.scrollContainer.appendChild(this.totalContainer);
         this.container.appendChild(this.scrollContainer);
         
-        // 绑定滚动事件
-        this.scrollContainer.addEventListener('scroll', () => this.onScroll());
+        // 绑定滚动事件 - 保存引用以便清理
+        this.onScrollHandler = () => this.onScroll();
+        this.scrollContainer.addEventListener('scroll', this.onScrollHandler);
         
         // 监听窗口大小变化
         this.resizeObserver = new ResizeObserver(() => this.updateLayout());
@@ -112,8 +113,25 @@ class VirtualList {
     }
     
     destroy() {
+        // 清理事件监听器
+        if (this.scrollContainer && this.onScrollHandler) {
+            this.scrollContainer.removeEventListener('scroll', this.onScrollHandler);
+        }
+        
+        // 清理ResizeObserver
         this.resizeObserver?.disconnect();
+        
+        // 清理DOM
         this.container.innerHTML = '';
+        
+        // 清理引用
+        this.scrollContainer = null;
+        this.totalContainer = null;
+        this.visibleContainer = null;
+        this.onScrollHandler = null;
+        this.resizeObserver = null;
+        this.data = null;
+        this.renderItem = null;
     }
 }
 

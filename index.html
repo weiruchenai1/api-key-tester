@@ -242,8 +242,16 @@
     <script src="js/ui/virtualList.js"></script>
     <script src="js/ui/performanceOptimized.js"></script>
     <script src="js/core/memoryManager.js"></script>
-          <script src="js/core/progressiveLoader.js"></script>
-      <script src="js/core/globalConcurrencyManager.js"></script>
+    <script src="js/core/progressiveLoader.js"></script>
+    <script src="js/core/globalConcurrencyManager.js"></script>
+    
+    <!-- 高性能优化模块 -->
+    <script src="js/core/adaptiveConcurrencyManager.js"></script>
+    <script src="js/core/smartRetryManager.js"></script>
+    <script src="js/core/enhancedMemoryManager.js"></script>
+    <script src="js/core/highPerformanceProcessor.js"></script>
+    <script src="js/core/networkOptimizer.js"></script>
+    <script src="js/core/highSpeedController.js"></script>
     
     <script>
         // 全局变量
@@ -254,84 +262,191 @@
         let detectedModels = new Set();
                   let currentConcurrency = 5;
         
-        // 初始化全局并发管理器
+        // 初始化高速检测控制器
         document.addEventListener('DOMContentLoaded', function() {
-            // 延迟检查，确保所有脚本都已加载
-            setTimeout(function() {
-                if (typeof globalConcurrencyManager !== 'undefined') {
-                    // 重置统计数据
-                    if (typeof globalConcurrencyManager.resetStats === 'function') {
-                        globalConcurrencyManager.resetStats();
-                        console.log('[Init] 统计数据已重置');
-                    }
+            // 延迟初始化，确保所有脚本都已加载
+            setTimeout(async function() {
+                try {
+                    console.log('[Init] 🚀 启动高速检测系统...');
                     
-                    // 设置初始并发数为5
-                    globalConcurrencyManager.maxGlobalConcurrency = 5;
-                    console.log(`[Init] 全局并发管理器已启用，初始并发数: ${globalConcurrencyManager.maxGlobalConcurrency}`);
-                    console.log('[Init] 使用固定并发控制模式');
-                    
-                    // 确保UI控制器已初始化并同步
-                    if (typeof updateConcurrency === 'function') {
-                        updateConcurrency(5); // 同步UI显示和全局管理器
-                        console.log('[Init] UI并发控制已同步');
-                    }
-                } else {
-                    console.warn('[Init] 全局并发管理器未加载，尝试创建简化版本...');
-                    
-                    // 创建简化的并发管理器作为后备方案
-                    try {
-                        window.globalConcurrencyManager = {
-                            maxGlobalConcurrency: 5,
-                            currentRunning: 0,
-                            waitingQueue: [],
+                    // 初始化高速控制器
+                    if (typeof highSpeedController !== 'undefined') {
+                        await highSpeedController.initialize();
+                        console.log('[Init] ✅ 高速检测控制器已启用');
+                        
+                        // 添加状态更新回调
+                        highSpeedController.onStatusUpdate((status) => {
+                            // 更新进度显示
+                            updateProgressDisplay(status);
+                        });
+                        
+                        // 替换原始的开始测试函数
+                        if (typeof window.startTest === 'function') {
+                            window.originalStartTest = window.startTest;
+                        }
+                        window.startTest = async function() {
+                            const keys = getApiKeysFromInput();
+                            const apiType = document.getElementById('apiType').value;
                             
-                            async acquireSlot() {
-                                this.currentRunning++;
-                                const slot = {
-                                    id: `slot-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`,
-                                    acquireTime: Date.now(),
-                                    releaseSlot: () => {
-                                        this.currentRunning--;
-                                    }
-                                };
-                                console.log(`[Fallback] 获取槽位: ${slot.id}, 当前并发: ${this.currentRunning}`);
-                                return slot;
-                            },
+                            if (!keys || keys.length === 0) {
+                                alert('请输入API密钥');
+                                return;
+                            }
                             
-                            releaseSlot(slot, result = {}) {
-                                if (slot && typeof slot.releaseSlot === 'function') {
-                                    slot.releaseSlot();
-                                    console.log(`[Fallback] 释放槽位: ${slot.id}, 当前并发: ${this.currentRunning}`);
+                            // 显示加载状态
+                            showLoadingState();
+                            
+                            try {
+                                console.log(`[HighSpeed] 开始高速检测: ${keys.length} 个密钥`);
+                                const results = await highSpeedController.detectKeysAtHighSpeed(keys, apiType);
+                                
+                                // 显示完成状态
+                                showCompletionState(results);
+                                
+                            } catch (error) {
+                                console.error('[HighSpeed] 检测失败:', error);
+                                alert('检测失败: ' + error.message);
+                                
+                                // 回退到传统模式
+                                if (typeof window.originalStartTest === 'function') {
+                                    console.log('[HighSpeed] 回退到传统检测模式');
+                                    await window.originalStartTest();
                                 }
-                            },
-                            
-                            getMetrics() {
-                                return {
-                                    totalRequests: 0,
-                                    completedRequests: 0,
-                                    currentRunning: this.currentRunning,
-                                    maxGlobalConcurrency: this.maxGlobalConcurrency,
-                                    peakConcurrency: this.currentRunning
-                                };
+                            } finally {
+                                hideLoadingState();
                             }
                         };
                         
-                        console.log('[Init] 简化版并发管理器已创建，并发数: 5');
-                        console.log('[Init] 注意: 使用的是后备版本，仅提供基本并发控制');
-                        
-                        // 同步UI控制器
-                        if (typeof updateConcurrency === 'function') {
-                            updateConcurrency(5);
-                            console.log('[Init] UI并发控制已同步（后备版本）');
-                        }
-                        
-                    } catch (error) {
-                        console.error('[Init] 创建后备并发管理器失败:', error);
-                        console.warn('[Init] 将使用固定并发数:', currentConcurrency);
+                    } else {
+                        console.warn('[Init] 高速检测控制器未加载，使用传统模式');
+                        initializeFallbackMode();
                     }
+                    
+                    // 兼容性：保持原有的并发管理器
+                    if (typeof globalConcurrencyManager !== 'undefined') {
+                        globalConcurrencyManager.maxGlobalConcurrency = 10; // 提高默认并发数
+                        console.log('[Init] 传统并发管理器已配置');
+                    }
+                    
+                } catch (error) {
+                    console.error('[Init] 初始化失败:', error);
+                    initializeFallbackMode();
                 }
-            }, 100); // 延迟100ms确保脚本加载完成
+            }, 200); // 延迟200ms确保所有脚本加载完成
         });
+        
+        // 获取API密钥输入
+        function getApiKeysFromInput() {
+            const textarea = document.getElementById('apiKeys');
+            if (!textarea) return [];
+            
+            return textarea.value
+                .split('\n')
+                .map(key => key.trim())
+                .filter(key => key.length > 0);
+        }
+        
+        // 显示加载状态
+        function showLoadingState() {
+            const loading = document.getElementById('loading');
+            const progressBar = document.getElementById('progressBar');
+            const resultsSection = document.getElementById('resultsSection');
+            
+            if (loading) loading.classList.remove('hidden');
+            if (progressBar) progressBar.classList.remove('hidden');
+            if (resultsSection) resultsSection.classList.remove('hidden');
+            
+            isTestingInProgress = true;
+        }
+        
+        // 隐藏加载状态
+        function hideLoadingState() {
+            const loading = document.getElementById('loading');
+            if (loading) loading.classList.add('hidden');
+            
+            isTestingInProgress = false;
+        }
+        
+        // 显示完成状态
+        function showCompletionState(results) {
+            console.log('[UI] 显示检测结果');
+            
+            // 更新统计显示
+            updateFinalStats();
+            
+            // 显示完成消息
+            showCompletionMessage();
+        }
+        
+        // 更新进度显示
+        function updateProgressDisplay(status) {
+            // 更新进度条
+            const progressFill = document.getElementById('progressFill');
+            if (progressFill) {
+                progressFill.style.width = `${status.progress}%`;
+            }
+            
+            // 更新统计计数
+            const testingElement = document.getElementById('testingCount');
+            if (testingElement) {
+                testingElement.textContent = (status.total - status.processed).toString();
+            }
+        }
+        
+        // 更新最终统计
+        function updateFinalStats() {
+            if (typeof allKeysData === 'undefined') return;
+            
+            const stats = {
+                total: allKeysData.length,
+                valid: allKeysData.filter(k => k.status === 'valid').length,
+                invalid: allKeysData.filter(k => k.status === 'invalid').length,
+                rateLimited: allKeysData.filter(k => k.status === 'rate-limited').length,
+                paid: allKeysData.filter(k => k.status === 'paid').length
+            };
+            
+            // 更新DOM元素
+            const elements = {
+                totalCount: stats.total,
+                validCount: stats.valid,
+                invalidCount: stats.invalid,
+                rateLimitedCount: stats.rateLimited,
+                paidCount: stats.paid,
+                testingCount: 0
+            };
+            
+            Object.entries(elements).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value.toString();
+                }
+            });
+        }
+        
+        // 后备模式初始化
+        function initializeFallbackMode() {
+            console.log('[Init] 启用后备模式');
+            
+            // 创建简化的并发管理器
+            if (typeof globalConcurrencyManager === 'undefined') {
+                window.globalConcurrencyManager = {
+                    maxGlobalConcurrency: 10,
+                    currentRunning: 0,
+                    async acquireSlot() {
+                        return { id: Date.now(), acquireTime: Date.now() };
+                    },
+                    releaseSlot() {},
+                    getMetrics() {
+                        return { currentRunning: 0, maxGlobalConcurrency: 10 };
+                    }
+                };
+            }
+            
+            // 确保基本功能可用
+            if (typeof window.startTest === 'undefined') {
+                console.warn('[Init] startTest函数未定义，可能需要检查其他脚本加载');
+            }
+        }
         let currentRetryCount = 3;
         let isTestingInProgress = false;
         let shouldCancelTesting = false;
@@ -364,6 +479,58 @@
             }
             alert(message);
         }
+
+        // 页面卸载时清理资源
+        function cleanupResources() {
+            console.log('[Cleanup] 开始清理页面资源...');
+            
+            try {
+                // 清理UI模块的定时器
+                if (typeof cleanupUITimers === 'function') {
+                    cleanupUITimers();
+                }
+                
+                // 清理性能优化模块
+                if (typeof cleanupPerformanceOptimization === 'function') {
+                    cleanupPerformanceOptimization();
+                }
+                
+                // 清理主定时器
+                if (typeof updateTimer !== 'undefined' && updateTimer) {
+                    clearTimeout(updateTimer);
+                    updateTimer = null;
+                }
+                
+                // 清理虚拟列表（如果性能优化模块没有处理）
+                if (typeof virtualLists !== 'undefined') {
+                    Object.values(virtualLists).forEach(list => {
+                        if (list && typeof list.destroy === 'function') {
+                            list.destroy();
+                        }
+                    });
+                }
+                
+                // 清理全局状态
+                allKeysData = [];
+                if (typeof detectedModels !== 'undefined') {
+                    detectedModels.clear();
+                }
+                
+                // 重置测试状态
+                isTestingInProgress = false;
+                shouldCancelTesting = false;
+                completedCount = 0;
+                totalCount = 0;
+                
+                console.log('[Cleanup] 资源清理完成');
+            } catch (error) {
+                console.error('[Cleanup] 资源清理时出错:', error);
+            }
+        }
+
+        // 监听页面卸载事件
+        window.addEventListener('beforeunload', cleanupResources);
+        window.addEventListener('unload', cleanupResources);
 
     </script>
 </body>

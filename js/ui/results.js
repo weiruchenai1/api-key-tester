@@ -175,6 +175,14 @@ function updateUIAsync() {
 	}, 50);
 }
 
+// 清理定时器的函数
+function cleanupUITimers() {
+	if (updateTimer) {
+		clearTimeout(updateTimer);
+		updateTimer = null;
+	}
+}
+
 try {
 	if (typeof window !== 'undefined') {
 		window.updateStats = updateStats;
@@ -183,6 +191,7 @@ try {
 		window.showTab = showTab;
 		window.updateStartButtonText = updateStartButtonText;
 		window.updateUIAsync = updateUIAsync;
+		window.cleanupUITimers = cleanupUITimers;
 	}
 } catch (_) {}
 
