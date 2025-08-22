@@ -1,0 +1,124 @@
+:root {
+  /* 颜色变量 - 浅色主题 */
+  --color-primary: #667eea;
+  --color-primary-hover: #5a67d8;
+  --color-secondary: #6c757d;
+  --color-secondary-hover: #5a6268;
+  --color-success: #28a745;
+  --color-success-hover: #218838;
+  --color-warning: #ffc107;
+  --color-warning-hover: #e0a800;
+  --color-danger: #dc3545;
+  --color-danger-hover: #c82333;
+  --color-info: #17a2b8;
+  --color-info-hover: #138496;
+
+  /* 背景颜色 */
+  --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --bg-container: #ffffff;
+  --bg-section: #f8f9fa;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+
+  /* 文字颜色 */
+  --text-primary: #495057;
+  --text-secondary: #6c757d;
+  --text-muted: #6c757d;
+  --text-on-primary: #ffffff;
+
+  /* 边框颜色 */
+  --border-primary: #dee2e6;
+  --border-secondary: #e9ecef;
+  --border-focus: #667eea;
+
+  /* 状态颜色 */
+  --status-valid: #28a745;
+  --status-invalid: #dc3545;
+  --status-rate-limit: #ffc107;
+  --status-testing: #6f42c1;
+  --status-retrying: #fd7e14;
+
+  /* 阴影 */
+  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.1);
+
+  /* 字体大小 */
+  --font-size-xs: clamp(10px, 1.8vw, 12px);
+  --font-size-sm: clamp(12px, 2vw, 14px);
+  --font-size-base: clamp(14px, 2.5vw, 16px);
+  --font-size-lg: clamp(16px, 3vw, 18px);
+  --font-size-xl: clamp(1.2rem, 4vw, 1.5rem);
+  --font-size-2xl: clamp(1.5rem, 4vw, 2rem);
+  --font-size-3xl: clamp(1.8rem, 5vw, 2.5rem);
+
+  /* 间距 */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-base: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 48px;
+
+  /* 圆角 */
+  --radius-sm: 4px;
+  --radius-base: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 50%;
+
+  /* 过渡动画 */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* Z-index */
+  --z-dropdown: 1000;
+  --z-modal: 1050;
+  --z-tooltip: 1070;
+  --z-toast: 1080;
+
+  /* 断点 */
+  --breakpoint-mobile: 768px;
+  --breakpoint-tablet: 1024px;
+  --breakpoint-desktop: 1200px;
+}
+
+/* 深色主题变量 */
+.dark-theme {
+  /* 颜色变量 - 深色主题 */
+  --color-primary: #4c63d2;
+  --color-primary-hover: #3c52d2;
+  --color-secondary: #3c4269;
+  --color-secondary-hover: #4a5079;
+  --color-warning: #d68910;
+  --color-warning-hover: #b7791f;
+
+  /* 背景颜色 */
+  --bg-body: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  --bg-container: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
+  --bg-section: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+  --bg-card: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+  --bg-input: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+
+  /* 文字颜色 */
+  --text-primary: #e8eaed;
+  --text-secondary: #b0b3c1;
+  --text-muted: #b0b3c1;
+
+  /* 边框颜色 */
+  --border-primary: #3c4269;
+  --border-secondary: #3c4269;
+  --border-focus: #4c63d2;
+
+  /* 状态颜色 */
+  --status-rate-limit: #d68910;
+
+  /* 阴影 */
+  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.3);
+}

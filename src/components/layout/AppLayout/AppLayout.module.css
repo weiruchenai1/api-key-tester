@@ -1,0 +1,48 @@
+.appLayout {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 10px;
+  line-height: 1.5;
+  position: relative;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.mainContent {
+  padding: 20px;
+}
+
+/* 深色主题 */
+:global(.dark-theme) .appLayout {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+:global(.dark-theme) .container {
+  background: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
+  color: #e8eaed;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .appLayout {
+    padding: 5px;
+  }
+
+  .container {
+    border-radius: 15px;
+    margin: 0;
+  }
+
+  .mainContent {
+    padding: 16px;
+  }
+}

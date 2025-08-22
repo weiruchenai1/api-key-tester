@@ -1,39 +1,61 @@
 {
   "name": "api-key-tester",
-  "version": "2.0.0",
-  "description": "高性能API密钥测试工具，支持OpenAI、Claude、Gemini等多种API",
+  "version": "1.0.0",
   "private": true,
-  "type": "module",
-  "scripts": {
-    "test": "vitest",
-    "test:unit": "vitest run tests/unit",
-    "test:integration": "vitest run tests/integration",
-    "test:performance": "vitest run tests/performance",
-    "test:e2e": "vitest run tests/e2e",
-    "test:watch": "vitest --watch",
-    "test:coverage": "vitest run --coverage",
-    "test:all": "node tests/testRunner.js",
-    "coverage": "vitest run --coverage",
-    "dev": "python -m http.server 8080",
-    "serve": "python -m http.server 8080",
-    "lint": "echo 'Linting JavaScript files...'",
-    "validate": "node tests/testRunner.js"
-  },
+  "homepage": "https://weiruchenai1.github.io/api-key-tester",
+  "description": "批量检测 Gemini、Claude、GPT API 密钥有效性的 React 应用",
   "keywords": [
     "api-key",
-    "testing",
+    "tester",
     "openai",
     "claude",
     "gemini",
-    "performance",
-    "optimization"
+    "react",
+    "web-worker",
+    "virtualization"
   ],
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "react-window": "^1.8.8",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "analyze": "npm run build && npx serve -s build"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "devDependencies": {
-    "@vitest/coverage-v8": "^1.6.0",
-    "jsdom": "^24.0.0",
-    "vitest": "^1.6.0"
+    "@types/react": "^18.0.15",
+    "@types/react-dom": "^18.0.6",
+    "@types/react-window": "^1.8.5"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
   }
 }

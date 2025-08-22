@@ -1,0 +1,113 @@
+.key-input {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-group {
+  margin-bottom: 16px;
+}
+
+.label-with-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.label-with-controls label {
+  font-weight: 600;
+  color: #495057;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.textarea-wrapper {
+  position: relative;
+}
+
+.form-control.textarea {
+  resize: vertical;
+  min-height: 120px;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(12px, 2vw, 14px);
+  line-height: 1.4;
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.form-control.textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-control.textarea:hover:not(:disabled) {
+  border-color: #667eea;
+  background: #fafbff;
+}
+
+.form-control.textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f8f9fa;
+}
+
+.key-input-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.import-btn,
+.paste-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: auto;
+  padding: 8px 12px;
+  font-size: clamp(12px, 2vw, 14px);
+}
+
+/* 深色主题 */
+:global(.dark-theme) .label-with-controls label {
+  color: #e8eaed;
+}
+
+:global(.dark-theme) .form-control.textarea {
+  background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+  color: #e8eaed;
+  border-color: #3c4269;
+}
+
+:global(.dark-theme) .form-control.textarea:focus {
+  border-color: #4c63d2;
+  box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+}
+
+:global(.dark-theme) .form-control.textarea:hover:not(:disabled) {
+  border-color: #4c63d2;
+  background: linear-gradient(135deg, #252849 0%, #2a2d47 100%);
+}
+
+:global(.dark-theme) .form-control.textarea:disabled {
+  background: #2a2d47;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .key-input-controls {
+    justify-content: center;
+  }
+
+  .import-btn,
+  .paste-btn {
+    flex: 1;
+    max-width: 120px;
+    justify-content: center;
+  }
+}

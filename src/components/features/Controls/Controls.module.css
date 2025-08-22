@@ -1,0 +1,31 @@
+.controls-container {
+  margin-top: 20px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.action-buttons .btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 140px;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .action-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .action-buttons .btn {
+    width: 100%;
+    justify-content: center;
+    min-width: auto;
+  }
+}

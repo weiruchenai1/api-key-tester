@@ -1,0 +1,25 @@
+.header {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  padding: 20px;
+  text-align: center;
+  border-radius: 20px 20px 0 0;
+}
+
+.header h1 {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  margin-bottom: 8px;
+  font-weight: 700;
+  word-break: break-word;
+}
+
+.header p {
+  font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+  opacity: 0.9;
+  line-height: 1.4;
+}
+
+/* 深色主题 */
+:global(.dark-theme) .header {
+  background: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
+}

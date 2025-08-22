@@ -1,0 +1,237 @@
+.api-config {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.input-group {
+  margin-bottom: 16px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #495057;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  font-size: clamp(14px, 2.5vw, 16px);
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-control:hover {
+  border-color: #667eea;
+  background: #fafbff;
+}
+
+.form-help {
+  color: #6c757d;
+  font-size: clamp(10px, 1.8vw, 12px);
+  margin-top: 4px;
+  display: block;
+  line-height: 1.3;
+}
+
+.model-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.model-input-group .form-control {
+  flex: 1;
+  min-width: 0;
+}
+
+.model-toggle-btn {
+  padding: 12px 12px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: clamp(12px, 2vw, 14px);
+  white-space: nowrap;
+  transition: background 0.3s ease;
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.model-toggle-btn:hover {
+  background: #5a6268;
+}
+
+.model-toggle-btn.active {
+  background: #667eea;
+}
+
+.detected-models {
+  background: #e3f2fd;
+  border: 1px solid #bbdefb;
+  border-radius: 8px;
+  margin-top: 10px;
+  transition: all 0.3s ease;
+}
+
+.detected-models:hover {
+  border-color: #2196f3;
+  background: #e1f5fe;
+  box-shadow: 0 2px 12px rgba(33, 150, 243, 0.15);
+}
+
+.detected-models-header {
+  padding: 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #bbdefb;
+  transition: background 0.3s ease;
+}
+
+.detected-models-header:hover {
+  background: rgba(33, 150, 243, 0.1);
+}
+
+.detected-models-header h4 {
+  margin: 0;
+  color: #1976d2;
+  font-size: clamp(12px, 2vw, 14px);
+}
+
+.collapse-icon {
+  color: #1976d2;
+  font-size: 14px;
+  transition: transform 0.3s ease;
+}
+
+.collapse-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+.model-list-container {
+  padding: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.model-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.model-tag {
+  background: #2196f3;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: clamp(10px, 1.8vw, 12px);
+  cursor: pointer;
+  transition: background 0.3s ease;
+  word-break: break-all;
+}
+
+.model-tag:hover {
+  background: #1976d2;
+}
+
+/* 深色主题 */
+:global(.dark-theme) .input-group label {
+  color: #e8eaed;
+}
+
+:global(.dark-theme) .form-control {
+  background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+  color: #e8eaed;
+  border-color: #3c4269;
+}
+
+:global(.dark-theme) .form-control:focus {
+  border-color: #4c63d2;
+  box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+}
+
+:global(.dark-theme) .form-control:hover {
+  border-color: #4c63d2;
+  background: linear-gradient(135deg, #252849 0%, #2a2d47 100%);
+}
+
+:global(.dark-theme) .form-help {
+  color: #b0b3c1;
+}
+
+:global(.dark-theme) .model-toggle-btn {
+  background: #3c4269;
+}
+
+:global(.dark-theme) .model-toggle-btn:hover {
+  background: #4a5079;
+}
+
+:global(.dark-theme) .model-toggle-btn.active {
+  background: #4c63d2;
+}
+
+:global(.dark-theme) .detected-models {
+  background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+  border-color: #3c4269;
+}
+
+:global(.dark-theme) .detected-models:hover {
+  border-color: #4c63d2;
+  background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+  box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
+}
+
+:global(.dark-theme) .detected-models-header {
+  border-bottom-color: #3c4269;
+}
+
+:global(.dark-theme) .detected-models-header:hover {
+  background: rgba(76, 99, 210, 0.1);
+}
+
+:global(.dark-theme) .detected-models-header h4 {
+  color: #4c63d2;
+}
+
+:global(.dark-theme) .collapse-icon {
+  color: #4c63d2;
+}
+
+:global(.dark-theme) .model-tag {
+  background: #4c63d2;
+}
+
+:global(.dark-theme) .model-tag:hover {
+  background: #3c52d2;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .model-input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .model-toggle-btn {
+    width: 100%;
+    margin-top: 8px;
+    min-width: auto;
+  }
+}

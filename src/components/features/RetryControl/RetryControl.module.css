@@ -1,0 +1,215 @@
+.retryContainer {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding: 16px;
+  background: #fff3cd;
+  border: 2px solid #ffeaa7;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.retryContainer:hover {
+  border-color: #f39c12;
+  background: #fef9e7;
+}
+
+.retryInputSection {
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.retryInputSection .form-control {
+  width: 80px !important;
+  text-align: center;
+  font-weight: 600;
+  color: #f39c12 !important;
+  background: white !important;
+  border: 2px solid #ffeaa7 !important;
+}
+
+.retryInputSection .form-control:focus {
+  border-color: #f39c12 !important;
+  box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1) !important;
+}
+
+.retryInputSection .form-control:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f8f9fa !important;
+}
+
+.retrySliderSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.retrySliderContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.retrySlider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: #ffeaa7;
+  outline: none;
+  transition: background 0.3s ease;
+}
+
+.retrySlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f39c12;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  box-shadow: 0 2px 6px rgba(243, 156, 18, 0.3);
+}
+
+.retrySlider::-webkit-slider-thumb:hover {
+  background: #e67e22;
+  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+}
+
+.retrySlider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f39c12;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(243, 156, 18, 0.3);
+}
+
+.retrySlider:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.retrySlider:disabled::-webkit-slider-thumb {
+  cursor: not-allowed;
+}
+
+.retrySlider:disabled::-moz-range-thumb {
+  cursor: not-allowed;
+}
+
+.retrySliderValue {
+  min-width: 30px;
+  text-align: center;
+  font-weight: 700;
+  color: #f39c12;
+  font-size: clamp(14px, 2.5vw, 18px);
+  background: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: 1px solid #ffeaa7;
+  flex-shrink: 0;
+}
+
+.retryPresetButtons {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.retryPresetBtn {
+  padding: 10px 14px;
+  border: 1px solid #f39c12;
+  background: white;
+  color: #f39c12;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 60px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  max-width: 85px;
+  text-align: center;
+}
+
+.retryPresetBtn:hover:not(:disabled) {
+  background: #f39c12;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+}
+
+.retryPresetBtn.active {
+  background: #f39c12;
+  color: white;
+  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
+}
+
+.retryPresetBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* 深色主题 */
+:global(.dark-theme) .retryContainer {
+  background: linear-gradient(135deg, #3d3314 0%, #2d2a1a 100%);
+  border-color: #5d4e23;
+}
+
+:global(.dark-theme) .retryContainer:hover {
+  border-color: #d68910;
+  background: linear-gradient(135deg, #4d4024 0%, #3d3314 100%);
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .retryContainer {
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    align-items: stretch;
+  }
+
+  .retryInputSection {
+    align-self: center;
+    min-width: auto;
+  }
+
+  .retryInputSection .form-control {
+    width: 100px !important;
+    margin: 0 auto;
+  }
+
+  .retrySliderSection {
+    width: 100%;
+  }
+
+  .retryPresetButtons {
+    gap: 6px;
+    margin-top: 8px;
+  }
+
+  .retryPresetBtn {
+    min-width: 65px;
+    max-width: none;
+    flex: 1;
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+}
