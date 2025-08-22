@@ -65,6 +65,57 @@ export const testGeminiKey = async (apiKey, model, proxyUrl) => {
   }
 };
 
+export const testGeminiPaidKey = async (apiKey, model, proxyUrl) => {
+  try {
+    // 生成长文本内容用于Cache API检测
+    const longText = "You are an expert at analyzing transcripts. ".repeat(128);
+    
+    const apiUrl = getApiUrl('gemini', '/v1beta/cachedContents', proxyUrl);
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey
+      },
+      body: JSON.stringify({
+        model: `models/${model}`,
+        contents: [
+          {
+            parts: [
+              {
+                text: longText
+              }
+            ],
+            role: "user"
+          }
+        ],
+        ttl: "30s"
+      })
+    });
+
+    // 付费Key可以成功访问Cache API
+    if (response.ok) {
+      return { isPaid: true, error: null };
+    }
+
+    // 429错误通常表示免费Key的速率限制
+    if (response.status === 429) {
+      return { isPaid: false, error: null };
+    }
+
+    // 403错误可能表示免费Key无权访问Cache API
+    if (response.status === 403) {
+      return { isPaid: false, error: null };
+    }
+
+    // 其他错误无法确定付费状态
+    const errorText = await response.text().catch(() => '');
+    return { isPaid: null, error: `HTTP ${response.status}: ${errorText}` };
+  } catch (error) {
+    return { isPaid: null, error: error.message };
+  }
+};
+
 export const getGeminiModels = async (apiKey, proxyUrl) => {
   try {
     const apiUrl = getApiUrl('gemini', `/models?key=${apiKey}`, proxyUrl);

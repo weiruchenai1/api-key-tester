@@ -65,7 +65,7 @@ self.onmessage = function (e) {
   }
 };
 
-async function startTesting({ apiKeys, apiType, model, proxyUrl, concurrency, maxRetries }) {
+async function startTesting({ apiKeys, apiType, model, proxyUrl, concurrency, maxRetries, enablePaidDetection }) {
   if (isProcessing) {
     return;
   }
@@ -79,7 +79,8 @@ async function startTesting({ apiKeys, apiType, model, proxyUrl, concurrency, ma
       model,
       proxyUrl,
       concurrency,
-      maxRetries
+      maxRetries,
+      enablePaidDetection
     });
   } finally {
     isProcessing = false;
@@ -162,18 +163,32 @@ async function processKeyWithRetry(apiKey, config, slotIndex) {
 
       const result = await testApiKey(apiKey, config);
 
-      // 成功或速率限制：直接返回
+      // 成功或速率限制：继续处理
       if (result.valid || result.isRateLimit) {
+        let finalResult = result;
+        
+        // 如果是Gemini且启用了付费检测，进行二阶段检测
+        if (result.valid && config.apiType === 'gemini' && config.enablePaidDetection) {
+          try {
+            const paidResult = await testGeminiPaidKey(apiKey, config.model, config);
+            finalResult = { ...result, isPaid: paidResult.isPaid };
+          } catch (error) {
+            // 付费检测失败，但不影响基础验证结果
+            finalResult = { ...result, isPaid: null };
+          }
+        }
+        
         self.postMessage({
           type: 'KEY_STATUS_UPDATE',
           payload: {
             key: apiKey,
             status: result.valid ? 'valid' : 'rate-limited',
             error: result.error,
-            retryCount: attempt
+            retryCount: attempt,
+            isPaid: finalResult.isPaid
           }
         });
-        return result;
+        return finalResult;
       }
 
       // 最后一次尝试：无论结果如何都返回
@@ -463,5 +478,56 @@ async function testGeminiKey(apiKey, model, config) {
       return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false };
     }
     return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
+  }
+}
+
+async function testGeminiPaidKey(apiKey, model, config) {
+  try {
+    // 生成长文本内容用于Cache API检测
+    const longText = "You are an expert at analyzing transcripts. ".repeat(128);
+    
+    const apiUrl = getApiUrl('gemini', '/v1beta/cachedContents', config.proxyUrl);
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey
+      },
+      body: JSON.stringify({
+        model: 'models/' + model,
+        contents: [
+          {
+            parts: [
+              {
+                text: longText
+              }
+            ],
+            role: "user"
+          }
+        ],
+        ttl: "30s"
+      })
+    });
+
+    // 付费Key可以成功访问Cache API
+    if (response.ok) {
+      return { isPaid: true, error: null };
+    }
+
+    // 429错误通常表示免费Key的速率限制
+    if (response.status === 429) {
+      return { isPaid: false, error: null };
+    }
+
+    // 403错误可能表示免费Key无权访问Cache API
+    if (response.status === 403) {
+      return { isPaid: false, error: null };
+    }
+
+    // 其他错误无法确定付费状态
+    const errorText = await response.text().catch(() => '');
+    return { isPaid: null, error: `HTTP ${response.status}: ${errorText}` };
+  } catch (error) {
+    return { isPaid: null, error: error.message };
   }
 }

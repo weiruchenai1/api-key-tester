@@ -86,6 +86,14 @@
   color: #6f42c1;
 }
 
+.stat-number.paid {
+  color: #e74c3c;
+}
+
+.stat-number.free {
+  color: #3498db;
+}
+
 .results-controls {
   display: flex;
   justify-content: space-between;
@@ -201,6 +209,37 @@
   font-size: clamp(10px, 1.8vw, 12px);
   color: #f39c12;
   animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+.key-paid-status {
+  font-size: clamp(10px, 1.8vw, 12px);
+  font-weight: 600;
+  margin-bottom: 2px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.key-paid-status.paid {
+  background: #ffe6e6;
+  color: #e74c3c;
+}
+
+.key-paid-status.free {
+  background: #e6f3ff;
+  color: #3498db;
+}
+
+.copy-button-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.copy-btn.paid {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+  color: white;
+  border: none;
 }
 
 .key-status {

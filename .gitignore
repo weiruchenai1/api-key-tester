@@ -19,4 +19,9 @@ yarn-error.log*
 
 # 其他
 .DS_Store
-coverage
+
+# 测试覆盖率报告
+coverage/
+*.lcov
+coverage-summary.json
+开发工具/

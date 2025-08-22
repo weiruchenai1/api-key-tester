@@ -14,6 +14,9 @@ const initialState = {
   concurrency: 5,
   retryCount: 3,
 
+  // Gemini付费检测
+  enablePaidDetection: false,
+
   // 测试状态
   isTesting: false,
   keyResults: [],
@@ -69,6 +72,12 @@ const appReducer = (state, action) => {
         retryCount: action.payload
       };
 
+    case 'SET_PAID_DETECTION':
+      return {
+        ...state,
+        enablePaidDetection: action.payload
+      };
+
     case 'START_TESTING':
       return {
         ...state,
@@ -79,7 +88,8 @@ const appReducer = (state, action) => {
           status: 'pending',
           error: null,
           retryCount: 0,
-          model: state.model
+          model: state.model,
+          isPaid: null // For Gemini paid detection
         })),
         progress: 0,
         activeTab: 'all'
@@ -144,7 +154,8 @@ const appReducer = (state, action) => {
         model: getDefaultModel(state.apiType),
         proxyUrl: state.proxyUrl,
         concurrency: state.concurrency,
-        retryCount: state.retryCount
+        retryCount: state.retryCount,
+        enablePaidDetection: state.enablePaidDetection
       };
 
     default:

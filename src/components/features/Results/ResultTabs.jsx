@@ -6,12 +6,18 @@ const ResultTabs = () => {
   const { t } = useLanguage();
   const { state, dispatch } = useAppState();
 
-  const tabs = [
+  const baseTabs = [
     { key: 'all', labelKey: 'all' },
     { key: 'valid', labelKey: 'validKeys' },
     { key: 'invalid', labelKey: 'invalidKeys' },
     { key: 'rate-limited', labelKey: 'rateLimitedKeys' }
   ];
+
+  // Add paid keys tab if Gemini paid detection is enabled
+  const tabs = [...baseTabs];
+  if (state.apiType === 'gemini' && state.enablePaidDetection) {
+    tabs.splice(2, 0, { key: 'paid', labelKey: 'paidKeys' });
+  }
 
   const handleTabChange = (tabKey) => {
     dispatch({ type: 'SET_ACTIVE_TAB', payload: tabKey });

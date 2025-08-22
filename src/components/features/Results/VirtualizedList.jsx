@@ -70,6 +70,11 @@ const KeyItem = ({ index, style, data }) => {
               {t('retry') || '重试'}: {keyData.retryCount}
             </div>
           )}
+          {keyData.status === 'valid' && keyData.isPaid !== null && (
+            <div className={`key-paid-status ${keyData.isPaid ? 'paid' : 'free'}`}>
+              {keyData.isPaid ? '💎 ' + (t('paidKeys') || '付费') : '🆓 ' + (t('freeKeys') || '免费')}
+            </div>
+          )}
         </div>
         <div className={`key-status ${getStatusClass(keyData.status)}`}>
           {getStatusText(keyData.status)}
@@ -100,6 +105,8 @@ const VirtualizedList = () => {
         return state.keyResults.filter(k => k.status === 'invalid');
       case 'rate-limited':
         return state.keyResults.filter(k => k.status === 'rate-limited');
+      case 'paid':
+        return state.keyResults.filter(k => k.status === 'valid' && k.isPaid === true);
       default:
         return state.keyResults;
     }

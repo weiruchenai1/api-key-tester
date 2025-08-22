@@ -56,6 +56,13 @@ export const TRANSLATIONS = {
     retrying: '重试中',
     pending: '等待中',
 
+    // Gemini付费检测
+    enablePaidDetection: '启用付费检测',
+    paidDetectionHelp: '仅对Gemini API有效，会额外调用cacheContent API来检测付费密钥，会消耗额外配额',
+    paidDetectionWarning: '⚠️ 启用付费检测会消耗额外的API配额',
+    paidKeys: '付费密钥',
+    copyPaidKeys: '复制付费密钥',
+
     // 结果标签
     all: '全部',
     validKeys: '有效密钥',
@@ -185,6 +192,13 @@ export const TRANSLATIONS = {
     testingLabel: 'Testing',
     retrying: 'Retrying',
     pending: 'Pending',
+
+    // Gemini Paid Detection
+    enablePaidDetection: 'Enable Paid Detection',
+    paidDetectionHelp: 'Only valid for Gemini API, will call additional cacheContent API to detect paid keys, consumes extra quota',
+    paidDetectionWarning: '⚠️ Enabling paid detection will consume additional API quota',
+    paidKeys: 'Paid Keys',
+    copyPaidKeys: 'Copy Paid Keys',
 
     // Result tabs
     all: 'All',

@@ -91,6 +91,29 @@ const ModelSelector = () => {
       </div>
       <small className="form-help">{t('modelHelp')}</small>
 
+      {/* Gemini付费检测开关 */}
+      {state.apiType === 'gemini' && (
+        <div className="paid-detection-group">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={state.enablePaidDetection}
+              onChange={(e) => dispatch({ type: 'SET_PAID_DETECTION', payload: e.target.checked })}
+              disabled={state.isTesting}
+            />
+            <span className="checkbox-text">{t('enablePaidDetection')}</span>
+          </label>
+          <small className="form-help warning">
+            {t('paidDetectionHelp')}
+          </small>
+          {state.enablePaidDetection && (
+            <small className="form-warning">
+              {t('paidDetectionWarning')}
+            </small>
+          )}
+        </div>
+      )}
+
       {/* 检测到的模型 */}
       {state.detectedModels.size > 0 && (
         <div className={`detected-models ${isDetectedModelsExpanded ? 'expanded' : ''}`}>

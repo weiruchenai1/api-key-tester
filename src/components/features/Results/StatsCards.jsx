@@ -6,7 +6,7 @@ const StatsCards = () => {
   const { t } = useLanguage();
   const { state } = useAppState();
 
-  const stats = [
+  const baseStats = [
     {
       key: 'total',
       value: state.keyResults.length,
@@ -38,6 +38,20 @@ const StatsCards = () => {
       className: 'retrying'
     }
   ];
+
+  // Add paid detection stats if enabled for Gemini
+  const paidStats = [];
+  if (state.apiType === 'gemini' && state.enablePaidDetection) {
+    paidStats.push(
+      {
+        key: 'paidKeys',
+        value: state.keyResults.filter(k => k.status === 'valid' && k.isPaid === true).length,
+        className: 'paid'
+      }
+    );
+  }
+
+  const stats = [...baseStats, ...paidStats];
 
   return (
     <div className="stats">

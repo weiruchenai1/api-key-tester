@@ -150,6 +150,57 @@
   background: #1976d2;
 }
 
+.paid-detection-group {
+  margin-top: 12px;
+  padding: 12px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.paid-detection-group:hover {
+  border-color: #f39c12;
+  background: #fef5e7;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+.checkbox-label input[type="checkbox"] {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.checkbox-text {
+  font-weight: 600;
+  color: #856404;
+  font-size: clamp(12px, 2vw, 14px);
+}
+
+.form-help.warning {
+  color: #856404;
+  font-style: italic;
+}
+
+.form-warning {
+  color: #dc3545;
+  font-size: clamp(10px, 1.8vw, 12px);
+  font-weight: 600;
+  margin-top: 4px;
+  display: block;
+  background: #f8d7da;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border-left: 3px solid #dc3545;
+}
+
 /* 深色主题 */
 :global(.dark-theme) .input-group label {
   color: #e8eaed;
@@ -220,6 +271,30 @@
 
 :global(.dark-theme) .model-tag:hover {
   background: #3c52d2;
+}
+
+:global(.dark-theme) .paid-detection-group {
+  background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+  border-color: #3c4269;
+}
+
+:global(.dark-theme) .paid-detection-group:hover {
+  border-color: #4c63d2;
+  background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+}
+
+:global(.dark-theme) .checkbox-text {
+  color: #e8eaed;
+}
+
+:global(.dark-theme) .form-help.warning {
+  color: #b0b3c1;
+}
+
+:global(.dark-theme) .form-warning {
+  background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+  color: #ff6b6b;
+  border-left-color: #ff6b6b;
 }
 
 /* 移动端优化 */
