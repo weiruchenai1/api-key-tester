@@ -21,7 +21,8 @@ export const useApiTester = () => {
         model: state.model,
         proxyUrl: state.proxyUrl,
         concurrency: state.concurrency,
-        maxRetries: state.retryCount
+        maxRetries: state.retryCount,
+        enablePaidDetection: state.enablePaidDetection
       });
     } catch (error) {
       console.error('测试过程出现错误:', error);

@@ -11,7 +11,7 @@ const ProgressBar = () => {
   }
 
   const completedCount = state.keyResults.filter(k =>
-    ['valid', 'invalid', 'rate-limited'].includes(k.status)
+    ['valid', 'invalid', 'rate-limited', 'paid'].includes(k.status)
   ).length;
 
   const totalCount = state.keyResults.length;

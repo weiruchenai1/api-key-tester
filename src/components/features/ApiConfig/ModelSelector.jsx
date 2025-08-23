@@ -61,35 +61,61 @@ const ModelSelector = () => {
       <div className="model-input-group">
         {!isCustomModel ? (
           <select
+            value={state.enablePaidDetection ? 'gemini-2.5-flash' : state.model}
+            onChange={(e) => dispatch({ type: 'SET_MODEL', payload: e.target.value })}
+            disabled={state.isTesting || state.enablePaidDetection}
             className="form-control"
-            value={state.model}
-            onChange={handleModelChange}
-            disabled={state.isTesting}
           >
-            {currentModels.map(model => (
-              <option key={model} value={model}>{model}</option>
-            ))}
+            {state.enablePaidDetection ? (
+              <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+            ) : (
+              currentModels.map(model => (
+                <option key={model} value={model}>
+                  {model}
+                </option>
+              ))
+            )}
           </select>
         ) : (
           <input
             type="text"
             className="form-control"
             placeholder={t('modelInputPlaceholder')}
-            value={state.model}
+            value={state.enablePaidDetection ? 'gemini-2.5-flash' : state.model}
             onChange={handleCustomModelChange}
-            disabled={state.isTesting}
+            disabled={state.isTesting || state.enablePaidDetection}
           />
         )}
         <button
           type="button"
           className={`model-toggle-btn ${isCustomModel ? 'active' : ''}`}
           onClick={toggleModelInput}
-          disabled={state.isTesting}
+          disabled={state.isTesting || state.enablePaidDetection}
         >
           {isCustomModel ? t('presetModel') : t('customModel')}
         </button>
+        {state.apiType === 'gemini' && (
+          <button
+            type="button"
+            className={`model-toggle-btn paid-detection-btn ${state.enablePaidDetection ? 'active' : ''}`}
+            onClick={() => dispatch({ type: 'SET_PAID_DETECTION', payload: !state.enablePaidDetection })}
+            disabled={state.isTesting}
+            title={t('paidDetectionHelp')}
+          >
+            {t('enablePaidKeyDetection')}
+          </button>
+        )}
       </div>
       <small className="form-help">{t('modelHelp')}</small>
+
+      {/* 付费检测警告信息 */}
+      {state.apiType === 'gemini' && state.enablePaidDetection && (
+        <div className="paid-detection-warning">
+          <small className="form-warning">
+            {t('paidDetectionWarning')}
+          </small>
+        </div>
+      )}
 
       {/* 检测到的模型 */}
       {state.detectedModels.size > 0 && (

@@ -65,6 +65,63 @@ export const testGeminiKey = async (apiKey, model, proxyUrl) => {
   }
 };
 
+export const testGeminiPaidKey = async (apiKey, model, proxyUrl) => {
+  try {
+    // 生成长文本内容用于Cache API检测 (参考项目的做法)
+    const longText = "You are an expert at analyzing transcripts.".repeat(128);
+    
+    const apiUrl = getApiUrl('gemini', '/cachedContents', proxyUrl);
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey
+      },
+      body: JSON.stringify({
+        model: 'models/gemini-2.5-flash', // 固定使用 gemini-2.5-flash
+        contents: [
+          {
+            parts: [
+              {
+                text: longText
+              }
+            ],
+            role: "user"
+          }
+        ],
+        generationConfig: {
+          thinkingConfig: {
+            thinkingBudget: 0
+          }
+        },
+        ttl: "30s"
+      })
+    });
+
+    // 付费Key可以成功访问Cache API
+    if (response.ok) {
+      return { isPaid: true, error: null, cacheApiStatus: response.status };
+    }
+
+    // 严格按照参考项目的错误处理逻辑
+    if (response.status === 429) {
+      // 429 Rate Limit = 免费Key
+      return { isPaid: false, error: null, cacheApiStatus: response.status };
+    }
+
+    if (response.status === 400 || response.status === 401 || response.status === 403) {
+      // 4xx错误通常表示Key无效或权限不足，归类为免费Key
+      return { isPaid: false, error: null, cacheApiStatus: response.status };
+    }
+
+    // 其他错误无法确定付费状态
+    const errorText = await response.text().catch(() => '');
+    return { isPaid: null, error: `HTTP ${response.status}: ${errorText}`, cacheApiStatus: response.status };
+  } catch (error) {
+    return { isPaid: null, error: error.message };
+  }
+};
+
 export const getGeminiModels = async (apiKey, proxyUrl) => {
   try {
     const apiUrl = getApiUrl('gemini', `/models?key=${apiKey}`, proxyUrl);

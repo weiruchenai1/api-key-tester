@@ -65,7 +65,7 @@ self.onmessage = function (e) {
   }
 };
 
-async function startTesting({ apiKeys, apiType, model, proxyUrl, concurrency, maxRetries }) {
+async function startTesting({ apiKeys, apiType, model, proxyUrl, concurrency, maxRetries, enablePaidDetection }) {
   if (isProcessing) {
     return;
   }
@@ -79,7 +79,8 @@ async function startTesting({ apiKeys, apiType, model, proxyUrl, concurrency, ma
       model,
       proxyUrl,
       concurrency,
-      maxRetries
+      maxRetries,
+      enablePaidDetection
     });
   } finally {
     isProcessing = false;
@@ -162,18 +163,59 @@ async function processKeyWithRetry(apiKey, config, slotIndex) {
 
       const result = await testApiKey(apiKey, config);
 
-      // 成功或速率限制：直接返回
+      // 成功或速率限制：继续处理
       if (result.valid || result.isRateLimit) {
+        let finalResult = result;
+        
+        // 如果是Gemini且启用了付费检测，进行二阶段检测
+        if (result.valid && config.apiType === 'gemini' && config.enablePaidDetection) {
+          try {
+            const paidResult = await testGeminiPaidKey(apiKey, config.model, config);
+            
+            if (paidResult.isPaid === true) {
+              // 付费key：设置为付费状态
+              finalResult = { ...result, isPaid: true, cacheApiStatus: paidResult.cacheApiStatus };
+            } else {
+              // 免费key：保持valid=true，isPaid=false，显示为有效key
+              finalResult = { ...result, isPaid: false, cacheApiStatus: paidResult.cacheApiStatus };
+            }
+          } catch (error) {
+            // 付费检测失败，默认为免费key
+            finalResult = { ...result, isPaid: false };
+          }
+        } else {
+          // 没有开启付费检测，使用正常结果
+          finalResult = result;
+        }
+        
+        // 确定最终状态
+        let finalStatus;
+        if (finalResult.isPaid === true) {
+          finalStatus = 'paid'; // 付费key
+        } else if (result.valid) {
+          finalStatus = 'valid'; // 免费key（有效key）
+        } else {
+          finalStatus = 'rate-limited';
+        }
+        
+        const payload = {
+          key: apiKey,
+          status: finalStatus,
+          error: result.error,
+          retryCount: attempt,
+          isPaid: finalResult.isPaid
+        };
+        
+        // 只有在开启付费检测时才添加cacheApiStatus
+        if (config.apiType === 'gemini' && config.enablePaidDetection) {
+          payload.cacheApiStatus = finalResult.cacheApiStatus;
+        }
+        
         self.postMessage({
           type: 'KEY_STATUS_UPDATE',
-          payload: {
-            key: apiKey,
-            status: result.valid ? 'valid' : 'rate-limited',
-            error: result.error,
-            retryCount: attempt
-          }
+          payload
         });
-        return result;
+        return finalResult;
       }
 
       // 最后一次尝试：无论结果如何都返回
@@ -463,5 +505,57 @@ async function testGeminiKey(apiKey, model, config) {
       return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false };
     }
     return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
+  }
+}
+
+async function testGeminiPaidKey(apiKey, model, config) {
+  try {
+    // 生成长文本内容用于Cache API检测 (参考项目的做法)
+    const longText = "You are an expert at analyzing transcripts.".repeat(128);
+    
+    const apiUrl = getApiUrl('gemini', '/cachedContents', config.proxyUrl);
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': apiKey
+      },
+      body: JSON.stringify({
+        model: 'models/gemini-2.5-flash', // 固定使用 gemini-2.5-flash
+        contents: [
+          {
+            parts: [
+              {
+                text: longText
+              }
+            ],
+            role: "user"
+          }
+        ],
+        ttl: "30s"
+      })
+    });
+
+    // 付费Key可以成功访问Cache API
+    if (response.ok) {
+      return { isPaid: true, error: null, cacheApiStatus: response.status };
+    }
+
+    // 严格按照参考项目的错误处理逻辑
+    if (response.status === 429) {
+      // 429 Rate Limit = 免费Key
+      return { isPaid: false, error: null, cacheApiStatus: response.status };
+    }
+
+    if (response.status === 400 || response.status === 401 || response.status === 403) {
+      // 4xx错误通常表示Key无效或权限不足，归类为免费Key
+      return { isPaid: false, error: null, cacheApiStatus: response.status };
+    }
+
+    // 其他错误无法确定付费状态
+    const errorText = await response.text().catch(() => '');
+    return { isPaid: null, error: `HTTP ${response.status}: ${errorText}`, cacheApiStatus: response.status };
+  } catch (error) {
+    return { isPaid: null, error: error.message };
   }
 }
