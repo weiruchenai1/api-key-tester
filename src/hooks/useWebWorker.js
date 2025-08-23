@@ -131,6 +131,14 @@ export const useWebWorker = () => {
         type: 'START_TESTING',
         payload: config
       });
+
+      // 清理函数，防止组件卸载时定时器仍在运行
+      return () => {
+        clearTimeout(timeout);
+        if (workerRef.current) {
+          workerRef.current.onmessage = originalOnMessage;
+        }
+      };
     });
   }, [isWorkerReady]);
 

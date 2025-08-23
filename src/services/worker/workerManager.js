@@ -4,6 +4,7 @@ class WorkerManager {
     this.isReady = false;
     this.messageHandlers = new Map();
     this.nextMessageId = 1;
+    this.pendingTimeouts = new Set(); // 追踪所有待清理的定时器
   }
 
   async init() {
@@ -64,11 +65,16 @@ class WorkerManager {
       const messageId = this.nextMessageId++;
       const timeout = setTimeout(() => {
         this.messageHandlers.delete(messageId);
+        this.pendingTimeouts.delete(timeout);
         reject(new Error('Message timeout'));
       }, 30000);
+      
+      // 追踪定时器以便清理
+      this.pendingTimeouts.add(timeout);
 
       this.messageHandlers.set(messageId, (response) => {
         clearTimeout(timeout);
+        this.pendingTimeouts.delete(timeout);
         if (response.error) {
           reject(new Error(response.error));
         } else {
@@ -128,6 +134,12 @@ class WorkerManager {
   }
 
   terminate() {
+    // 清理所有待处理的定时器
+    this.pendingTimeouts.forEach(timeout => {
+      clearTimeout(timeout);
+    });
+    this.pendingTimeouts.clear();
+
     if (this.worker) {
       this.worker.terminate();
       this.worker = null;
