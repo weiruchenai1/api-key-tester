@@ -21,9 +21,6 @@ const ModelSelector = () => {
     }
   }, [state.detectedModels.size]);
 
-  const handleModelChange = (e) => {
-    dispatch({ type: 'SET_MODEL', payload: e.target.value });
-  };
 
   const handleCustomModelChange = (e) => {
     dispatch({ type: 'SET_MODEL', payload: e.target.value });
