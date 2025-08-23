@@ -110,12 +110,7 @@ export const TRANSLATIONS = {
     // 使用说明
     usageTitle: '💡 使用说明：',
     usage1: '• 强烈建议使用自定义代理URL，公共代理可能不稳定',
-    usage2: '• Gemini代理示例: https://gemini.weiruchenai.me/v1beta',
-    usage3: '• OpenAI代理示例: https://openai.weiruchenai.me/v1',
-    usage4: '• Claude代理示例: https://claude.weiruchenai.me/v1',
-    usage5: '• 直接访问官方API会因CORS限制失败',
-    usage6: '• 测试过程中密钥仅用于验证，不会被存储',
-    usage7: '• 智能重试机制可提高检测准确性，减少误判',
+    usage2: '• 测试过程中密钥仅用于验证，不会被存储',
 
     // 通用
     ok: '确定',
@@ -240,12 +235,7 @@ export const TRANSLATIONS = {
     // Usage instructions
     usageTitle: '💡 Usage Instructions:',
     usage1: '• Strongly recommend using custom proxy URL, public proxies may be unstable',
-    usage2: '• Gemini proxy example: https://gemini.weiruchenai.me/v1beta',
-    usage3: '• OpenAI proxy example: https://openai.weiruchenai.me/v1',
-    usage4: '• Claude proxy example: https://claude.weiruchenai.me/v1',
-    usage5: '• Direct access to official APIs will fail due to CORS restrictions',
-    usage6: '• Keys are only used for validation during testing, not stored',
-    usage7: '• Smart retry mechanism improves detection accuracy and reduces false negatives',
+    usage2: '• Keys are only used for validation during testing, not stored',
 
     // General
     ok: 'OK',

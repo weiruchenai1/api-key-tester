@@ -313,18 +313,6 @@ sudo nginx -t  # 检查配置
 sudo nginx -s reload  # 重新加载配置
 ```
 
-**6. 测试反向代理**
-```bash
-# 测试 OpenAI 代理
-curl https://openai.your-domain.com/v1/models
-
-# 测试 Claude 代理  
-curl https://claude.your-domain.com/v1/messages
-
-# 测试 Gemini 代理
-curl https://gemini.your-domain.com/v1beta/models
-```
-
 **代理地址：**
 测试成功后，在API Key测试工具中使用以下代理地址：
 - OpenAI: `https://openai.your-domain.com`
