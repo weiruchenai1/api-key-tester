@@ -67,10 +67,10 @@ export const testGeminiKey = async (apiKey, model, proxyUrl) => {
 
 export const testGeminiPaidKey = async (apiKey, model, proxyUrl) => {
   try {
-    // 生成长文本内容用于Cache API检测
-    const longText = "You are an expert at analyzing transcripts. ".repeat(128);
+    // 生成长文本内容用于Cache API检测 (参考项目的做法)
+    const longText = "You are an expert at analyzing transcripts.".repeat(128);
     
-    const apiUrl = getApiUrl('gemini', '/v1beta/cachedContents', proxyUrl);
+    const apiUrl = getApiUrl('gemini', '/cachedContents', proxyUrl);
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers: {
@@ -78,7 +78,7 @@ export const testGeminiPaidKey = async (apiKey, model, proxyUrl) => {
         'x-goog-api-key': apiKey
       },
       body: JSON.stringify({
-        model: `models/${model}`,
+        model: 'models/gemini-2.5-flash', // 固定使用 gemini-2.5-flash
         contents: [
           {
             parts: [
@@ -89,28 +89,34 @@ export const testGeminiPaidKey = async (apiKey, model, proxyUrl) => {
             role: "user"
           }
         ],
+        generationConfig: {
+          thinkingConfig: {
+            thinkingBudget: 0
+          }
+        },
         ttl: "30s"
       })
     });
 
     // 付费Key可以成功访问Cache API
     if (response.ok) {
-      return { isPaid: true, error: null };
+      return { isPaid: true, error: null, cacheApiStatus: response.status };
     }
 
-    // 429错误通常表示免费Key的速率限制
+    // 严格按照参考项目的错误处理逻辑
     if (response.status === 429) {
-      return { isPaid: false, error: null };
+      // 429 Rate Limit = 免费Key
+      return { isPaid: false, error: null, cacheApiStatus: response.status };
     }
 
-    // 403错误可能表示免费Key无权访问Cache API
-    if (response.status === 403) {
-      return { isPaid: false, error: null };
+    if (response.status === 400 || response.status === 401 || response.status === 403) {
+      // 4xx错误通常表示Key无效或权限不足，归类为免费Key
+      return { isPaid: false, error: null, cacheApiStatus: response.status };
     }
 
     // 其他错误无法确定付费状态
     const errorText = await response.text().catch(() => '');
-    return { isPaid: null, error: `HTTP ${response.status}: ${errorText}` };
+    return { isPaid: null, error: `HTTP ${response.status}: ${errorText}`, cacheApiStatus: response.status };
   } catch (error) {
     return { isPaid: null, error: error.message };
   }

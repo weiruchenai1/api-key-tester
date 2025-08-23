@@ -14,7 +14,9 @@ const CopyButtons = () => {
         keysToCopy = state.keyResults.map(k => k.key);
         break;
       case 'valid':
-        keysToCopy = state.keyResults.filter(k => k.status === 'valid').map(k => k.key);
+        keysToCopy = state.enablePaidDetection ? 
+          state.keyResults.filter(k => k.status === 'valid').map(k => k.key) :
+          state.keyResults.filter(k => k.status === 'valid' || k.status === 'paid').map(k => k.key);
         break;
       case 'invalid':
         keysToCopy = state.keyResults.filter(k => k.status === 'invalid').map(k => k.key);

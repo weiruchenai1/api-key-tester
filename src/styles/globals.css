@@ -257,6 +257,16 @@ select:focus-visible {
   color: #6f42c1;
 }
 
+.stat-number.paid {
+  color: #3498db;
+}
+
+/* 付费密钥状态样式 */
+.status-paid {
+  background: #e6f3ff !important;
+  color: #2980b9 !important;
+}
+
 /* 深色主题统计卡片 */
 .dark-theme .stat-card {
   background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
@@ -359,6 +369,12 @@ select:focus-visible {
 
 .key-error.rate-limited-error {
   color: #856404;
+}
+
+.key-valid-info {
+  font-size: clamp(10px, 1.8vw, 12px) !important;
+  color: #28a745 !important;
+  margin-bottom: 2px;
 }
 
 .key-retry {

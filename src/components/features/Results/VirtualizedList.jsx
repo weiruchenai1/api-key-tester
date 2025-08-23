@@ -6,6 +6,7 @@ import { useVirtualization } from '../../../hooks/useVirtualization';
 
 const KeyItem = ({ index, style, data }) => {
   const { t } = useLanguage();
+  const { state } = useAppState();
   const keyData = data[index];
 
   if (!keyData) {
@@ -15,9 +16,11 @@ const KeyItem = ({ index, style, data }) => {
   const getStatusClass = (status) => {
     switch (status) {
       case 'valid': return 'status-valid';
+      case 'paid': return state.enablePaidDetection ? 'status-paid' : 'status-valid';
       case 'invalid': return 'status-invalid';
       case 'rate-limited': return 'status-rate-limited';
       case 'retrying': return 'status-retrying';
+      case 'testing': return 'status-testing';
       default: return 'status-testing';
     }
   };
@@ -25,6 +28,7 @@ const KeyItem = ({ index, style, data }) => {
   const getStatusText = (status) => {
     switch (status) {
       case 'valid': return t('statusValid');
+      case 'paid': return state.enablePaidDetection ? (t('paidKeys') || '付费Key') : t('statusValid');
       case 'invalid': return t('statusInvalid');
       case 'rate-limited': return t('statusRateLimit');
       case 'retrying': return t('statusRetrying');
@@ -70,9 +74,11 @@ const KeyItem = ({ index, style, data }) => {
               {t('retry') || '重试'}: {keyData.retryCount}
             </div>
           )}
-          {keyData.status === 'valid' && keyData.isPaid !== null && (
-            <div className={`key-paid-status ${keyData.isPaid ? 'paid' : 'free'}`}>
-              {keyData.isPaid ? '💎 ' + (t('paidKeys') || '付费') : '🆓 ' + (t('freeKeys') || '免费')}
+          {(keyData.status === 'valid' || keyData.status === 'paid') && !keyData.isPaid && (
+            <div className="key-valid-info">
+              {state.enablePaidDetection && keyData.cacheApiStatus ? 
+                `${t('freeKey')} (${keyData.cacheApiStatus})` : 
+                `${t('validKey')} (${keyData.basicApiStatus || 200})`}
             </div>
           )}
         </div>
@@ -100,17 +106,19 @@ const VirtualizedList = () => {
   const filteredKeys = useMemo(() => {
     switch (state.activeTab) {
       case 'valid':
-        return state.keyResults.filter(k => k.status === 'valid');
+        return state.enablePaidDetection ? 
+          state.keyResults.filter(k => k.status === 'valid') :
+          state.keyResults.filter(k => k.status === 'valid' || k.status === 'paid');
       case 'invalid':
         return state.keyResults.filter(k => k.status === 'invalid');
       case 'rate-limited':
         return state.keyResults.filter(k => k.status === 'rate-limited');
       case 'paid':
-        return state.keyResults.filter(k => k.status === 'valid' && k.isPaid === true);
+        return state.keyResults.filter(k => k.status === 'paid');
       default:
         return state.keyResults;
     }
-  }, [state.keyResults, state.activeTab]);
+  }, [state.keyResults, state.activeTab, state.enablePaidDetection]);
 
   const listHeight = getListHeight();
 

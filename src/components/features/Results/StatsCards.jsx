@@ -14,7 +14,9 @@ const StatsCards = () => {
     },
     {
       key: 'valid',
-      value: state.keyResults.filter(k => k.status === 'valid').length,
+      value: state.enablePaidDetection ? 
+        state.keyResults.filter(k => k.status === 'valid').length :
+        state.keyResults.filter(k => k.status === 'valid' || k.status === 'paid').length,
       className: 'valid'
     },
     {
@@ -45,7 +47,7 @@ const StatsCards = () => {
     paidStats.push(
       {
         key: 'paidKeys',
-        value: state.keyResults.filter(k => k.status === 'valid' && k.isPaid === true).length,
+        value: state.keyResults.filter(k => k.status === 'paid').length,
         className: 'paid'
       }
     );

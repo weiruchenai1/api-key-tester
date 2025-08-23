@@ -75,7 +75,9 @@ const appReducer = (state, action) => {
     case 'SET_PAID_DETECTION':
       return {
         ...state,
-        enablePaidDetection: action.payload
+        enablePaidDetection: action.payload,
+        // 当启用付费检测时，自动切换到gemini-2.5-flash
+        model: action.payload ? 'gemini-2.5-flash' : state.model
       };
 
     case 'START_TESTING':

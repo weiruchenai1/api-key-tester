@@ -58,8 +58,10 @@ export const TRANSLATIONS = {
 
     // Gemini付费检测
     enablePaidDetection: '启用付费检测',
-    paidDetectionHelp: '仅对Gemini API有效，会额外调用cacheContent API来检测付费密钥，会消耗额外配额',
-    paidDetectionWarning: '⚠️ 启用付费检测会消耗额外的API配额',
+    enablePaidKeyDetection: '检测付费key',
+    paidDetection: '付费检测',
+    paidDetectionHelp: '启用后将固定使用 gemini-2.5-flash 模型，通过 cacheContent API 检测付费密钥，会消耗额外配额',
+    paidDetectionWarning: '⚠️ 启用付费检测会消耗额外的API配额并锁定模型为 gemini-2.5-flash',
     paidKeys: '付费密钥',
     copyPaidKeys: '复制付费密钥',
 
@@ -113,6 +115,8 @@ export const TRANSLATIONS = {
     permissionDenied: '权限不足',
     networkFailed: '网络连接失败',
     retry: '重试',
+    freeKey: '免费密钥',
+    validKey: '有效密钥',
 
     // 使用说明
     usageTitle: '💡 使用说明：',
@@ -195,8 +199,10 @@ export const TRANSLATIONS = {
 
     // Gemini Paid Detection
     enablePaidDetection: 'Enable Paid Detection',
-    paidDetectionHelp: 'Only valid for Gemini API, will call additional cacheContent API to detect paid keys, consumes extra quota',
-    paidDetectionWarning: '⚠️ Enabling paid detection will consume additional API quota',
+    enablePaidKeyDetection: 'Enable Paid Key Detection',
+    paidDetection: 'Paid Detection',
+    paidDetectionHelp: 'When enabled, will lock model to gemini-2.5-flash and use cacheContent API to detect paid keys, consumes extra quota',
+    paidDetectionWarning: '⚠️ Enabling paid detection will consume additional API quota and lock model to gemini-2.5-flash',
     paidKeys: 'Paid Keys',
     copyPaidKeys: 'Copy Paid Keys',
 
@@ -250,6 +256,10 @@ export const TRANSLATIONS = {
     permissionDenied: 'Permission Denied',
     networkFailed: 'Network Failed',
     retry: 'Retry',
+    
+    // Key status messages
+    freeKey: 'Free Key',
+    validKey: 'Valid Key',
 
     // Usage instructions
     usageTitle: '💡 Usage Instructions:',

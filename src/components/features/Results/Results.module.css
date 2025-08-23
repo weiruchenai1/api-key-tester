@@ -87,7 +87,7 @@
 }
 
 .stat-number.paid {
-  color: #e74c3c;
+  color: #3498db;
 }
 
 .stat-number.free {
@@ -205,6 +205,12 @@
   margin-bottom: 2px;
 }
 
+.key-valid-info {
+  font-size: clamp(10px, 1.8vw, 12px);
+  color: #28a745;
+  margin-bottom: 2px;
+}
+
 .key-retry {
   font-size: clamp(10px, 1.8vw, 12px);
   color: #f39c12;
@@ -221,13 +227,23 @@
 }
 
 .key-paid-status.paid {
-  background: #ffe6e6;
-  color: #e74c3c;
+  background: #e6f3ff;
+  color: #3498db;
 }
 
 .key-paid-status.free {
   background: #e6f3ff;
   color: #3498db;
+}
+
+.cache-api-status {
+  font-size: 0.8rem;
+  color: #6c757d;
+  background: rgba(108, 117, 125, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+  font-family: 'Courier New', monospace;
 }
 
 .copy-button-group {
@@ -275,6 +291,11 @@
   background: #ffeaa7;
   color: #d68910;
   animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+.status-paid {
+  background: #e6f3ff !important;
+  color: #2980b9 !important;
 }
 
 @keyframes pulse {
@@ -393,6 +414,11 @@
 
 :global(.dark-theme) .empty-text {
   opacity: 0.7;
+}
+
+:global(.dark-theme) .status-paid {
+  background: #1a2332;
+  color: #5dade2;
 }
 
 /* 移动端优化 */
