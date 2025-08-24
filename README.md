@@ -22,7 +22,7 @@
 1. 访问：**https://weiruchenai1.github.io/api-key-tester**
 2. 选择 API 类型
 3. 填写代理服务器 URL（必需）
-4. 粘贴 API 密钥列表
+4. 粘贴或者导入（.txt） API 密钥列表
 5. 使用预设模型或输入自定义模型名
 6. 根据需要选择合适的并发数和重试次数
 7. 点击开始测试
@@ -30,12 +30,6 @@
 ## ⚠️ 重要提醒
 
 由于浏览器 CORS 限制，必须使用代理服务器：
-- **Gemini**: 
-`https://gemini.weiruchenai.me/v1beta`
-- **OpenAI**: 
-`https://openai.weiruchenai.me/v1`
-- **Claude**: 
-`https://claude.weiruchenai.me/v1`
 
 **公共代理风险提醒：**
 - ⚠️ **安全风险**：API密钥可能被代理服务器记录
@@ -313,18 +307,6 @@ sudo nginx -t  # 检查配置
 sudo nginx -s reload  # 重新加载配置
 ```
 
-**6. 测试反向代理**
-```bash
-# 测试 OpenAI 代理
-curl https://openai.your-domain.com/v1/models
-
-# 测试 Claude 代理  
-curl https://claude.your-domain.com/v1/messages
-
-# 测试 Gemini 代理
-curl https://gemini.your-domain.com/v1beta/models
-```
-
 **代理地址：**
 测试成功后，在API Key测试工具中使用以下代理地址：
 - OpenAI: `https://openai.your-domain.com`
@@ -456,7 +438,7 @@ npm run build
 
 ## 🛠️ 技术栈
 
-纯前端：HTML + CSS + JavaScript（零依赖）
+纯前端：HTML + CSS + JavaScript
 
 ## 📄 许可证
 
