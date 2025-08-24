@@ -55,7 +55,6 @@
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@types/react-window": "^1.8.5",
-    "jest-coverage-badges": "^1.1.2",
     "jest-environment-jsdom": "^30.0.5",
     "nyc": "^17.1.0"
   },

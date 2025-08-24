@@ -25,10 +25,10 @@ const CopyButtons = () => {
         keysToCopy = state.keyResults.filter(k => k.status === 'rate-limited').map(k => k.key);
         break;
       case 'paid':
-        keysToCopy = state.keyResults.filter(k => k.status === 'valid' && k.isPaid === true).map(k => k.key);
+        keysToCopy = state.keyResults.filter(k => k.status === 'paid').map(k => k.key);
         break;
       case 'free':
-        keysToCopy = state.keyResults.filter(k => k.status === 'valid' && k.isPaid === false).map(k => k.key);
+        keysToCopy = state.keyResults.filter(k => k.status === 'valid').map(k => k.key);
         break;
       default:
         console.warn('Unknown copy type:', type);

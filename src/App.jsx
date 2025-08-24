@@ -26,11 +26,6 @@ const AppContent = () => {
           <strong>{t('usageTitle')}</strong>
           <br />{t('usage1')}
           <br />{t('usage2')}
-          <br />{t('usage3')}
-          <br />{t('usage4')}
-          <br />{t('usage5')}
-          <br />{t('usage6')}
-          <br />{t('usage7')}
         </div>
 
         <Controls />

@@ -51,13 +51,14 @@ export const useVirtualization = () => {
 
   useEffect(() => {
     updateListHeight();
+    let orientationTimeout;
 
     const handleResize = () => {
       updateListHeight();
     };
 
     const handleOrientationChange = () => {
-      setTimeout(updateListHeight, 100);
+      orientationTimeout = setTimeout(updateListHeight, 100);
     };
 
     window.addEventListener('resize', handleResize);
@@ -66,6 +67,9 @@ export const useVirtualization = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('orientationchange', handleOrientationChange);
+      if (orientationTimeout) {
+        clearTimeout(orientationTimeout);
+      }
     };
   }, [updateListHeight]);
 
