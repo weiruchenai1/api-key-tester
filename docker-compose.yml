@@ -1,0 +1,15 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+    # 可选：更安全的只读文件系统（如开启需给 nginx 写目录提供 tmpfs）
+    # read_only: true
+    # tmpfs:
+    #   - /var/cache/nginx
+    #   - /run
