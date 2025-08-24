@@ -26,7 +26,7 @@ describe('Paid Key Detection Integration Test', () => {
 
       const basicResult = await testGeminiKey('paid-test-key', 'gemini-pro', null);
       expect(basicResult.valid).toBe(true);
-      expect(basicResult.responseStatus).toBe(200);
+      expect(basicResult.error).toBe(null);
 
       // Mock successful Cache API call (200) - indicates paid key
       fetch.mockResolvedValueOnce({

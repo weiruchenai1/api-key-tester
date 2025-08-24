@@ -36,10 +36,8 @@ describe('付费Key检测逻辑测试', () => {
           text: () => Promise.resolve('Rate limit exceeded')
         });
 
-      // 动态导入worker函数
-      const workerCode = await import('fs').then(fs => 
-        fs.readFileSync('e:/AAA_Program/keychecher-react/api-key-tester/public/worker.js', 'utf8')
-      );
+      // 移除硬编码路径，直接模拟检测逻辑
+      // 不需要实际读取worker文件，直接测试检测逻辑
       
       // 模拟检测结果
       const expectedResult = {
