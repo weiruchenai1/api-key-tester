@@ -1,8 +1,6 @@
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/weiruchenai1/api-key-tester:latest
     ports:
       - "8080:80"
     restart: unless-stopped
