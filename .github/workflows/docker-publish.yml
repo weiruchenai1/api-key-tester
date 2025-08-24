@@ -2,7 +2,7 @@ name: Build and Publish Docker image to GHCR
 
 on:
   push:
-    branches: [ experimental ]
+    branches: [ experimental, main ]
   workflow_dispatch:
 
 permissions:
@@ -29,7 +29,23 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push
+      # experimental 分支：仅推送 SHA 标签（避免污染 latest）
+      - name: Build and push (experimental)
+        if: github.ref == 'refs/heads/experimental'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/api-key-tester:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # main 分支：推送 latest 与 SHA 标签（正式发布）
+      - name: Build and push (main)
+        if: github.ref == 'refs/heads/main'
         uses: docker/build-push-action@v5
         with:
           context: .
