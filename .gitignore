@@ -24,4 +24,20 @@ yarn-error.log*
 coverage/
 *.lcov
 coverage-summary.json
+
+# 编辑器与系统文件
+.vscode/
+.idea/
+*.iml
+Thumbs.db
+ehthumbs.db
+
+# 工具缓存与临时文件
+.eslintcache
+.cache/
+.nyc_output
+pnpm-debug.log*
+*.log
+
+# 本地开发工具目录
 开发工具/
