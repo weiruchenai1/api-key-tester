@@ -426,30 +426,12 @@ npm run build
 
 ### 1. Docker 部署
 
-**直接使用预构建镜像：**
 ```bash
 docker run -d \
   --name api-key-tester \
   -p 8080:80 \
   --restart unless-stopped \
   ghcr.io/weiruchenai1/api-key-tester:latest
-```
-
-**从源码构建：**
-```bash
-# 克隆仓库
-git clone https://github.com/weiruchenai1/api-key-tester.git
-cd api-key-tester
-
-# 构建镜像
-docker build -t api-key-tester .
-
-# 运行容器
-docker run -d \
-  --name api-key-tester \
-  -p 8080:80 \
-  --restart unless-stopped \
-  api-key-tester
 ```
 
 访问 http://localhost:8080
@@ -486,7 +468,6 @@ services:
 
 ### 3. Cloudflare Pages 部署
 
-**方法 1：通过 GitHub 连接**
 1. Fork 此仓库到你的 GitHub 账户
 2. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
 3. 进入 `Workers & Pages` > `Create application` > `Pages` > `Connect to Git`
@@ -496,21 +477,6 @@ services:
    - **构建输出目录**: `build`
    - **Node.js 版本**: `18` 或 `20`
 6. 点击 `Save and Deploy`
-
-**方法 2：通过命令行**
-```bash
-# 安装 Wrangler CLI
-npm install -g wrangler
-
-# 登录 Cloudflare
-wrangler login
-
-# 构建项目
-npm run build
-
-# 部署到 Cloudflare Pages
-wrangler pages deploy build --project-name=api-key-tester
-```
 
 ### 4. Vercel 部署
 

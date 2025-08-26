@@ -426,30 +426,12 @@ Build artifacts will be generated in the `build/` directory
 
 ### 1. Docker Deployment
 
-**Using pre-built image:**
 ```bash
 docker run -d \
   --name api-key-tester \
   -p 8080:80 \
   --restart unless-stopped \
   ghcr.io/weiruchenai1/api-key-tester:latest
-```
-
-**Build from source:**
-```bash
-# Clone repository
-git clone https://github.com/weiruchenai1/api-key-tester.git
-cd api-key-tester
-
-# Build image
-docker build -t api-key-tester .
-
-# Run container
-docker run -d \
-  --name api-key-tester \
-  -p 8080:80 \
-  --restart unless-stopped \
-  api-key-tester
 ```
 
 Visit http://localhost:8080
@@ -486,7 +468,6 @@ services:
 
 ### 3. Cloudflare Pages Deployment
 
-**Method 1: GitHub Connection**
 1. Fork this repository to your GitHub account
 2. Login to [Cloudflare Dashboard](https://dash.cloudflare.com/)
 3. Go to `Workers & Pages` > `Create application` > `Pages` > `Connect to Git`
@@ -496,21 +477,6 @@ services:
    - **Build output directory**: `build`
    - **Node.js version**: `18` or `20`
 6. Click `Save and Deploy`
-
-**Method 2: Command Line**
-```bash
-# Install Wrangler CLI
-npm install -g wrangler
-
-# Login to Cloudflare
-wrangler login
-
-# Build project
-npm run build
-
-# Deploy to Cloudflare Pages
-wrangler pages deploy build --project-name=api-key-tester
-```
 
 ### 4. Vercel Deployment
 
