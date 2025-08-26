@@ -1,6 +1,8 @@
 # 🔑 API Key 测活工具
 > 一个现代化的在线工具，批量检测 OpenAI、Claude、Gemini API 密钥有效性
 
+**中文** | [English](./README.en.md)
+
 [![GitHub stars](https://img.shields.io/github/stars/weiruchenai1/api-key-tester?style=flat&color=yellow)](https://github.com/weiruchenai1/api-key-tester)
 [![在线使用](https://img.shields.io/badge/在线使用-GitHub%20Pages-blue)](https://weiruchenai1.github.io/api-key-tester)
 
@@ -383,16 +385,11 @@ vercel --prod
 
 ### 方案对比
 
-| 方案 | 优势 | 劣势 | 国内访问情况 |
-|------|------|------|-------------|
-| **Cloudflare Workers** | 免费、简单、全球CDN | 有请求限制 | ⚠️ 访问不稳定 |
-| **Nginx + 服务器** | 无限制、可定制、稳定 | 需要服务器、维护成本 | ✅ 完全可控 |
-| **Vercel** | 简单部署、免费 | 有冷启动、请求限制 | ❌ 已被墙 |
-
-> **重要提醒**：
-> - **Cloudflare Workers** 在国内访问可能不稳定，速度较慢
-> - **Vercel** 在国内已被墙，无法直接访问  
-> - **Nginx + 海外服务器** 是最稳定可靠的方案
+| 方案 | 优势 | 劣势 |
+|------|------|------|
+| **Cloudflare Workers** | 免费、简单、全球CDN | 有请求限制 |
+| **Nginx + 服务器** | 无限制、可定制、稳定 | 需要服务器、维护成本 |
+| **Vercel** | 简单部署、免费 | 有冷启动、请求限制 |
 
 </details>
 
@@ -423,6 +420,144 @@ npm start
 npm run build
 ```
 
+构建产物将生成到 `build/` 目录
+
+## 🚀 部署方式
+
+### 1. Docker 部署
+
+**直接使用预构建镜像：**
+```bash
+docker run -d \
+  --name api-key-tester \
+  -p 8080:80 \
+  --restart unless-stopped \
+  ghcr.io/weiruchenai1/api-key-tester:latest
+```
+
+**从源码构建：**
+```bash
+# 克隆仓库
+git clone https://github.com/weiruchenai1/api-key-tester.git
+cd api-key-tester
+
+# 构建镜像
+docker build -t api-key-tester .
+
+# 运行容器
+docker run -d \
+  --name api-key-tester \
+  -p 8080:80 \
+  --restart unless-stopped \
+  api-key-tester
+```
+
+访问 http://localhost:8080
+
+### 2. Docker Compose 部署
+
+使用提供的 docker-compose.yml 文件：
+
+```bash
+# 下载配置文件
+curl -O https://raw.githubusercontent.com/weiruchenai1/api-key-tester/main/docker-compose.yml
+
+# 启动服务
+docker-compose up -d
+
+# 查看日志
+docker-compose logs -f
+
+# 停止服务
+docker-compose down
+```
+
+自定义配置：
+```yaml
+services:
+  web:
+    image: ghcr.io/weiruchenai1/api-key-tester:latest
+    ports:
+      - "3000:80"  # 修改端口
+    restart: unless-stopped
+    environment:
+      - TZ=Asia/Shanghai
+```
+
+### 3. Cloudflare Pages 部署
+
+**方法 1：通过 GitHub 连接**
+1. Fork 此仓库到你的 GitHub 账户
+2. 登录 [Cloudflare Dashboard](https://dash.cloudflare.com/)
+3. 进入 `Workers & Pages` > `Create application` > `Pages` > `Connect to Git`
+4. 选择你 Fork 的仓库
+5. 配置构建设置：
+   - **构建命令**: `npm run build`
+   - **构建输出目录**: `build`
+   - **Node.js 版本**: `18` 或 `20`
+6. 点击 `Save and Deploy`
+
+**方法 2：通过命令行**
+```bash
+# 安装 Wrangler CLI
+npm install -g wrangler
+
+# 登录 Cloudflare
+wrangler login
+
+# 构建项目
+npm run build
+
+# 部署到 Cloudflare Pages
+wrangler pages deploy build --project-name=api-key-tester
+```
+
+### 4. Vercel 部署
+
+**一键部署：**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/weiruchenai1/api-key-tester&project-name=api-key-tester)
+
+### 5. 静态文件服务器部署
+
+适用于任何支持静态文件的服务器：
+
+```bash
+# 构建项目
+npm run build
+
+# 将 build 目录的内容上传到你的 Web 服务器
+# 确保服务器配置了正确的路由规则（SPA 支持）
+```
+
+**Nginx 配置示例：**
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    root /path/to/build;
+    index index.html;
+    
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+    
+    # 启用 gzip 压缩
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+}
+```
+
+### 部署方式对比
+
+| 部署方式 | 优势 | 劣势 | 费用 |
+|---------|------|------|------|
+| **Docker** | 可控性强、隔离性好 | 需要服务器维护 | 服务器成本 |
+| **Docker Compose** | 简化多服务编排 | 需要 Docker 环境 | 服务器成本 |
+| **Cloudflare Pages** | 免费、CDN、快速 | 构建时间限制 | 免费/付费套餐 |
+| **Vercel** | 零配置、自动部署 | 有使用限制 | 免费/付费套餐 |
+| **静态服务器** | 完全控制、无限制 | 需要手动部署 | 服务器成本 |
+
 ## 💡 适用场景
 
 - API 密钥批量验证
@@ -450,4 +585,10 @@ MIT License
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=weiruchenai1/api-key-tester&type=Date)](https://www.star-history.com/#weiruchenai1/api-key-tester&Date)
+<a href="https://www.star-history.com/#weiruchenai1/api-key-tester&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=weiruchenai1/api-key-tester&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=weiruchenai1/api-key-tester&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=weiruchenai1/api-key-tester&type=Date" />
+ </picture>
+</a>
