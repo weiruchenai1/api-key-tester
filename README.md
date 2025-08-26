@@ -1,10 +1,22 @@
+<div align="center">
+
 # 🔑 API Key 测活工具
 > 一个现代化的在线工具，批量检测 OpenAI、Claude、Gemini API 密钥有效性
 
 **中文** | [English](./README.en.md)
 
-[![GitHub stars](https://img.shields.io/github/stars/weiruchenai1/api-key-tester?style=flat&color=yellow)](https://github.com/weiruchenai1/api-key-tester)
-[![在线使用](https://img.shields.io/badge/在线使用-GitHub%20Pages-blue)](https://weiruchenai1.github.io/api-key-tester)
+[![Contributors](https://img.shields.io/github/contributors/weiruchenai1/api-key-tester?style=flat&color=orange)](https://github.com/weiruchenai1/api-key-tester/graphs/contributors)
+[![GitHub stars](https://img.shields.io/github/stars/weiruchenai1/api-key-tester?style=flat&color=yellow)](https://github.com/weiruchenai1/api-key-tester/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/weiruchenai1/api-key-tester?style=flat&color=green)](https://github.com/weiruchenai1/api-key-tester/network/members)
+
+[![License](https://img.shields.io/github/license/weiruchenai1/api-key-tester?style=flat&color=blue)](https://github.com/weiruchenai1/api-key-tester/blob/main/LICENSE)
+[![Node Version](https://img.shields.io/badge/node-%3E=16.0.0-brightgreen?style=flat&logo=node.js)](https://nodejs.org/)
+[![Top Language](https://img.shields.io/github/languages/top/weiruchenai1/api-key-tester?style=flat&logo=javascript&color=yellow)](https://github.com/weiruchenai1/api-key-tester)
+
+[![在线使用](https://img.shields.io/badge/在线使用-GitHub%20Pages-blue?style=flat&logo=github)](https://weiruchenai1.github.io/api-key-tester)
+[![Deploy with Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=flat&logo=vercel)](https://vercel.com/new/clone?repository-url=https://github.com/weiruchenai1/api-key-tester)
+
+</div>
 
 ## ✨ 功能
 
@@ -42,80 +54,6 @@
 
 <details>
 <summary>🛠️ 如何搭建自己的反向代理</summary>
-
-<details>
-<summary>📦 Cloudflare Workers 方案</summary>
-
-1. **注册 Cloudflare 账号**：访问 [cloudflare.com](https://cloudflare.com) 注册
-
-2. **创建 Worker**：
-   - 进入 Cloudflare Dashboard
-   - 点击 `Workers & Pages` > `Create application` > `Create Worker`
-   - 给 Worker 起个名字（如 `api-proxy`）
-
-3. **部署代码**：将以下代码粘贴到 Worker 编辑器中
-
-```javascript
-// OpenAI 代理
-export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url);
-    
-    // 设置目标 API
-    const targets = {
-      '/openai/': 'https://api.openai.com',
-      '/claude/': 'https://api.anthropic.com', 
-      '/gemini/': 'https://generativelanguage.googleapis.com'
-    };
-    
-    let targetBase = null;
-    let newPath = url.pathname;
-    
-    for (const [prefix, target] of Object.entries(targets)) {
-      if (url.pathname.startsWith(prefix)) {
-        targetBase = target;
-        newPath = url.pathname.replace(prefix, '/');
-        break;
-      }
-    }
-    
-    if (!targetBase) {
-      return new Response('Not Found', { status: 404 });
-    }
-    
-    const targetUrl = targetBase + newPath + url.search;
-    
-    const headers = new Headers(request.headers);
-    headers.set('Host', new URL(targetBase).host);
-    headers.delete('cf-connecting-ip');
-    headers.delete('cf-ray');
-    
-    const response = await fetch(targetUrl, {
-      method: request.method,
-      headers: headers,
-      body: request.body
-    });
-    
-    const newResponse = new Response(response.body, response);
-    newResponse.headers.set('Access-Control-Allow-Origin', '*');
-    newResponse.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    newResponse.headers.set('Access-Control-Allow-Headers', '*');
-    
-    return newResponse;
-  },
-};
-```
-
-4. **保存并部署**：点击 `Save and Deploy`
-
-5. **获取代理地址**：
-   - OpenAI: `https://your-worker.workers.dev/openai`
-   - Claude: `https://your-worker.workers.dev/claude`
-   - Gemini: `https://your-worker.workers.dev/gemini`
-</details>
-
-<details>
-<summary>🖥️ Nginx 反向代理方案</summary>
 
 如果你有自己的海外服务器，可以使用 Nginx 搭建反向代理：
 
@@ -314,82 +252,6 @@ sudo nginx -s reload  # 重新加载配置
 - OpenAI: `https://openai.your-domain.com`
 - Claude: `https://claude.your-domain.com`  
 - Gemini: `https://gemini.your-domain.com`
-</details>
-
-<details>
-<summary>⚡ Vercel 方案</summary>
-
-1. **Fork 项目**：
-```bash
-git clone https://github.com/你的用户名/api-proxy-vercel
-cd api-proxy-vercel
-```
-
-2. **创建 api/[...path].js**：
-```javascript
-export default async function handler(req, res) {
-  const { path } = req.query;
-  const targetPath = Array.isArray(path) ? path.join('/') : path;
-  
-  const apiMappings = {
-    'openai': 'https://api.openai.com',
-    'claude': 'https://api.anthropic.com',
-    'gemini': 'https://generativelanguage.googleapis.com'
-  };
-  
-  const apiType = targetPath.split('/')[0];
-  const targetBase = apiMappings[apiType];
-  
-  if (!targetBase) {
-    return res.status(404).json({ error: 'API not supported' });
-  }
-  
-  const targetUrl = `${targetBase}/${targetPath.split('/').slice(1).join('/')}`;
-  
-  try {
-    const response = await fetch(targetUrl, {
-      method: req.method,
-      headers: {
-        ...req.headers,
-        host: new URL(targetBase).host,
-      },
-      body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined,
-    });
-    
-    const data = await response.text();
-    
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', '*');
-    
-    res.status(response.status).send(data);
-  } catch (error) {
-    res.status(500).json({ error: 'Proxy error' });
-  }
-}
-```
-
-3. **部署到 Vercel**：
-```bash
-npm i -g vercel
-vercel --prod
-```
-
-### 使用自建代理
-
-将工具中的代理 URL 替换为你的域名：
-- **Cloudflare**: `https://your-worker.workers.dev/openai`
-- **Nginx**: `https://openai.your-domain.com`  
-- **Vercel**: `https://your-app.vercel.app/api/openai`
-</details>
-
-### 方案对比
-
-| 方案 | 优势 | 劣势 |
-|------|------|------|
-| **Cloudflare Workers** | 免费、简单、全球CDN | 有请求限制 |
-| **Nginx + 服务器** | 无限制、可定制、稳定 | 需要服务器、维护成本 |
-| **Vercel** | 简单部署、免费 | 有冷启动、请求限制 |
 
 </details>
 
@@ -513,16 +375,6 @@ server {
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 }
 ```
-
-### 部署方式对比
-
-| 部署方式 | 优势 | 劣势 | 费用 |
-|---------|------|------|------|
-| **Docker** | 可控性强、隔离性好 | 需要服务器维护 | 服务器成本 |
-| **Docker Compose** | 简化多服务编排 | 需要 Docker 环境 | 服务器成本 |
-| **Cloudflare Pages** | 免费、CDN、快速 | 构建时间限制 | 免费/付费套餐 |
-| **Vercel** | 零配置、自动部署 | 有使用限制 | 免费/付费套餐 |
-| **静态服务器** | 完全控制、无限制 | 需要手动部署 | 服务器成本 |
 
 ## 💡 适用场景
 

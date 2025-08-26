@@ -1,10 +1,22 @@
+<div align="center">
+
 # 🔑 API Key Tester
 > A modern online tool for batch testing OpenAI, Claude, and Gemini API key validity
 
 [中文](./README.md) | **English**
 
-[![GitHub stars](https://img.shields.io/github/stars/weiruchenai1/api-key-tester?style=flat&color=yellow)](https://github.com/weiruchenai1/api-key-tester)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue)](https://weiruchenai1.github.io/api-key-tester)
+[![Contributors](https://img.shields.io/github/contributors/weiruchenai1/api-key-tester?style=flat&color=orange)](https://github.com/weiruchenai1/api-key-tester/graphs/contributors)
+[![GitHub stars](https://img.shields.io/github/stars/weiruchenai1/api-key-tester?style=flat&color=yellow)](https://github.com/weiruchenai1/api-key-tester/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/weiruchenai1/api-key-tester?style=flat&color=green)](https://github.com/weiruchenai1/api-key-tester/network/members)
+
+[![License](https://img.shields.io/github/license/weiruchenai1/api-key-tester?style=flat&color=blue)](https://github.com/weiruchenai1/api-key-tester/blob/main/LICENSE)
+[![Node Version](https://img.shields.io/badge/node-%3E=16.0.0-brightgreen?style=flat&logo=node.js)](https://nodejs.org/)
+[![Top Language](https://img.shields.io/github/languages/top/weiruchenai1/api-key-tester?style=flat&logo=javascript&color=yellow)](https://github.com/weiruchenai1/api-key-tester)
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=flat&logo=github)](https://weiruchenai1.github.io/api-key-tester)
+[![Deploy with Vercel](https://img.shields.io/badge/Deploy-Vercel-black?style=flat&logo=vercel)](https://vercel.com/new/clone?repository-url=https://github.com/weiruchenai1/api-key-tester)
+
+</div>
 
 ## ✨ Features
 
@@ -42,80 +54,6 @@ Due to browser CORS restrictions, a proxy server is required:
 
 <details>
 <summary>🛠️ How to Set Up Your Own Reverse Proxy</summary>
-
-<details>
-<summary>📦 Cloudflare Workers Solution</summary>
-
-1. **Register Cloudflare Account**: Visit [cloudflare.com](https://cloudflare.com) to register
-
-2. **Create Worker**:
-   - Go to Cloudflare Dashboard
-   - Click `Workers & Pages` > `Create application` > `Create Worker`
-   - Give your Worker a name (e.g., `api-proxy`)
-
-3. **Deploy Code**: Paste the following code into the Worker editor
-
-```javascript
-// API Proxy
-export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url);
-    
-    // Set target APIs
-    const targets = {
-      '/openai/': 'https://api.openai.com',
-      '/claude/': 'https://api.anthropic.com', 
-      '/gemini/': 'https://generativelanguage.googleapis.com'
-    };
-    
-    let targetBase = null;
-    let newPath = url.pathname;
-    
-    for (const [prefix, target] of Object.entries(targets)) {
-      if (url.pathname.startsWith(prefix)) {
-        targetBase = target;
-        newPath = url.pathname.replace(prefix, '/');
-        break;
-      }
-    }
-    
-    if (!targetBase) {
-      return new Response('Not Found', { status: 404 });
-    }
-    
-    const targetUrl = targetBase + newPath + url.search;
-    
-    const headers = new Headers(request.headers);
-    headers.set('Host', new URL(targetBase).host);
-    headers.delete('cf-connecting-ip');
-    headers.delete('cf-ray');
-    
-    const response = await fetch(targetUrl, {
-      method: request.method,
-      headers: headers,
-      body: request.body
-    });
-    
-    const newResponse = new Response(response.body, response);
-    newResponse.headers.set('Access-Control-Allow-Origin', '*');
-    newResponse.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    newResponse.headers.set('Access-Control-Allow-Headers', '*');
-    
-    return newResponse;
-  },
-};
-```
-
-4. **Save and Deploy**: Click `Save and Deploy`
-
-5. **Get Proxy URLs**:
-   - OpenAI: `https://your-worker.workers.dev/openai`
-   - Claude: `https://your-worker.workers.dev/claude`
-   - Gemini: `https://your-worker.workers.dev/gemini`
-</details>
-
-<details>
-<summary>🖥️ Nginx Reverse Proxy Solution</summary>
 
 If you have your own overseas server, you can use Nginx to set up a reverse proxy:
 
@@ -314,82 +252,6 @@ After successful testing, use the following proxy URLs in the API Key tester:
 - OpenAI: `https://openai.your-domain.com`
 - Claude: `https://claude.your-domain.com`  
 - Gemini: `https://gemini.your-domain.com`
-</details>
-
-<details>
-<summary>⚡ Vercel Solution</summary>
-
-1. **Fork Project**:
-```bash
-git clone https://github.com/your-username/api-proxy-vercel
-cd api-proxy-vercel
-```
-
-2. **Create api/[...path].js**:
-```javascript
-export default async function handler(req, res) {
-  const { path } = req.query;
-  const targetPath = Array.isArray(path) ? path.join('/') : path;
-  
-  const apiMappings = {
-    'openai': 'https://api.openai.com',
-    'claude': 'https://api.anthropic.com',
-    'gemini': 'https://generativelanguage.googleapis.com'
-  };
-  
-  const apiType = targetPath.split('/')[0];
-  const targetBase = apiMappings[apiType];
-  
-  if (!targetBase) {
-    return res.status(404).json({ error: 'API not supported' });
-  }
-  
-  const targetUrl = `${targetBase}/${targetPath.split('/').slice(1).join('/')}`;
-  
-  try {
-    const response = await fetch(targetUrl, {
-      method: req.method,
-      headers: {
-        ...req.headers,
-        host: new URL(targetBase).host,
-      },
-      body: req.method !== 'GET' ? JSON.stringify(req.body) : undefined,
-    });
-    
-    const data = await response.text();
-    
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', '*');
-    
-    res.status(response.status).send(data);
-  } catch (error) {
-    res.status(500).json({ error: 'Proxy error' });
-  }
-}
-```
-
-3. **Deploy to Vercel**:
-```bash
-npm i -g vercel
-vercel --prod
-```
-
-### Using Self-hosted Proxy
-
-Replace the proxy URL in the tool with your domain:
-- **Cloudflare**: `https://your-worker.workers.dev/openai`
-- **Nginx**: `https://openai.your-domain.com`  
-- **Vercel**: `https://your-app.vercel.app/api/openai`
-</details>
-
-### Solution Comparison
-
-| Solution | Advantages | Disadvantages |
-|----------|------------|---------------|
-| **Cloudflare Workers** | Free, simple, global CDN | Request limits |
-| **Nginx + Server** | No limits, customizable, stable | Requires server maintenance |
-| **Vercel** | Simple deployment, free | Cold starts, request limits |
 
 </details>
 
@@ -513,16 +375,6 @@ server {
     gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
 }
 ```
-
-### Deployment Comparison
-
-| Deployment Method | Advantages | Disadvantages | Cost |
-|-------------------|------------|---------------|------|
-| **Docker** | High control, good isolation | Server maintenance required | Server cost |
-| **Docker Compose** | Simplified orchestration | Docker environment required | Server cost |
-| **Cloudflare Pages** | Free, CDN, fast | Build time limits | Free/Paid plans |
-| **Vercel** | Zero config, auto deployment | Usage limits | Free/Paid plans |
-| **Static Server** | Full control, no limits | Manual deployment | Server cost |
 
 ## 💡 Use Cases
 
