@@ -18,6 +18,10 @@
 
 </div>
 
+## 📸 Preview
+
+![Preview](./Preview.en.png)
+
 ## ✨ Features
 
 - 🚀 Batch test multiple API keys
