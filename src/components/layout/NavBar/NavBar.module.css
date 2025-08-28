@@ -1,17 +1,22 @@
 .navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  position: relative;
   height: 60px;
   background: rgba(255, 255, 255, 0.95);
   border-bottom: 1px solid #E5E7EB;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
+  justify-content: center;
   z-index: 1000;
   backdrop-filter: blur(8px);
+}
+
+.navbarContent {
+  max-width: 1440px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
 }
 
 /* Brand Section - Left Side */
