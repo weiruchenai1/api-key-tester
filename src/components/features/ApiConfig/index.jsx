@@ -2,14 +2,16 @@ import React from 'react';
 import ApiTypeSelector from './ApiTypeSelector';
 import ModelSelector from './ModelSelector';
 import ProxySettings from './ProxySettings';
-import './ApiConfig.module.css';
+import styles from './ApiConfig.module.css';
 
 const ApiConfig = () => {
   return (
-    <div className="api-config">
+    <div className={styles.apiConfig}>
       <ApiTypeSelector />
-      <ModelSelector />
-      <ProxySettings />
+      <div className={styles.urlModelRow}>
+        <ProxySettings />
+        <ModelSelector />
+      </div>
     </div>
   );
 };

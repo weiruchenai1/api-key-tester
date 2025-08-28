@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
+import { useApiTester } from '../../../hooks/useApiTester';
 import { MODEL_OPTIONS } from '../../../constants/api';
 const ModelSelector = () => {
   const { t } = useLanguage();
   const { state, dispatch } = useAppState();
+  const { detectModels, isDetecting } = useApiTester();
   const [isCustomModel, setIsCustomModel] = useState(false);
   const [isDetectedModelsExpanded, setIsDetectedModelsExpanded] = useState(false);
   const currentModels = useMemo(() => MODEL_OPTIONS[state.apiType] || [], [state.apiType]);
@@ -51,6 +53,21 @@ const ModelSelector = () => {
     setIsDetectedModelsExpanded(!isDetectedModelsExpanded);
   };
 
+  const handleDetectModels = async () => {
+    if (!state.apiKeysText.trim()) {
+      alert(t('enterApiKeysFirst') || '请先输入API密钥！');
+      return;
+    }
+
+    const apiKeys = state.apiKeysText.split('\n').filter(key => key.trim());
+    if (apiKeys.length === 0) {
+      alert(t('enterValidKeys') || '请输入有效的API密钥！');
+      return;
+    }
+
+    await detectModels(apiKeys[0].trim());
+  };
+
   return (
     <div className="input-group">
       <label>{t('selectModel')}</label>
@@ -89,6 +106,18 @@ const ModelSelector = () => {
           disabled={state.isTesting || state.enablePaidDetection}
         >
           {isCustomModel ? t('presetModel') : t('customModel')}
+        </button>
+        <button
+          type="button"
+          className="model-toggle-btn detect-models-btn"
+          onClick={handleDetectModels}
+          disabled={state.isTesting || isDetecting}
+        >
+          {isDetecting ? (
+            <>🔄 {t('detecting')}</>
+          ) : (
+            <>🔍 {t('detectModels')}</>
+          )}
         </button>
         {state.apiType === 'gemini' && (
           <button

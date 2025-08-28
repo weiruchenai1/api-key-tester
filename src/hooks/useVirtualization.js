@@ -30,18 +30,8 @@ export const useVirtualization = () => {
   }, []);
 
   const getListHeight = useCallback(() => {
-    // 根据屏幕大小动态调整列表高度
-    if (typeof window !== 'undefined') {
-      const screenHeight = window.innerHeight;
-      if (screenHeight <= 768) {
-        return 300; // 移动端
-      } else if (screenHeight <= 1024) {
-        return 350; // 平板
-      } else {
-        return 400; // 桌面端
-      }
-    }
-    return 350;
+    // 固定高度，适配新的容器结构
+    return 250;
   }, []);
 
   const updateListHeight = useCallback(() => {

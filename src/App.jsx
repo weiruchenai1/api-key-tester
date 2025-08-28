@@ -14,24 +14,72 @@ import { useLanguage } from './hooks/useLanguage';
 const AppContent = () => {
   const { t } = useLanguage();
 
-  return (
-    <AppLayout>
+  // 左侧功能区
+  const leftPanel = (
+    <>
       <div className="input-section">
         <ApiConfig />
-        <KeyInput />
-        <ConcurrencyControl />
-        <RetryControl />
+      </div>
 
+      <div className="input-section">
+        <KeyInput />
+      </div>
+
+      <Controls />
+
+      <div className="input-section">
         <div className="alert">
           <strong>{t('usageTitle')}</strong>
           <br />{t('usage1')}
           <br />{t('usage2')}
         </div>
-
-        <Controls />
       </div>
 
-      <Results />
+      <div className="input-section">
+        <details style={{cursor: 'pointer'}}>
+          <summary style={{
+            padding: '12px 0', 
+            fontSize: '18px', 
+            fontWeight: '600',
+            color: 'var(--text-color)',
+            listStyle: 'none',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            高级设置
+            <span style={{fontSize: '12px', transition: 'transform 0.3s ease'}}>▼</span>
+          </summary>
+          <div style={{paddingTop: '16px', display: 'flex', flexDirection: 'column', gap: '16px'}}>
+            <div>
+              <h4 style={{margin: '0 0 12px 0', color: 'var(--text-color)', fontSize: '16px', fontWeight: '500'}}>
+                并发控制
+              </h4>
+              <ConcurrencyControl />
+            </div>
+            <div>
+              <h4 style={{margin: '0 0 12px 0', color: 'var(--text-color)', fontSize: '16px', fontWeight: '500'}}>
+                重试控制
+              </h4>
+              <RetryControl />
+            </div>
+          </div>
+        </details>
+      </div>
+    </>
+  );
+
+  // 右侧状态区
+  const rightPanel = (
+    <Results />
+  );
+
+  return (
+    <AppLayout>
+      {{
+        leftPanel,
+        rightPanel
+      }}
     </AppLayout>
   );
 };
