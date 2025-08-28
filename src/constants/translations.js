@@ -45,7 +45,7 @@ export const TRANSLATIONS = {
     clear: '清空',
 
     // 状态显示
-    testing: '正在测试 API 密钥...',
+    testing: '测试中',
     detecting: '正在检测可用模型...',
     completed: '测试完成',
     total: '总计',
@@ -133,7 +133,13 @@ export const TRANSLATIONS = {
     error: '错误',
     warning: '警告',
     success: '成功',
-    info: '提示'
+    info: '提示',
+
+    // 主题控制
+    control: '控制台',
+    lightMode: '浅色',
+    darkMode: '深色',
+    systemMode: '跟随系统'
   },
   en: {
     // Page titles
@@ -271,6 +277,12 @@ export const TRANSLATIONS = {
     error: 'Error',
     warning: 'Warning',
     success: 'Success',
-    info: 'Info'
+    info: 'Info',
+
+    // Theme Control
+    control: 'Controls',
+    lightMode: 'Light',
+    darkMode: 'Dark',
+    systemMode: 'System'
   }
 };

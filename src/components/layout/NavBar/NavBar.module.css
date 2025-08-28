@@ -1,0 +1,319 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid #E5E7EB;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 1000;
+  backdrop-filter: blur(8px);
+}
+
+/* Brand Section - Left Side */
+.brandSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brandIcon {
+  position: relative;
+  line-height: 1;
+  color: currentColor;
+}
+
+.keyIcon {
+  transition: transform 0.3s ease;
+}
+
+.brandIcon:hover .keyIcon {
+  transform: rotate(-5deg) scale(1.05);
+}
+
+.brandText {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1F2937;
+  line-height: 1;
+}
+
+/* Action Group - Right Side */
+.actionGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* GitHub Action Button */
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.actionBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 1);
+}
+
+.githubLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Language Combobox Button */
+.comboboxBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(0, 0, 0, 0.7);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.comboboxBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: rgba(0, 0, 0, 1);
+}
+
+.chevron {
+  opacity: 0.5;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.comboboxBtn:hover .chevron {
+  opacity: 1;
+}
+
+/* Dual Icon Animation for Theme Button */
+.sunIcon,
+.moonIcon {
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.sunIcon.visible {
+  rotate: 0deg;
+  scale: 1;
+  opacity: 1;
+}
+
+.sunIcon.hidden {
+  rotate: -90deg;
+  scale: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+.moonIcon.visible {
+  rotate: 0deg;
+  scale: 1;
+  opacity: 1;
+}
+
+.moonIcon.hidden {
+  rotate: 90deg;
+  scale: 0;
+  opacity: 0;
+  position: absolute;
+}
+
+/* Dropdown Components */
+.dropdown {
+  position: relative;
+}
+
+/* Dropdown Menu */
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  z-index: 1001;
+  backdrop-filter: blur(16px);
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: none;
+  color: #1F2937;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: left;
+}
+
+.dropdownItem:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.dropdownItem.active {
+  color: #3B82F6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* Theme item layout (with icon) */
+.themeItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkIcon {
+  color: #10B981;
+  flex-shrink: 0;
+}
+
+/* Dark Theme Styles */
+:global(.dark-theme) .navbar {
+  background: rgba(31, 41, 55, 0.95);
+  border-bottom-color: #374151;
+}
+
+:global(.dark-theme) .brandText {
+  color: #F9FAFB;
+}
+
+:global(.dark-theme) .actionBtn {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+:global(.dark-theme) .actionBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 1);
+}
+
+:global(.dark-theme) .comboboxBtn {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+:global(.dark-theme) .comboboxBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 1);
+}
+
+:global(.dark-theme) .dropdownMenu {
+  background: rgba(31, 41, 55, 0.95);
+  border-color: #374151;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+:global(.dark-theme) .dropdownItem {
+  color: #F9FAFB;
+}
+
+:global(.dark-theme) .dropdownItem:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+:global(.dark-theme) .dropdownItem.active {
+  color: #60A5FA;
+  background: rgba(96, 165, 250, 0.1);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .navbar {
+    height: 56px;
+    padding: 0 16px;
+  }
+
+  .brandIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .brandText {
+    font-size: 16px;
+  }
+
+  .actionGroup {
+    gap: 4px;
+  }
+
+  .actionBtn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .comboboxBtn {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .dropdownMenu {
+    min-width: 140px;
+    right: -8px;
+  }
+
+  .dropdownItem {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0 12px;
+  }
+
+  .brandText {
+    display: none;
+  }
+
+  .actionGroup {
+    gap: 2px;
+  }
+
+  .actionBtn {
+    width: 24px;
+    height: 24px;
+  }
+
+  .comboboxBtn {
+    padding: 4px 6px;
+  }
+
+  .comboboxBtn span {
+    display: none;
+  }
+}

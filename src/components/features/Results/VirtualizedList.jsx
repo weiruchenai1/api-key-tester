@@ -143,26 +143,26 @@ const VirtualizedList = () => {
     };
 
     return (
-      <div className="key-list-container">
-        <EmptyState message={emptyMessages[state.activeTab]} />
+      <div className="empty-state">
+        <div className="empty-icon">📭</div>
+        <div className="empty-text">{emptyMessages[state.activeTab]}</div>
       </div>
     );
   }
 
   return (
-    <div className="key-list-container">
-      <List
-        ref={listRef}
-        height={listHeight}
-        itemCount={filteredKeys.length}
-        itemSize={getItemSize}
-        itemData={filteredKeys}
-        overscanCount={5}
-        width="100%"
-      >
-        {KeyItem}
-      </List>
-    </div>
+    <List
+      ref={listRef}
+      height={listHeight}
+      itemCount={filteredKeys.length}
+      itemSize={getItemSize}
+      itemData={filteredKeys}
+      overscanCount={5}
+      width="100%"
+      className="virtualized-list"
+    >
+      {KeyItem}
+    </List>
   );
 };
 

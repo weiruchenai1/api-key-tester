@@ -28,7 +28,11 @@ const StatsCards = () => {
       key: 'rateLimited',
       value: state.keyResults.filter(k => k.status === 'rate-limited').length,
       className: 'rate-limited'
-    },
+    }
+  ];
+
+  // 第二行状态（测试相关）
+  const testingStats = [
     {
       key: 'testing',
       value: state.keyResults.filter(k => ['testing', 'pending'].includes(k.status)).length,
@@ -53,20 +57,32 @@ const StatsCards = () => {
     );
   }
 
-  const stats = [...baseStats, ...paidStats];
-
   return (
-    <div className="stats">
-      {stats.map(stat => (
-        <div key={stat.key} className="stat-card">
-          <div className={`stat-number ${stat.className}`}>
-            {stat.value}
+    <div className="stats-container">
+      <div className="stats">
+        {[...baseStats, ...paidStats].map(stat => (
+          <div key={stat.key} className="stat-card">
+            <div className={`stat-number ${stat.className}`}>
+              {stat.value}
+            </div>
+            <div className="stat-label">
+              {t(stat.key)}
+            </div>
           </div>
-          <div className="stat-label">
-            {t(stat.key)}
+        ))}
+      </div>
+      <div className="stats">
+        {testingStats.map(stat => (
+          <div key={stat.key} className="stat-card">
+            <div className={`stat-number ${stat.className}`}>
+              {stat.value}
+            </div>
+            <div className="stat-label">
+              {t(stat.key)}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };

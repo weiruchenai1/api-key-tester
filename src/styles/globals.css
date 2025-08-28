@@ -5,6 +5,43 @@
   box-sizing: border-box;
 }
 
+/* CSS变量定义 */
+:root {
+  --text-color: #495057;
+  --border-color: #dee2e6;
+}
+
+.dark-theme {
+  --text-color: #FFFFFF;
+  --border-color: #374151;
+}
+
+/* 高级设置折叠样式 */
+details {
+  transition: all 0.3s ease;
+}
+
+details summary {
+  outline: none;
+  user-select: none;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details[open] summary span {
+  transform: rotate(180deg);
+}
+
+details summary:hover {
+  color: #667eea !important;
+}
+
+.dark-theme details summary:hover {
+  color: #60A5FA !important;
+}
+
 /* 全局样式 */
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -17,9 +54,9 @@ body {
 /* 通用样式类 */
 .input-section {
   background: #f8f9fa;
-  border-radius: 15px;
-  padding: 20px;
-  margin-bottom: 20px;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 10px;
   border: 2px solid #e9ecef;
   transition: all 0.3s ease;
 }
@@ -80,46 +117,46 @@ body {
 
 /* 深色主题 */
 .dark-theme .input-section {
-  background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
-  border-color: #3c4269;
+  background: #000000;
+  border-color: #374151;
 }
 
 .dark-theme .input-section:hover {
-  border-color: #4c63d2;
-  background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
-  box-shadow: 0 4px 20px rgba(76, 99, 210, 0.15);
+  border-color: #60A5FA;
+  background: #000000;
+  box-shadow: 0 4px 20px rgba(96, 165, 250, 0.15);
 }
 
 .dark-theme .form-control {
-  background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
-  color: #e8eaed;
-  border-color: #3c4269;
+  background: #000000;
+  color: #FFFFFF;
+  border-color: #374151;
 }
 
 .dark-theme .form-control:focus {
-  border-color: #4c63d2;
-  box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
+  border-color: #60A5FA;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
 }
 
 .dark-theme .form-control:hover {
-  border-color: #4c63d2;
-  background: linear-gradient(135deg, #252849 0%, #2a2d47 100%);
+  border-color: #60A5FA;
+  background: #000000;
 }
 
 .dark-theme .input-group label {
-  color: #e8eaed;
+  color: #FFFFFF;
 }
 
 .dark-theme .form-help {
-  color: #b0b3c1;
+  color: #FFFFFF;
 }
 
 /* 移动端优化 */
 @media (max-width: 768px) {
   .input-section {
-    padding: 16px;
-    margin-bottom: 16px;
-    border-radius: 12px;
+    padding: 8px;
+    margin-bottom: 6px;
+    border-radius: 10px;
   }
 }
 
@@ -198,27 +235,31 @@ select:focus-visible {
 }
 
 /* 统计卡片样式 */
+.stats-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
 .stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .stat-card {
   background: #f8f9fa;
-  padding: 16px 12px;
+  padding: 16px;
   border-radius: 12px;
   text-align: center;
   border: 2px solid #e9ecef;
-  transition: all 0.3s ease;
+  min-width: 100px;
+  flex: 1;
 }
 
 .stat-card:hover {
-  border-color: #667eea;
-  background: #f0f4ff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.15);
+  /* 完全移除hover特效 */
 }
 
 .stat-number {
@@ -269,30 +310,28 @@ select:focus-visible {
 
 /* 深色主题统计卡片 */
 .dark-theme .stat-card {
-  background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
-  border-color: #3c4269;
+  background: #000000;
+  border-color: #374151;
 }
 
 .dark-theme .stat-card:hover {
-  border-color: #4c63d2;
-  background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(76, 99, 210, 0.2);
+  /* 完全移除深色主题hover特效 */
 }
 
 .dark-theme .stat-label {
-  color: #b0b3c1;
+  color: #FFFFFF;
 }
 
 /* 移动端优化 */
 @media (max-width: 768px) {
   .stats {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 6px;
+    margin-bottom: 16px;
   }
 
   .stat-card {
-    padding: 12px 8px;
+    padding: 6px 4px;
+    min-width: 80px;
   }
 }
 
@@ -301,14 +340,10 @@ select:focus-visible {
   background: #f8f9fa;
   border: 2px solid #e9ecef;
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px;
   transition: all 0.3s ease;
-  max-height: 350px;
-  min-height: 120px;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .key-list-container:hover {
@@ -420,33 +455,27 @@ select:focus-visible {
 
 /* 深色主题密钥列表 */
 .dark-theme .key-list-container {
-  background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
-  border-color: #3c4269;
-}
-
-.dark-theme .key-list-container:hover {
-  border-color: #4c63d2;
-  background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
-  box-shadow: 0 2px 12px rgba(76, 99, 210, 0.15);
+  background: transparent;
+  border: none;
 }
 
 .dark-theme .key-item {
-  background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
-  border-color: #3c4269;
+  background: #000000;
+  border-color: #374151;
 }
 
 .dark-theme .key-item:hover {
-  background: linear-gradient(135deg, #2a2d47 0%, #1e1e2e 100%);
-  border-color: #4c63d2;
-  box-shadow: 0 2px 8px rgba(76, 99, 210, 0.15);
+  background: #000000;
+  border-color: #60A5FA;
+  box-shadow: 0 2px 8px rgba(96, 165, 250, 0.15);
 }
 
 .dark-theme .key-text {
-  color: #e8eaed;
+  color: #FFFFFF;
 }
 
 .dark-theme .key-model {
-  color: #b0b3c1;
+  color: #FFFFFF;
 }
 
 /* 空状态样式 */
@@ -475,7 +504,7 @@ select:focus-visible {
 }
 
 .dark-theme .empty-state {
-  color: #b0b3c1;
+  color: #FFFFFF;
 }
 
 .dark-theme .empty-icon {
@@ -686,75 +715,75 @@ select:focus-visible {
 
 /* 深色主题样式 */
 .dark-theme .model-toggle-btn {
-  background: #3c4269;
+  background: #374151;
 }
 
 .dark-theme .model-toggle-btn:hover {
-  background: #4a5079;
+  background: #4B5563;
 }
 
 .dark-theme .model-toggle-btn.active {
-  background: #4c63d2;
+  background: #60A5FA;
 }
 
 .dark-theme .detected-models {
-  background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
-  border-color: #3c4269;
+  background: #000000;
+  border-color: #374151;
 }
 
 .dark-theme .detected-models:hover {
-  border-color: #4c63d2;
-  background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
-  box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
+  border-color: #60A5FA;
+  background: #000000;
+  box-shadow: 0 2px 12px rgba(96, 165, 250, 0.2);
 }
 
 .dark-theme .detected-models-header {
-  border-bottom-color: #3c4269;
+  border-bottom-color: #374151;
 }
 
 .dark-theme .detected-models-header:hover {
-  background: rgba(76, 99, 210, 0.1);
+  background: rgba(96, 165, 250, 0.1);
 }
 
 .dark-theme .detected-models-header h4 {
-  color: #4c63d2;
+  color: #60A5FA;
 }
 
 .dark-theme .collapse-icon {
-  color: #4c63d2;
+  color: #60A5FA;
 }
 
 .dark-theme .model-tag {
-  background: #4c63d2;
+  background: #60A5FA;
 }
 
 .dark-theme .model-tag:hover {
-  background: #3c52d2;
+  background: #3B82F6;
 }
 
 .dark-theme .import-btn,
 .dark-theme .paste-btn {
-  background: #2a2d47;
-  border-color: #3c4269;
-  color: #e8eaed;
+  background: #000000;
+  border-color: #374151;
+  color: #FFFFFF;
 }
 
 .dark-theme .import-btn:hover,
 .dark-theme .paste-btn:hover {
-  background: #323556;
-  border-color: #4c63d2;
+  background: #000000;
+  border-color: #60A5FA;
 }
 
 .dark-theme .alert {
-  background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
-  border-color: #3c4269;
-  color: #e8eaed;
+  background: #000000;
+  border-color: #374151;
+  color: #FFFFFF;
 }
 
 .dark-theme .alert:hover {
-  border-color: #4c63d2;
-  background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
-  box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
+  border-color: #60A5FA;
+  background: #000000;
+  box-shadow: 0 2px 12px rgba(96, 165, 250, 0.2);
 }
 
 /* 移动端优化 */
@@ -771,8 +800,20 @@ select:focus-visible {
 }
 
 /* 结果区域样式 */
-.results-section {
-  margin-top: 20px;
+.results-main {
+  display: flex;
+  flex-direction: column;
+  height: 350px;
+}
+
+.results-content {
+  flex: 1;
+  overflow: hidden;
+  margin: 16px 0;
+}
+
+.progress-wrapper {
+  margin-top: 8px;
 }
 
 .results-controls {
@@ -789,7 +830,8 @@ select:focus-visible {
   border-bottom: 2px solid #e9ecef;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  flex: 1;
+  margin: -12px -12px 16px -12px;
+  padding: 0 12px;
 }
 
 .tab {
@@ -861,24 +903,24 @@ select:focus-visible {
 
 /* 深色主题结果样式 */
 .dark-theme .results-tabs {
-  border-bottom-color: #3c4269;
+  border-bottom-color: #374151;
 }
 
 .dark-theme .tab {
-  color: #b0b3c1;
+  color: #FFFFFF;
 }
 
 .dark-theme .tab.active {
-  color: #4c63d2;
-  border-bottom-color: #4c63d2;
+  color: #60A5FA;
+  border-bottom-color: #60A5FA;
 }
 
 .dark-theme .tab:hover {
-  color: #4c63d2;
+  color: #60A5FA;
 }
 
 .dark-theme .progress-text {
-  color: #b0b3c1;
+  color: #FFFFFF;
 }
 
 /* 移动端优化 */
@@ -1004,11 +1046,11 @@ select:focus-visible {
 
 /* 深色主题按钮 */
 .dark-theme .btn-secondary {
-  background: linear-gradient(135deg, #3c4269 0%, #2a2d47 100%);
+  background: #374151;
 }
 
 .dark-theme .btn-secondary:hover:not(:disabled) {
-  background: linear-gradient(135deg, #4a5079 0%, #3c4269 100%);
+  background: #4B5563;
 }
 
 /* 加载状态 */
@@ -1047,24 +1089,24 @@ select:focus-visible {
 
 /* 修复深色主题下拉框样式 */
 .dark-theme select.form-control {
-  background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%) !important;
-  color: #e8eaed !important;
-  border-color: #3c4269 !important;
+  background: #000000 !important;
+  color: #FFFFFF !important;
+  border-color: #374151 !important;
 }
 
 .dark-theme select.form-control option {
-  background: #232741 !important;
-  color: #e8eaed !important;
+  background: #000000 !important;
+  color: #FFFFFF !important;
 }
 
 .dark-theme select.form-control:focus {
-  border-color: #4c63d2 !important;
-  box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1) !important;
+  border-color: #60A5FA !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
 }
 
 .dark-theme select.form-control:hover {
-  border-color: #4c63d2 !important;
-  background: linear-gradient(135deg, #252849 0%, #2a2d47 100%) !important;
+  border-color: #60A5FA !important;
+  background: #000000 !important;
 }
 
 /* 修复虚拟化列表样式 */
