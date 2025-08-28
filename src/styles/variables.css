@@ -1,47 +1,47 @@
 :root {
   /* 颜色变量 - 浅色主题 */
-  --color-primary: #667eea;
-  --color-primary-hover: #5a67d8;
-  --color-secondary: #6c757d;
-  --color-secondary-hover: #5a6268;
-  --color-success: #28a745;
-  --color-success-hover: #218838;
-  --color-warning: #ffc107;
-  --color-warning-hover: #e0a800;
-  --color-danger: #dc3545;
-  --color-danger-hover: #c82333;
-  --color-info: #17a2b8;
-  --color-info-hover: #138496;
+  --color-primary: #3B82F6;
+  --color-primary-hover: #2563EB;
+  --color-secondary: #6C757D;
+  --color-secondary-hover: #5A6268;
+  --color-success: #10B981;
+  --color-success-hover: #059669;
+  --color-warning: #F59E0B;
+  --color-warning-hover: #D97706;
+  --color-danger: #EF4444;
+  --color-danger-hover: #DC2626;
+  --color-info: #06B6D4;
+  --color-info-hover: #0891B2;
 
-  /* 背景颜色 */
+  /* 背景颜色 - 浅色主题 */
   --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --bg-container: #ffffff;
-  --bg-section: #f8f9fa;
-  --bg-card: #ffffff;
-  --bg-input: #ffffff;
+  --bg-container: #FFFFFF;
+  --bg-section: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
 
-  /* 文字颜色 */
-  --text-primary: #495057;
-  --text-secondary: #6c757d;
-  --text-muted: #6c757d;
-  --text-on-primary: #ffffff;
+  /* 文字颜色 - 浅色主题 */
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  --text-on-primary: #FFFFFF;
 
-  /* 边框颜色 */
-  --border-primary: #dee2e6;
-  --border-secondary: #e9ecef;
-  --border-focus: #667eea;
+  /* 边框颜色 - 浅色主题 */
+  --border-primary: #E5E7EB;
+  --border-secondary: #F3F4F6;
+  --border-focus: #3B82F6;
 
   /* 状态颜色 */
-  --status-valid: #28a745;
-  --status-invalid: #dc3545;
-  --status-rate-limit: #ffc107;
-  --status-testing: #6f42c1;
-  --status-retrying: #fd7e14;
+  --status-valid: #10B981;
+  --status-invalid: #EF4444;
+  --status-rate-limit: #F59E0B;
+  --status-testing: #6366F1;
+  --status-retrying: #F97316;
 
   /* 阴影 */
-  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.1);
+  --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-heavy: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
   /* 字体大小 */
   --font-size-xs: clamp(10px, 1.8vw, 12px);
@@ -72,8 +72,8 @@
 
   /* 过渡动画 */
   --transition-fast: 0.15s ease;
-  --transition-normal: 0.3s ease;
-  --transition-slow: 0.5s ease;
+  --transition-normal: 0.2s ease;
+  --transition-slow: 0.3s ease;
 
   /* Z-index */
   --z-dropdown: 1000;
@@ -90,35 +90,35 @@
 /* 深色主题变量 */
 .dark-theme {
   /* 颜色变量 - 深色主题 */
-  --color-primary: #4c63d2;
-  --color-primary-hover: #3c52d2;
-  --color-secondary: #3c4269;
-  --color-secondary-hover: #4a5079;
-  --color-warning: #d68910;
-  --color-warning-hover: #b7791f;
+  --color-primary: #60A5FA;
+  --color-primary-hover: #3B82F6;
+  --color-secondary: #4B5563;
+  --color-secondary-hover: #6B7280;
+  --color-warning: #F59E0B;
+  --color-warning-hover: #D97706;
 
-  /* 背景颜色 */
+  /* 背景颜色 - 深色主题 */
   --bg-body: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  --bg-container: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
-  --bg-section: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
-  --bg-card: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
-  --bg-input: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
+  --bg-container: #000000;
+  --bg-section: #000000;
+  --bg-card: #000000;
+  --bg-input: #000000;
 
-  /* 文字颜色 */
-  --text-primary: #e8eaed;
-  --text-secondary: #b0b3c1;
-  --text-muted: #b0b3c1;
+  /* 文字颜色 - 深色主题 */
+  --text-primary: #FFFFFF;
+  --text-secondary: #FFFFFF;
+  --text-muted: #FFFFFF;
 
-  /* 边框颜色 */
-  --border-primary: #3c4269;
-  --border-secondary: #3c4269;
-  --border-focus: #4c63d2;
+  /* 边框颜色 - 深色主题 */
+  --border-primary: #374151;
+  --border-secondary: #4B5563;
+  --border-focus: #60A5FA;
 
-  /* 状态颜色 */
-  --status-rate-limit: #d68910;
+  /* 状态颜色 - 深色主题调整 */
+  --status-rate-limit: #F59E0B;
 
-  /* 阴影 */
-  --shadow-light: 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.2);
-  --shadow-heavy: 0 20px 60px rgba(0, 0, 0, 0.3);
+  /* 阴影 - 深色主题 */
+  --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-heavy: 0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
 }

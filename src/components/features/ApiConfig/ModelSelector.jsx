@@ -1,18 +1,47 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
+import { useApiTester } from '../../../hooks/useApiTester';
 import { MODEL_OPTIONS } from '../../../constants/api';
+import PaidDetectionPrompt from '../PaidDetectionPrompt';
 const ModelSelector = () => {
   const { t } = useLanguage();
   const { state, dispatch } = useAppState();
+  const { detectModels, isDetecting } = useApiTester();
   const [isCustomModel, setIsCustomModel] = useState(false);
   const [isDetectedModelsExpanded, setIsDetectedModelsExpanded] = useState(false);
+  const [showPaidDetectionPrompt, setShowPaidDetectionPrompt] = useState(false);
   const currentModels = useMemo(() => MODEL_OPTIONS[state.apiType] || [], [state.apiType]);
   useEffect(() => {
     if (currentModels.length > 0 && !isCustomModel) {
       dispatch({ type: 'SET_MODEL', payload: currentModels[0] });
     }
   }, [currentModels, isCustomModel, dispatch]);
+
+  // 检查是否需要显示付费检测弹窗
+  const checkPaidDetectionPrompt = (selectedModel) => {
+    // 只对Gemini模型显示弹窗
+    if (state.apiType !== 'gemini') return false;
+    
+    // 检查是否已经禁用了提示
+    const promptDisabled = localStorage.getItem('geminiPaidDetectionPromptDisabled') === 'true';
+    if (promptDisabled) {
+      // 如果禁用了提示，使用默认设置
+      const defaultSetting = localStorage.getItem('geminiPaidDetectionDefault') === 'true';
+      dispatch({ type: 'SET_PAID_DETECTION', payload: defaultSetting });
+      return false;
+    }
+    
+    return true;
+  };
+
+  // 处理模型选择
+  const handleModelSelect = (selectedModel) => {
+    if (checkPaidDetectionPrompt(selectedModel)) {
+      setShowPaidDetectionPrompt(true);
+    }
+    dispatch({ type: 'SET_MODEL', payload: selectedModel });
+  };
 
   useEffect(() => {
     // 当检测到模型时自动展开
@@ -51,6 +80,21 @@ const ModelSelector = () => {
     setIsDetectedModelsExpanded(!isDetectedModelsExpanded);
   };
 
+  const handleDetectModels = async () => {
+    if (!state.apiKeysText.trim()) {
+      alert(t('enterApiKeysFirst') || '请先输入API密钥！');
+      return;
+    }
+
+    const apiKeys = state.apiKeysText.split('\n').filter(key => key.trim());
+    if (apiKeys.length === 0) {
+      alert(t('enterValidKeys') || '请输入有效的API密钥！');
+      return;
+    }
+
+    await detectModels(apiKeys[0].trim());
+  };
+
   return (
     <div className="input-group">
       <label>{t('selectModel')}</label>
@@ -58,7 +102,7 @@ const ModelSelector = () => {
         {!isCustomModel ? (
           <select
             value={state.enablePaidDetection ? 'gemini-2.5-flash' : state.model}
-            onChange={(e) => dispatch({ type: 'SET_MODEL', payload: e.target.value })}
+            onChange={(e) => handleModelSelect(e.target.value)}
             disabled={state.isTesting || state.enablePaidDetection}
             className="form-control"
           >
@@ -90,25 +134,26 @@ const ModelSelector = () => {
         >
           {isCustomModel ? t('presetModel') : t('customModel')}
         </button>
-        {state.apiType === 'gemini' && (
-          <button
-            type="button"
-            className={`model-toggle-btn paid-detection-btn ${state.enablePaidDetection ? 'active' : ''}`}
-            onClick={() => dispatch({ type: 'SET_PAID_DETECTION', payload: !state.enablePaidDetection })}
-            disabled={state.isTesting}
-            title={t('paidDetectionHelp')}
-          >
-            {t('enablePaidKeyDetection')}
-          </button>
-        )}
+        <button
+          type="button"
+          className="model-toggle-btn detect-models-btn"
+          onClick={handleDetectModels}
+          disabled={state.isTesting || isDetecting}
+        >
+          {isDetecting ? (
+            <>🔄 {t('detecting')}</>
+          ) : (
+            <>🔍 {t('detectModels')}</>
+          )}
+        </button>
       </div>
       <small className="form-help">{t('modelHelp')}</small>
 
-      {/* 付费检测警告信息 */}
-      {state.apiType === 'gemini' && state.enablePaidDetection && (
-        <div className="paid-detection-warning">
-          <small className="form-warning">
-            {t('paidDetectionWarning')}
+      {/* 付费检测状态信息 */}
+      {state.apiType === 'gemini' && (
+        <div className="paid-detection-status">
+          <small className={`form-info ${state.enablePaidDetection ? 'enabled' : 'disabled'}`}>
+            {state.enablePaidDetection ? '✅ 已开启付费检测' : '❌ 未开启付费检测'}
           </small>
         </div>
       )}
@@ -143,6 +188,15 @@ const ModelSelector = () => {
           )}
         </div>
       )}
+
+      {/* Gemini付费检测弹窗 */}
+      <PaidDetectionPrompt
+        isOpen={showPaidDetectionPrompt}
+        onClose={() => setShowPaidDetectionPrompt(false)}
+        onConfirm={(enablePaidDetection) => {
+          dispatch({ type: 'SET_PAID_DETECTION', payload: enablePaidDetection });
+        }}
+      />
     </div>
   );
 };

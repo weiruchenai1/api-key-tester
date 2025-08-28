@@ -3,31 +3,63 @@ import React, { createContext, useState, useEffect } from 'react';
 export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState('system'); // Default to system
+  const [actualTheme, setActualTheme] = useState('light'); // The actual applied theme
+
+  // Function to get system theme preference
+  const getSystemTheme = () => {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  };
+
+  // Function to resolve the actual theme based on user preference
+  const resolveActualTheme = (userTheme) => {
+    if (userTheme === 'system') {
+      return getSystemTheme();
+    }
+    return userTheme;
+  };
 
   useEffect(() => {
-    // 从本地存储加载主题设置
+    // Load theme setting from local storage
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
+    if (savedTheme && ['light', 'dark', 'system'].includes(savedTheme)) {
       setTheme(savedTheme);
     } else {
-      // 检测系统主题偏好
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(prefersDark ? 'dark' : 'light');
+      // Default to system theme
+      setTheme('system');
     }
   }, []);
 
   useEffect(() => {
-    // 应用主题到body类名
-    if (theme === 'dark') {
+    // Update actual theme when user theme changes or system preference changes
+    const newActualTheme = resolveActualTheme(theme);
+    setActualTheme(newActualTheme);
+  }, [theme]);
+
+  useEffect(() => {
+    // Listen for system theme changes only when theme is set to 'system'
+    if (theme === 'system') {
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => {
+        setActualTheme(getSystemTheme());
+      };
+
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
+    }
+  }, [theme]);
+
+  useEffect(() => {
+    // Apply theme to body class
+    if (actualTheme === 'dark') {
       document.body.classList.add('dark-theme');
     } else {
       document.body.classList.remove('dark-theme');
     }
 
-    // 保存到本地存储
+    // Save to local storage
     localStorage.setItem('theme', theme);
-  }, [theme]);
+  }, [actualTheme, theme]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
@@ -35,8 +67,10 @@ export const ThemeProvider = ({ children }) => {
 
   const value = {
     theme,
+    setTheme,
     toggleTheme,
-    isDark: theme === 'dark'
+    actualTheme,
+    isDark: actualTheme === 'dark'
   };
 
   return (

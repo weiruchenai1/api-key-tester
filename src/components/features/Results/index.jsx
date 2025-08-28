@@ -10,25 +10,37 @@ import { useAppState } from '../../../contexts/AppStateContext';
 const Results = () => {
   const { state } = useAppState();
 
-  if (!state.showResults && !state.isTesting) {
-    return null;
-  }
-
   return (
-    <div className="results-section">
-      <ProgressBar />
+    <>
+      {(state.showResults || state.isTesting || state.keyResults.length > 0) ? (
+        <>
+          <StatsCards />
+          
+          <div className="input-section results-main">
+            <ResultTabs />
+            <div className="results-content">
+              <VirtualizedList />
+            </div>
+            <CopyButtons />
+          </div>
+          
+          {state.isTesting && (
+            <div className="progress-wrapper">
+              <ProgressBar />
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="input-section">
+          <div className="empty-state">
+            <div className="empty-icon">🔍</div>
+            <div className="empty-text">检测结果将显示在这里</div>
+          </div>
+        </div>
+      )}
 
       <Loading isVisible={state.isTesting && state.keyResults.length === 0} />
-
-      <StatsCards />
-
-      <ResultTabs />
-
-      <div className="tab-content active">
-        <VirtualizedList />
-        <CopyButtons />
-      </div>
-    </div>
+    </>
   );
 };
 

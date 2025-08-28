@@ -7,7 +7,7 @@ import { deduplicateAndCleanKeys } from '../../../utils/keyProcessor';
 const ActionButtons = () => {
   const { t } = useLanguage();
   const { state, dispatch } = useAppState();
-  const { startTesting, cancelTesting, detectModels, isDetecting } = useApiTester();
+  const { startTesting, cancelTesting } = useApiTester();
 
   const handleStartTest = async () => {
     if (state.isTesting) {
@@ -42,21 +42,6 @@ const ActionButtons = () => {
     }
 
     await startTesting(uniqueKeys);
-  };
-
-  const handleDetectModels = async () => {
-    if (!state.apiKeysText.trim()) {
-      alert(t('enterApiKeysFirst') || '请先输入API密钥！');
-      return;
-    }
-
-    const apiKeys = state.apiKeysText.split('\n').filter(key => key.trim());
-    if (apiKeys.length === 0) {
-      alert(t('enterValidKeys') || '请输入有效的API密钥！');
-      return;
-    }
-
-    await detectModels(apiKeys[0].trim());
   };
 
   const handleDedupeKeys = () => {
@@ -97,21 +82,8 @@ const ActionButtons = () => {
   return (
     <div className="button-group">
       <button
-        className="btn btn-success"
-        onClick={handleDetectModels}
-        disabled={state.isTesting || isDetecting}
-      >
-        {isDetecting ? (
-          <>🔄 {t('detecting')}</>
-        ) : (
-          <>🔍 {t('detectModels')}</>
-        )}
-      </button>
-
-      <button
         className="btn btn-primary"
         onClick={handleStartTest}
-        disabled={isDetecting}
       >
         {state.isTesting ? (
           <>❌ {t('cancelTest')}</>
