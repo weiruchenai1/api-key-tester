@@ -37,20 +37,21 @@ const NavBar = () => {
 
   return (
     <nav className={styles.navbar}>
-      {/* Left side - Project Identity */}
-      <div className={styles.brandSection}>
-        <div className={styles.brandIcon}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.keyIcon}>
-            <circle cx="7.5" cy="15.5" r="5.5"/>
-            <path d="m21 2-9.6 9.6"/>
-            <path d="m15.5 7.5 3 3L22 7l-3-3"/>
-          </svg>
+      <div className={styles.navbarContent}>
+        {/* Left side - Project Identity */}
+        <div className={styles.brandSection}>
+          <div className={styles.brandIcon}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.keyIcon}>
+              <circle cx="7.5" cy="15.5" r="5.5"/>
+              <path d="m21 2-9.6 9.6"/>
+              <path d="m15.5 7.5 3 3L22 7l-3-3"/>
+            </svg>
+          </div>
+          <span className={styles.brandText}>API Key Tester</span>
         </div>
-        <span className={styles.brandText}>API Key Tester</span>
-      </div>
 
-      {/* Right side - Action Group */}
-      <div className={styles.actionGroup}>
+        {/* Right side - Action Group */}
+        <div className={styles.actionGroup}>
         {/* GitHub Link */}
         <button className={styles.actionBtn}>
           <a 
@@ -227,6 +228,7 @@ const NavBar = () => {
               </button>
             </div>
           )}
+        </div>
         </div>
       </div>
     </nav>
