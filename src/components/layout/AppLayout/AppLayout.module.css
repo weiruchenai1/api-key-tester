@@ -1,16 +1,15 @@
 .appLayout {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: #f5f5f5;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-body);
   min-height: 100vh;
   line-height: 1.5;
-  position: relative;
 }
 
 .container {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 16px 24px;
-  background: #F9FAFB;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-container);
 }
 
 .mainContent {
@@ -22,82 +21,89 @@
 .twoColumnLayout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 32px;
+  gap: var(--spacing-lg);
   min-height: calc(100vh - 120px);
-  background: transparent;
 }
 
-/* 左侧功能区 */
-.leftColumn {
+.leftColumn,
+.rightColumn {
   min-width: 0;
-  background: transparent;
 }
 
 .functionArea {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  background: transparent;
-}
-
-/* 右侧状态区 */
-.rightColumn {
-  min-width: 0;
-  background: transparent;
+  gap: var(--spacing-md);
 }
 
 .statusArea {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--spacing-sm);
   min-width: 0;
 }
 
-/* 深色主题 */
-:global(.dark-theme) .appLayout {
-  background: #2d2d2d;
+/* 功能卡片样式 */
+:global(.function-card) {
+  background: var(--bg-card);
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius);
+  border: 1px solid var(--border-color);
 }
 
-:global(.dark-theme) .container {
-  background: #3a3a3a;
+/* 使用说明卡片 */
+:global(.usage-card) {
+  background: #e3f2fd;
+  border-color: #bbdefb;
+  color: #1976d2;
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+}
+
+.dark-theme :global(.usage-card) {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--color-primary);
+}
+
+/* 设置卡片 */
+:global(.settings-card) {
+  padding: 0;
+  overflow: hidden;
+}
+
+:global(.settings-button) {
+  width: 100%;
+  padding: var(--spacing-lg);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+:global(.settings-icon) {
+  font-size: 16px;
 }
 
 /* 响应式设计 */
-@media (max-width: 1200px) {
-  .twoColumnLayout {
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
-  }
-}
-
 @media (max-width: 992px) {
   .twoColumnLayout {
     grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .statusArea {
-    position: static;
-    height: auto;
-    gap: 8px;
+    gap: var(--spacing-md);
   }
 }
 
 @media (max-width: 768px) {
-  .appLayout {
-    padding-top: 56px;
-  }
-
   .container {
-    margin: 0 16px;
-    padding: 12px 0;
+    padding: var(--spacing-md);
   }
   
   .functionArea {
-    gap: 6px;
-  }
-  
-  .statusArea {
-    gap: 8px;
+    gap: var(--spacing-sm);
   }
 }

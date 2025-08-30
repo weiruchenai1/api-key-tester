@@ -1,13 +1,11 @@
 .navbar {
-  position: relative;
   height: 60px;
-  background: rgba(255, 255, 255, 0.95);
-  border-bottom: 1px solid #E5E7EB;
+  background: var(--bg-container);
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(8px);
 }
 
 .navbarContent {
@@ -16,45 +14,30 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 var(--spacing-lg);
 }
 
-/* Brand Section - Left Side */
+/* Brand Section */
 .brandSection {
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.brandIcon {
-  position: relative;
-  line-height: 1;
-  color: currentColor;
-}
-
-.keyIcon {
-  transition: transform 0.3s ease;
-}
-
-.brandIcon:hover .keyIcon {
-  transform: rotate(-5deg) scale(1.05);
+  gap: var(--spacing-sm);
 }
 
 .brandText {
   font-size: 18px;
   font-weight: 600;
-  color: #1F2937;
+  color: var(--text-primary);
   line-height: 1;
 }
 
-/* Action Group - Right Side */
+/* Action Group */
 .actionGroup {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
-/* GitHub Action Button */
 .actionBtn {
   display: inline-flex;
   align-items: center;
@@ -65,13 +48,7 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  transition: all 0.2s ease;
-  color: rgba(0, 0, 0, 0.7);
-}
-
-.actionBtn:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: rgba(0, 0, 0, 1);
+  color: var(--text-secondary);
 }
 
 .githubLink {
@@ -84,90 +61,57 @@
   text-decoration: none;
 }
 
-/* Language Combobox Button */
+/* Language Combobox */
 .comboboxBtn {
-  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
   border: none;
   border-radius: 6px;
   background: transparent;
-  color: rgba(0, 0, 0, 0.7);
-  font-size: 14px;
+  color: var(--text-secondary);
+  font-size: var(--font-size-base);
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.comboboxBtn:hover {
-  background: rgba(0, 0, 0, 0.05);
-  color: rgba(0, 0, 0, 1);
 }
 
 .chevron {
   opacity: 0.5;
-  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.comboboxBtn:hover .chevron {
-  opacity: 1;
-}
-
-/* Dual Icon Animation for Theme Button */
+/* Theme Icons */
 .sunIcon,
 .moonIcon {
   transition: all 0.3s ease;
-  transform-origin: center;
 }
 
-.sunIcon.visible {
-  rotate: 0deg;
-  scale: 1;
-  opacity: 1;
-}
-
-.sunIcon.hidden {
-  rotate: -90deg;
-  scale: 0;
-  opacity: 0;
-  position: absolute;
-}
-
+.sunIcon.visible,
 .moonIcon.visible {
-  rotate: 0deg;
-  scale: 1;
   opacity: 1;
 }
 
+.sunIcon.hidden,
 .moonIcon.hidden {
-  rotate: 90deg;
-  scale: 0;
   opacity: 0;
   position: absolute;
 }
 
-/* Dropdown Components */
+/* Dropdown */
 .dropdown {
   position: relative;
 }
 
-/* Dropdown Menu */
 .dropdownMenu {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
   min-width: 160px;
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  background: var(--bg-container);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
   overflow: hidden;
   z-index: 1001;
-  backdrop-filter: blur(16px);
 }
 
 .dropdownItem {
@@ -178,100 +122,37 @@
   padding: 10px 12px;
   border: none;
   background: none;
-  color: #1F2937;
-  font-size: 14px;
-  font-weight: 500;
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
   cursor: pointer;
-  transition: background-color 0.2s ease;
   text-align: left;
 }
 
-.dropdownItem:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
 .dropdownItem.active {
-  color: #3B82F6;
+  color: var(--color-primary);
   background: rgba(59, 130, 246, 0.1);
 }
 
-/* Theme item layout (with icon) */
 .themeItem {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--spacing-sm);
 }
 
 .checkIcon {
-  color: #10B981;
+  color: var(--color-success);
   flex-shrink: 0;
 }
 
-/* Dark Theme Styles */
-:global(.dark-theme) .navbar {
-  background: rgba(31, 41, 55, 0.95);
-  border-bottom-color: #374151;
-}
-
-:global(.dark-theme) .brandText {
-  color: #F9FAFB;
-}
-
-:global(.dark-theme) .actionBtn {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-:global(.dark-theme) .actionBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 1);
-}
-
-:global(.dark-theme) .comboboxBtn {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-:global(.dark-theme) .comboboxBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 1);
-}
-
-:global(.dark-theme) .dropdownMenu {
-  background: rgba(31, 41, 55, 0.95);
-  border-color: #374151;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
-}
-
-:global(.dark-theme) .dropdownItem {
-  color: #F9FAFB;
-}
-
-:global(.dark-theme) .dropdownItem:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-:global(.dark-theme) .dropdownItem.active {
-  color: #60A5FA;
-  background: rgba(96, 165, 250, 0.1);
-}
-
-/* Mobile Responsive */
+/* 响应式 */
 @media (max-width: 768px) {
   .navbar {
     height: 56px;
-    padding: 0 16px;
-  }
-
-  .brandIcon {
-    width: 20px;
-    height: 20px;
+    padding: 0 var(--spacing-md);
   }
 
   .brandText {
     font-size: 16px;
-  }
-
-  .actionGroup {
-    gap: 4px;
   }
 
   .actionBtn {
@@ -280,42 +161,19 @@
   }
 
   .comboboxBtn {
-    padding: 6px 8px;
-    font-size: 13px;
-  }
-
-  .dropdownMenu {
-    min-width: 140px;
-    right: -8px;
-  }
-
-  .dropdownItem {
-    padding: 8px 10px;
+    padding: 6px var(--spacing-sm);
     font-size: 13px;
   }
 }
 
-/* Extra small screens */
 @media (max-width: 480px) {
-  .navbar {
-    padding: 0 12px;
-  }
-
   .brandText {
     display: none;
-  }
-
-  .actionGroup {
-    gap: 2px;
   }
 
   .actionBtn {
     width: 24px;
     height: 24px;
-  }
-
-  .comboboxBtn {
-    padding: 4px 6px;
   }
 
   .comboboxBtn span {

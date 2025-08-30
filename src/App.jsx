@@ -16,47 +16,34 @@ const AppContent = () => {
 
   // 左侧功能区
   const leftPanel = (
-    <div className="input-section">
-      <ApiConfig />
+    <div>
+      <div className="function-card">
+        <ApiConfig />
+      </div>
       
-      <div style={{marginTop: '20px'}}>
+      <div className="function-card">
         <KeyInput />
       </div>
 
-      <div style={{marginTop: '20px'}}>
+      <div className="function-card">
         <Controls />
       </div>
 
-      <div className="alert" style={{marginTop: '20px'}}>
+      <div className="function-card usage-card">
         <strong>{t('usageTitle')}</strong>
         <br />{t('usage1')}
         <br />{t('usage2')}
       </div>
 
-      <button 
-        style={{
-          marginTop: '20px',
-          padding: '12px 0', 
-          fontSize: '18px', 
-          fontWeight: '600',
-          color: 'var(--text-color)',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          width: '100%',
-          borderRadius: '8px',
-          transition: 'background-color 0.2s ease'
-        }}
-        onMouseEnter={(e) => e.target.style.backgroundColor = 'var(--bg-secondary)'}
-        onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
-        onClick={() => setIsAdvancedSettingsOpen(true)}
-      >
-        高级设置
-        <span style={{fontSize: '12px'}}>⚙️</span>
-      </button>
+      <div className="function-card settings-card">
+        <button 
+          className="settings-button"
+          onClick={() => setIsAdvancedSettingsOpen(true)}
+        >
+          高级设置
+          <span className="settings-icon">⚙️</span>
+        </button>
+      </div>
     </div>
   );
 
