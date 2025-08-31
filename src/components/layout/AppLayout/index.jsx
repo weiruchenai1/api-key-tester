@@ -4,7 +4,7 @@ import Sidebar from '../Sidebar';
 import styles from './AppLayout.module.css';
 
 const AppLayout = ({ children }) => {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true); // 默认折叠
 
   // 监听屏幕尺寸变化
   useEffect(() => {
@@ -12,10 +12,8 @@ const AppLayout = ({ children }) => {
       if (window.innerWidth <= 768) {
         // 移动端默认折叠
         setIsSidebarCollapsed(true);
-      } else {
-        // 桌面端默认展开
-        setIsSidebarCollapsed(false);
       }
+      // PC端保持用户选择的状态，不自动更改
     };
 
     handleResize();
@@ -30,7 +28,7 @@ const AppLayout = ({ children }) => {
         isSidebarCollapsed={isSidebarCollapsed}
       />
       <Sidebar isCollapsed={isSidebarCollapsed} />
-      <div className={`${styles.mainWrapper} ${isSidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
+      <div className={`${styles.mainWrapper} ${!isSidebarCollapsed ? styles.sidebarExpanded : ''}`}>
         <div className={styles.container}>
           <div className={styles.mainContent}>
             <div className={styles.twoColumnLayout}>

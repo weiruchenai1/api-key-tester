@@ -23,7 +23,7 @@ const getInitialState = () => {
       // 测试状态
       isTesting: false,
       keyResults: [],
-      progress: 0,
+      // progress: 0,  // 删除这行
 
       // UI状态
       showResults: false,
@@ -45,7 +45,7 @@ const getInitialState = () => {
       enablePaidDetection: false,
       isTesting: false,
       keyResults: [],
-      progress: 0,
+      // progress: 0,  // 删除这行
       showResults: false,
       activeTab: 'all',
       detectedModels: new Set(),
@@ -116,7 +116,7 @@ const appReducer = (state, action) => {
           model: state.model,
           isPaid: null // For Gemini paid detection
         })),
-        progress: 0,
+        // progress: 0,  // 删除这行
         activeTab: 'all'
       };
 

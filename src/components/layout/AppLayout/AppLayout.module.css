@@ -8,7 +8,8 @@
 
 .mainWrapper {
   flex: 1;
-  margin-left: 200px;
+  margin-left: 60px;
+  /* 默认为折叠状态的边距 */
   margin-top: 60px;
   transition: margin-left 0.3s ease;
   display: flex;
@@ -16,8 +17,9 @@
   min-height: calc(100vh - 60px);
 }
 
-.mainWrapper.sidebarCollapsed {
-  margin-left: 0;
+.mainWrapper.sidebarExpanded {
+  margin-left: 160px;
+  /* 展开状态的边距 */
 }
 
 .container {
@@ -45,6 +47,8 @@
   gap: var(--spacing-lg);
   flex: 1;
   min-height: 0;
+  align-items: start;
+  /* 让两栏顶部对齐 */
 }
 
 .leftColumn,
@@ -52,6 +56,8 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  height: fit-content;
+  /* 让高度适应内容 */
 }
 
 .functionArea {
@@ -65,7 +71,6 @@
   flex-direction: column;
   gap: var(--spacing-sm);
   min-width: 0;
-  flex: 1;
 }
 
 /* 响应式设计 */
@@ -83,7 +88,7 @@
     margin-top: 60px;
   }
 
-  .mainWrapper.sidebarCollapsed {
+  .mainWrapper.sidebarExpanded {
     margin-left: 0;
   }
 

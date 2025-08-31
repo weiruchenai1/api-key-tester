@@ -1,5 +1,6 @@
 .sidebar {
-  width: 200px;
+  width: 160px;
+  /* 从200px调整到160px */
   height: calc(100vh - 60px);
   background: var(--bg-card);
   border-right: 1px solid var(--border-color);
@@ -13,29 +14,46 @@
   overflow: hidden;
 }
 
-.collapsed {
-  transform: translateX(-200px);
-  /* 完全隐藏 */
+/* 折叠状态 - 显示为窄条 */
+.sidebar.collapsed {
+  width: 60px;
 }
 
 .providersSection {
-  padding: 20px 15px 15px;
+  padding: 20px 12px 15px;
+  /* 调整左右内边距 */
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
+/* 折叠时调整内边距 */
+.sidebar.collapsed .providersSection {
+  padding: 20px 8px 15px;
+  align-items: center;
+}
+
 .apiProvider {
   display: flex;
   align-items: center;
-  padding: 12px 15px;
+  padding: 12px;
+  /* 调整内边距 */
   border-radius: var(--border-radius);
   cursor: pointer;
   transition: all 0.2s ease;
-  gap: 12px;
+  gap: 10px;
+  /* 稍微减少间距 */
   min-height: 48px;
   justify-content: flex-start;
+  position: relative;
+}
+
+/* 折叠时的API提供商样式 */
+.sidebar.collapsed .apiProvider {
+  padding: 12px;
+  justify-content: center;
+  gap: 0;
 }
 
 .apiProvider:hover {
@@ -64,28 +82,76 @@
 
 .providerName {
   font-weight: 500;
-  font-size: 14px;
+  font-size: 13px;
+  /* 稍微减小字体 */
   white-space: nowrap;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* 折叠时隐藏提供商名称 */
+.sidebar.collapsed .providerName {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* Tooltip for collapsed state */
+.sidebar.collapsed .apiProvider {
+  position: relative;
+}
+
+.sidebar.collapsed .apiProvider:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-container);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  z-index: 1000;
+  margin-left: 8px;
+  font-size: 14px;
+  border: 1px solid var(--border-color);
 }
 
 .separator {
   height: 1px;
   background: var(--border-color);
-  margin: 0 15px;
+  margin: 0 12px;
+  /* 调整边距 */
+  transition: all 0.3s ease;
+}
+
+/* 折叠时调整分隔线 */
+.sidebar.collapsed .separator {
+  margin: 0 8px;
 }
 
 .addProvider {
-  padding: 15px;
+  padding: 15px 12px;
+  /* 调整内边距 */
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  /* 调整间距 */
   cursor: pointer;
   transition: all 0.2s ease;
   border-top: 1px solid var(--border-color);
   margin-top: auto;
   justify-content: flex-start;
   min-height: 48px;
+}
+
+/* 折叠时的添加提供商样式 */
+.sidebar.collapsed .addProvider {
+  padding: 15px 12px;
+  justify-content: center;
+  gap: 0;
 }
 
 .addProvider:hover {
@@ -107,16 +173,45 @@
 }
 
 .addText {
-  font-size: 14px;
+  font-size: 13px;
+  /* 稍微减小字体 */
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* 折叠时隐藏添加文本 */
+.sidebar.collapsed .addText {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* 折叠时的tooltip */
+.sidebar.collapsed .addProvider:hover::after {
+  content: "添加服务商";
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--bg-container);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  z-index: 1000;
+  margin-left: 8px;
+  font-size: 14px;
+  border: 1px solid var(--border-color);
 }
 
 /* 移动端和桌面端统一处理 */
 @media (max-width: 768px) {
   .sidebar {
-    width: 200px;
+    width: 160px;
+    /* 移动端也调整宽度 */
     height: calc(100vh - 60px);
     position: fixed;
     left: 0;
@@ -126,8 +221,9 @@
     flex-direction: column;
   }
 
-  .collapsed {
-    transform: translateX(-200px);
-    /* 移动端完全隐藏 */
+  /* 移动端折叠时完全隐藏 */
+  .sidebar.collapsed {
+    transform: translateX(-160px);
+    width: 160px;
   }
 }

@@ -3,11 +3,12 @@ import { useAppState } from '../../../contexts/AppStateContext';
 import PaidDetectionPrompt from '../../features/PaidDetectionPrompt';
 import styles from './Sidebar.module.css';
 
-const ApiProvider = ({ type, icon, name, isActive, onClick }) => (
+const ApiProvider = ({ type, icon, name, isActive, onClick, isCollapsed }) => (
   <div
     className={`${styles.apiProvider} ${isActive ? styles.active : ''}`}
     onClick={() => onClick(type)}
-    title={name}
+    title={isCollapsed ? name : ''}
+    data-tooltip={name}
   >
     <div className={styles.providerIcon}>{icon}</div>
     <span className={styles.providerName}>
@@ -98,6 +99,7 @@ const Sidebar = ({ isCollapsed }) => {
               name={provider.name}
               isActive={state.apiType === provider.type}
               onClick={handleApiTypeChange}
+              isCollapsed={isCollapsed}
             />
           ))}
         </div>

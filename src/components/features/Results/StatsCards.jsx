@@ -32,8 +32,11 @@ const StatsCards = () => {
     }
   ];
 
-  // 如果启用了Gemini付费检测，直接添加到主统计数组中
-  if (state.apiType === 'gemini' && state.enablePaidDetection) {
+  // 检查是否需要显示付费密钥统计
+  const hasPaidDetection = state.apiType === 'gemini' && state.enablePaidDetection;
+
+  // 如果启用了Gemini付费检测，直接添加付费密钥统计到主统计中
+  if (hasPaidDetection) {
     mainStats.push({
       key: 'paidKeys',
       value: state.keyResults.filter(k => k.status === 'paid').length,
@@ -58,7 +61,7 @@ const StatsCards = () => {
   return (
     <div className="stats-container">
       {/* 第一行：主要统计（包含付费密钥） */}
-      <div className="stats">
+      <div className={`stats ${!hasPaidDetection ? 'no-paid-detection' : ''}`}>
         {mainStats.map(stat => (
           <div key={stat.key} className="stat-card">
             <div className={`stat-number ${stat.className}`}>

@@ -86,7 +86,7 @@ body {
   margin-bottom: var(--spacing-md);
 }
 
-/* 统计容器和卡片样式 - 修改为横向布局 */
+/* 统计容器和卡片样式 - 强制付费密钥在第一行 */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -96,8 +96,14 @@ body {
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
+  /* 强制5列，确保付费密钥在第一行 */
   gap: var(--spacing-sm);
+}
+
+/* 当没有付费检测时，使用4列布局 */
+.stats.no-paid-detection {
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .testing-stats {
@@ -110,7 +116,8 @@ body {
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
   text-align: center;
-  min-width: 100px;
+  min-width: 80px;
+  /* 减小最小宽度以适应移动端 */
   min-height: 80px;
   flex: 1;
   display: flex;
@@ -125,7 +132,8 @@ body {
 }
 
 .stat-number {
-  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  /* 调整字体范围适应移动端 */
   font-weight: 700;
   margin-bottom: 4px;
   line-height: 1;
@@ -133,10 +141,11 @@ body {
 
 .stat-label {
   color: var(--text-secondary);
-  font-size: var(--font-size-sm);
+  font-size: clamp(10px, 2vw, 14px);
+  /* 让标签字体也响应式调整 */
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
 }
 
 /* 状态颜色 */
@@ -168,16 +177,56 @@ body {
   color: var(--color-primary);
 }
 
-/* 密钥列表 */
-.key-list-container {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-md);
-  max-height: 350px;
-  overflow-y: auto;
+/* 结果容器 */
+.results-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
+/* 结果卡片 - 让高度与左侧保持一致 */
+.results-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+  height: auto;
+  margin-bottom: 0;
+}
+
+/* 结果内容区域 */
+.results-content {
+  flex: 1;
+  min-height: 300px;
+  max-height: 500px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: var(--spacing-md);
+}
+
+/* 虚拟化列表容器 */
+.virtualized-list {
+  width: 100% !important;
+  height: 100% !important;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.virtualized-list-container {
+  height: 100%;
+  position: relative;
+  min-height: 300px;
+}
+
+/* 密钥项包装器 */
+.key-item-wrapper {
+  padding: 2px 4px;
+}
+
+/* 密钥项 */
 .key-item {
   display: flex;
   justify-content: space-between;
@@ -186,10 +235,10 @@ body {
   background: var(--bg-input);
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
-  margin-bottom: var(--spacing-sm);
   gap: var(--spacing-sm);
 }
 
+/* 密钥内容 */
 .key-content {
   flex: 1;
   min-width: 0;
@@ -203,6 +252,31 @@ body {
   margin-bottom: 4px;
 }
 
+.key-model {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.key-error {
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+  margin-bottom: 2px;
+}
+
+.key-retry {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: 2px;
+}
+
+.key-valid-info {
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+  margin-bottom: 2px;
+}
+
+/* 密钥状态 */
 .key-status {
   padding: 4px var(--spacing-sm);
   border-radius: 4px;
@@ -212,24 +286,34 @@ body {
   flex-shrink: 0;
 }
 
-.status-valid {
+.key-status.status-valid {
   background: #d4edda;
   color: #155724;
 }
 
-.status-invalid {
+.key-status.status-paid {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+}
+
+.key-status.status-invalid {
   background: #f8d7da;
   color: #721c24;
 }
 
-.status-rate-limited {
+.key-status.status-rate-limited {
   background: #fff3cd;
   color: #856404;
 }
 
-.status-testing {
+.key-status.status-testing {
   background: #e2e3e5;
   color: #6c757d;
+}
+
+.key-status.status-retrying {
+  background: #fd7e14;
+  color: white;
 }
 
 /* 标签页 */
@@ -252,151 +336,6 @@ body {
 .tab.active {
   color: var(--color-primary);
   border-bottom-color: var(--color-primary);
-}
-
-/* 滚动条 */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
-}
-
-.dark-theme ::-webkit-scrollbar-track {
-  background: #333;
-}
-
-.dark-theme ::-webkit-scrollbar-thumb {
-  background: #666;
-}
-
-/* 深色主题 */
-.dark-theme .stat-card:hover {
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
-}
-
-/* 工具类 */
-.hidden {
-  display: none !important;
-}
-
-.text-center {
-  text-align: center;
-}
-
-.flex {
-  display: flex;
-}
-
-.flex-column {
-  flex-direction: column;
-}
-
-/* 响应式 */
-@media (max-width: 768px) {
-  .function-card {
-    padding: var(--spacing-md);
-  }
-
-  .key-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--spacing-sm);
-  }
-
-  .key-status {
-    align-self: flex-end;
-  }
-
-  .stats {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .stat-card {
-    padding: var(--spacing-sm);
-    min-height: 70px;
-  }
-
-  .stat-number {
-    font-size: clamp(1.4rem, 3vw, 2rem);
-  }
-}
-
-@media (max-width: 480px) {
-  .stats {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .stat-number {
-    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
-  }
-
-  .stat-label {
-    font-size: 11px;
-  }
-
-  .stat-card {
-    min-height: 60px;
-  }
-}
-
-/* 结果容器 */
-.results-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-}
-
-/* 结果主要区域 */
-.results-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  margin-bottom: var(--spacing-md);
-}
-
-/* 结果内容区域 - 关键修改 */
-.results-content {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-  position: relative;
-}
-
-/* 虚拟化列表容器 */
-.virtualized-list {
-  width: 100% !important;
-  height: 100% !important;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-}
-
-/* 密钥项包装器 */
-.key-item-wrapper {
-  padding: 2px 4px;
-}
-
-/* 密钥项 */
-.key-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: var(--spacing-md);
-  background: var(--bg-input);
-  border-radius: var(--border-radius);
-  border: 1px solid var(--border-color);
-  gap: var(--spacing-sm);
 }
 
 /* 空状态样式 */
@@ -424,7 +363,6 @@ body {
 
 /* 复制按钮区域 */
 .copy-buttons {
-  margin-top: var(--spacing-md);
   display: flex;
   justify-content: center;
   flex-shrink: 0;
@@ -455,8 +393,71 @@ body {
   background: linear-gradient(135deg, #667eea, #764ba2);
 }
 
-/* 响应式调整 */
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.dark-theme ::-webkit-scrollbar-track {
+  background: #333;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: #666;
+}
+
+/* 深色主题 */
+.dark-theme .stat-card:hover {
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.dark-theme .key-status.status-valid {
+  background: #155724;
+  color: #d4edda;
+}
+
+.dark-theme .key-status.status-invalid {
+  background: #721c24;
+  color: #f8d7da;
+}
+
+.dark-theme .key-status.status-rate-limited {
+  background: #856404;
+  color: #fff3cd;
+}
+
+/* 工具类 */
+.hidden {
+  display: none !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-column {
+  flex-direction: column;
+}
+
+/* 移动端优化 - 保持一行显示 */
 @media (max-width: 768px) {
+  .function-card {
+    padding: var(--spacing-md);
+  }
+
   .key-item {
     flex-direction: column;
     align-items: flex-start;
@@ -465,5 +466,49 @@ body {
 
   .key-status {
     align-self: flex-end;
+  }
+
+  .stat-card {
+    padding: var(--spacing-sm);
+    min-height: 70px;
+    min-width: 60px;
+  }
+
+  .stat-number {
+    font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  }
+
+  .stat-label {
+    font-size: clamp(9px, 1.8vw, 12px);
+  }
+
+  .stats {
+    gap: 6px;
+  }
+
+  .results-content {
+    min-height: 250px;
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stat-card {
+    min-height: 60px;
+    min-width: 50px;
+    padding: 6px;
+  }
+
+  .stat-number {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  .stat-label {
+    font-size: clamp(8px, 1.5vw, 10px);
+    letter-spacing: 0.2px;
+  }
+
+  .stats {
+    gap: 4px;
   }
 }
