@@ -11,11 +11,11 @@ const Results = () => {
   const { state } = useAppState();
 
   return (
-    <>
+    <div className="results-container">
       {(state.showResults || state.isTesting || state.keyResults.length > 0) ? (
         <>
           <StatsCards />
-          
+
           <div className="input-section results-main">
             <ResultTabs />
             <div className="results-content">
@@ -23,7 +23,7 @@ const Results = () => {
             </div>
             <CopyButtons />
           </div>
-          
+
           {state.isTesting && (
             <div className="progress-wrapper">
               <ProgressBar />
@@ -40,7 +40,7 @@ const Results = () => {
       )}
 
       <Loading isVisible={state.isTesting && state.keyResults.length === 0} />
-    </>
+    </div>
   );
 };
 

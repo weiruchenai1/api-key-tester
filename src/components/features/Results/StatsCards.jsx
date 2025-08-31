@@ -6,7 +6,8 @@ const StatsCards = () => {
   const { t } = useLanguage();
   const { state } = useAppState();
 
-  const baseStats = [
+  // 第一行：主要统计数据（包括付费密钥）
+  const mainStats = [
     {
       key: 'total',
       value: state.keyResults.length,
@@ -14,7 +15,7 @@ const StatsCards = () => {
     },
     {
       key: 'valid',
-      value: state.enablePaidDetection ? 
+      value: state.enablePaidDetection ?
         state.keyResults.filter(k => k.status === 'valid').length :
         state.keyResults.filter(k => k.status === 'valid' || k.status === 'paid').length,
       className: 'valid'
@@ -31,6 +32,15 @@ const StatsCards = () => {
     }
   ];
 
+  // 如果启用了Gemini付费检测，直接添加到主统计数组中
+  if (state.apiType === 'gemini' && state.enablePaidDetection) {
+    mainStats.push({
+      key: 'paidKeys',
+      value: state.keyResults.filter(k => k.status === 'paid').length,
+      className: 'paid'
+    });
+  }
+
   // 第二行状态（测试相关）
   const testingStats = [
     {
@@ -45,22 +55,11 @@ const StatsCards = () => {
     }
   ];
 
-  // Add paid detection stats if enabled for Gemini
-  const paidStats = [];
-  if (state.apiType === 'gemini' && state.enablePaidDetection) {
-    paidStats.push(
-      {
-        key: 'paidKeys',
-        value: state.keyResults.filter(k => k.status === 'paid').length,
-        className: 'paid'
-      }
-    );
-  }
-
   return (
     <div className="stats-container">
+      {/* 第一行：主要统计（包含付费密钥） */}
       <div className="stats">
-        {[...baseStats, ...paidStats].map(stat => (
+        {mainStats.map(stat => (
           <div key={stat.key} className="stat-card">
             <div className={`stat-number ${stat.className}`}>
               {stat.value}
@@ -71,18 +70,22 @@ const StatsCards = () => {
           </div>
         ))}
       </div>
-      <div className="stats">
-        {testingStats.map(stat => (
-          <div key={stat.key} className="stat-card">
-            <div className={`stat-number ${stat.className}`}>
-              {stat.value}
+
+      {/* 第二行：测试状态（只在有数据时显示） */}
+      {(testingStats[0].value > 0 || testingStats[1].value > 0) && (
+        <div className="stats testing-stats">
+          {testingStats.map(stat => (
+            <div key={stat.key} className="stat-card">
+              <div className={`stat-number ${stat.className}`}>
+                {stat.value}
+              </div>
+              <div className="stat-label">
+                {t(stat.key)}
+              </div>
             </div>
-            <div className="stat-label">
-              {t(stat.key)}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

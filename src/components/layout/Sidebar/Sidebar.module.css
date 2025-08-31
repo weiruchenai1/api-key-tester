@@ -1,0 +1,133 @@
+.sidebar {
+  width: 200px;
+  height: calc(100vh - 60px);
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 60px;
+  z-index: 999;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.collapsed {
+  transform: translateX(-200px);
+  /* 完全隐藏 */
+}
+
+.providersSection {
+  padding: 20px 15px 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.apiProvider {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 12px;
+  min-height: 48px;
+  justify-content: flex-start;
+}
+
+.apiProvider:hover {
+  background: var(--bg-hover);
+}
+
+.apiProvider.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+.apiProvider.active .providerIcon {
+  transform: scale(1.1);
+}
+
+.providerIcon {
+  font-size: 16px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.providerName {
+  font-weight: 500;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.separator {
+  height: 1px;
+  background: var(--border-color);
+  margin: 0 15px;
+}
+
+.addProvider {
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+  justify-content: flex-start;
+  min-height: 48px;
+}
+
+.addProvider:hover {
+  background: var(--bg-hover);
+}
+
+.addIcon {
+  width: 20px;
+  height: 20px;
+  border: 2px dashed var(--border-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.addText {
+  font-size: 14px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* 移动端和桌面端统一处理 */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px;
+    height: calc(100vh - 60px);
+    position: fixed;
+    left: 0;
+    top: 60px;
+    z-index: 999;
+    border-right: 1px solid var(--border-color);
+    flex-direction: column;
+  }
+
+  .collapsed {
+    transform: translateX(-200px);
+    /* 移动端完全隐藏 */
+  }
+}

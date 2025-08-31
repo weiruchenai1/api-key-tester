@@ -76,8 +76,8 @@ const KeyItem = ({ index, style, data }) => {
           )}
           {(keyData.status === 'valid' || keyData.status === 'paid') && !keyData.isPaid && (
             <div className="key-valid-info">
-              {state.enablePaidDetection && keyData.cacheApiStatus ? 
-                `${t('freeKey')} (${keyData.cacheApiStatus})` : 
+              {state.enablePaidDetection && keyData.cacheApiStatus ?
+                `${t('freeKey')} (${keyData.cacheApiStatus})` :
                 `${t('validKey')} (${keyData.basicApiStatus || 200})`}
             </div>
           )}
@@ -102,11 +102,12 @@ const VirtualizedList = () => {
   const { state } = useAppState();
   const { getListHeight, getItemHeight } = useVirtualization();
   const listRef = useRef(null);
+  const containerRef = useRef(null);
 
   const filteredKeys = useMemo(() => {
     switch (state.activeTab) {
       case 'valid':
-        return state.enablePaidDetection ? 
+        return state.enablePaidDetection ?
           state.keyResults.filter(k => k.status === 'valid') :
           state.keyResults.filter(k => k.status === 'valid' || k.status === 'paid');
       case 'invalid':
@@ -142,27 +143,24 @@ const VirtualizedList = () => {
       'rate-limited': t('noRateLimitedKeys') || '暂无速率限制密钥'
     };
 
-    return (
-      <div className="empty-state">
-        <div className="empty-icon">📭</div>
-        <div className="empty-text">{emptyMessages[state.activeTab]}</div>
-      </div>
-    );
+    return <EmptyState message={emptyMessages[state.activeTab]} />;
   }
 
   return (
-    <List
-      ref={listRef}
-      height={listHeight}
-      itemCount={filteredKeys.length}
-      itemSize={getItemSize}
-      itemData={filteredKeys}
-      overscanCount={5}
-      width="100%"
-      className="virtualized-list"
-    >
-      {KeyItem}
-    </List>
+    <div ref={containerRef} className="virtualized-list-container" style={{ height: listHeight, position: 'relative' }}>
+      <List
+        ref={listRef}
+        height={listHeight}
+        itemCount={filteredKeys.length}
+        itemSize={getItemSize}
+        itemData={filteredKeys}
+        overscanCount={5}
+        width="100%"
+        className="virtualized-list"
+      >
+        {KeyItem}
+      </List>
+    </div>
   );
 };
 

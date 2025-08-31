@@ -14,7 +14,7 @@ const AppContent = () => {
   const { t } = useLanguage();
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
 
-  // 左侧功能区
+  // 左侧功能区（移除API类型选择器）
   const leftPanel = (
     <div>
       <div className="function-card">

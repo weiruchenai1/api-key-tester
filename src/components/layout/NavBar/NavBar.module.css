@@ -6,6 +6,10 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
 }
 
 .navbarContent {
@@ -15,6 +19,36 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--spacing-lg);
+}
+
+/* Left Section */
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.sidebarToggle {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebarToggle:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.sidebarToggle:active {
+  transform: scale(0.95);
 }
 
 /* Brand Section */
@@ -61,7 +95,7 @@
   text-decoration: none;
 }
 
-/* Language Combobox */
+/* Language/Theme Combobox */
 .comboboxBtn {
   display: flex;
   align-items: center;
@@ -153,6 +187,11 @@
 
   .brandText {
     font-size: 16px;
+  }
+
+  .sidebarToggle {
+    width: 32px;
+    height: 32px;
   }
 
   .actionBtn {
