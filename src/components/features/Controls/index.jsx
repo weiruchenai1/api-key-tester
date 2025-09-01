@@ -88,9 +88,20 @@ const Controls = () => {
           onClick={handleStartTest}
         >
           {state.isTesting ? (
-            <>⏹️ {t('cancelTest')}</>
+            <>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="6" y="4" width="4" height="16" />
+                <rect x="14" y="4" width="4" height="16" />
+              </svg>
+              {t('cancelTest')}
+            </>
           ) : (
-            <>▶️ {t('startTest')}</>
+            <>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polygon points="5,3 19,12 5,21" />
+              </svg>
+              {t('startTest')}
+            </>
           )}
         </button>
 
@@ -99,7 +110,12 @@ const Controls = () => {
           onClick={handleDedupeKeys}
           disabled={state.isTesting}
         >
-          🔄 {t('dedupeKeys')}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="23 4 23 10 17 10" />
+            <polyline points="1 20 1 14 7 14" />
+            <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+          </svg>
+          {t('dedupeKeys')}
         </button>
 
         <button
@@ -107,7 +123,11 @@ const Controls = () => {
           onClick={handleClear}
           disabled={state.isTesting}
         >
-          🗑️ {t('clear')}
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="3,6 5,6 21,6" />
+            <path d="m19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+          {t('clear')}
         </button>
       </div>
     </div>

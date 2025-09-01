@@ -81,9 +81,9 @@
   }
 }
 
-/* 深色主题 */
+/* 深色主题 - 修改背景色为 #2A2A2A */
 :global(.dark-theme) .modalContent {
-  background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+  background: #2A2A2A;
   color: #e8eaed;
 }
 

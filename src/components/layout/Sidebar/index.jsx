@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import PaidDetectionPrompt from '../../features/PaidDetectionPrompt';
 import styles from './Sidebar.module.css';
@@ -18,6 +19,7 @@ const ApiProvider = ({ type, icon, name, isActive, onClick, isCollapsed }) => (
 );
 
 const Sidebar = ({ isCollapsed }) => {
+  const { t } = useLanguage();
   const { state, dispatch } = useAppState();
   const [showPaidDetectionPrompt, setShowPaidDetectionPrompt] = useState(false);
 
@@ -41,10 +43,6 @@ const Sidebar = ({ isCollapsed }) => {
     if (checkPaidDetectionPrompt(apiType)) {
       setShowPaidDetectionPrompt(true);
     }
-  };
-
-  const handleAddProvider = () => {
-    console.log('添加其他API提供商');
   };
 
   const apiProviders = [
@@ -102,13 +100,6 @@ const Sidebar = ({ isCollapsed }) => {
               isCollapsed={isCollapsed}
             />
           ))}
-        </div>
-
-        <div className={styles.separator}></div>
-
-        <div className={styles.addProvider} onClick={handleAddProvider}>
-          <div className={styles.addIcon}>+</div>
-          <span className={styles.addText}>添加服务商</span>
         </div>
       </div>
 

@@ -10,10 +10,10 @@ const PaidDetectionControl = () => {
   const handleTogglePaidDetection = () => {
     const newValue = !state.enablePaidDetection;
     dispatch({ type: 'SET_PAID_DETECTION', payload: newValue });
-    
+
     // 同时更新本地存储
     localStorage.setItem('enablePaidDetection', JSON.stringify(newValue));
-    
+
     // 如果用户之前设置了不再提示，更新默认设置
     const promptDisabled = localStorage.getItem('geminiPaidDetectionPromptDisabled') === 'true';
     if (promptDisabled) {
@@ -46,7 +46,7 @@ const PaidDetectionControl = () => {
               <span className={styles.switchSlider}></span>
             </label>
             <span className={styles.switchLabel}>
-              {state.enablePaidDetection ? '已启用' : '已禁用'}
+              {state.enablePaidDetection ? t('paidDetectionEnabled') : t('paidDetectionDisabled')}
             </span>
           </div>
           <p className={styles.settingDescription}>
@@ -61,7 +61,7 @@ const PaidDetectionControl = () => {
           弹窗提示设置
         </label>
         <div className={styles.settingContent}>
-          <button 
+          <button
             className={styles.resetButton}
             onClick={handleResetPrompt}
           >
@@ -82,9 +82,24 @@ const PaidDetectionControl = () => {
           </div>
           <div className={styles.statusItem}>
             <span className={styles.statusLabel}>付费检测状态:</span>
-            <span className={`${styles.statusValue} ${state.enablePaidDetection ? styles.enabled : styles.disabled}`}>
-              {state.enablePaidDetection ? '✅ 已启用' : '❌ 已禁用'}
-            </span>
+            {state.enablePaidDetection ? (
+              <span className={`${styles.statusValue} ${styles.enabled}`}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}>
+                  <path d="m9 12 2 2 4-4" />
+                  <circle cx="12" cy="12" r="10" />
+                </svg>
+                {t('paidDetectionEnabled')}
+              </span>
+            ) : (
+              <span className={`${styles.statusValue} ${styles.disabled}`}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '4px' }}>
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="m15 9-6 6" />
+                  <path d="m9 9 6 6" />
+                </svg>
+                {t('paidDetectionDisabled')}
+              </span>
+            )}
           </div>
           {state.enablePaidDetection && (
             <div className={styles.statusItem}>

@@ -1,9 +1,5 @@
 export const TRANSLATIONS = {
   zh: {
-    // 页面标题
-    title: '🔑 API Key 测活工具',
-    subtitle: '批量检测 Gemini、Claude、GPT API 密钥有效性',
-
     // API配置
     selectApi: '选择 API 类型',
     selectModel: '测试模型',
@@ -11,9 +7,9 @@ export const TRANSLATIONS = {
     presetModel: '预设',
     modelHelp: '可以选择预设模型或输入自定义模型名',
     modelInputPlaceholder: '输入自定义模型名',
-    detectedModelsTitle: '检测到的可用模型',
+    detectedModelsTitle: '检测到的模型',
     proxyUrl: '代理服务器 URL (可选)',
-    proxyHelp: '留空使用默认代理，建议使用自己的反向代理以提高成功率',
+    proxyHelp: '留空使用默认代理，建议使用自己的反向代理',
 
     // 控制设置
     concurrencyControl: '并发控制',
@@ -38,7 +34,7 @@ export const TRANSLATIONS = {
     pasting: '粘贴中',
 
     // 操作按钮
-    detectModels: '检测模型',
+    detectModels: '获取模型',
     startTest: '开始测试',
     cancelTest: '取消测试',
     dedupeKeys: '去重密钥',
@@ -46,15 +42,16 @@ export const TRANSLATIONS = {
 
     // 状态显示
     testing: '测试中',
-    detecting: '正在检测可用模型...',
+    detecting: '检测中',
     completed: '测试完成',
     total: '总计',
     valid: '有效',
     invalid: '无效',
-    rateLimited: '速率限制',  // 添加这个缺失的翻译
+    rateLimited: '速率限制',
     testingLabel: '测试中',
     retrying: '重试中',
     pending: '等待中',
+    models: '个模型',
 
     // Gemini付费检测
     enablePaidDetection: '启用付费检测',
@@ -64,6 +61,8 @@ export const TRANSLATIONS = {
     paidDetectionWarning: '⚠️ 启用付费检测会消耗额外的API配额并锁定模型为 gemini-2.5-flash',
     paidKeys: '付费密钥',
     copyPaidKeys: '复制付费密钥',
+    paidDetectionEnabled: '已开启付费检测',
+    paidDetectionDisabled: '未开启付费检测',
 
     // 结果标签
     all: '全部',
@@ -119,8 +118,8 @@ export const TRANSLATIONS = {
     validKey: '有效密钥',
 
     // 使用说明
-    usageTitle: '💡 使用说明：',
-    usage1: '• 强烈建议使用自定义代理URL，公共代理可能不稳定',
+    usageTitle: '使用说明：',
+    usage1: '• 强烈建议使用自己的反向代理URL，公共代理可能不稳定',
     usage2: '• 测试过程中密钥仅用于验证，不会被存储',
 
     // 通用
@@ -139,13 +138,14 @@ export const TRANSLATIONS = {
     control: '控制台',
     lightMode: '浅色',
     darkMode: '深色',
-    systemMode: '跟随系统'
+    systemMode: '跟随系统',
+
+    // 界面元素
+    advancedSettings: '高级设置',
+    addProvider: '添加服务商',
+    appTitle: 'API Key 测活工具'
   },
   en: {
-    // Page titles
-    title: '🔑 API Key Tester',
-    subtitle: 'Batch test Gemini, Claude, GPT API key validity',
-
     // API configuration
     selectApi: 'Select API Type',
     selectModel: 'Test Model',
@@ -153,9 +153,9 @@ export const TRANSLATIONS = {
     presetModel: 'Preset',
     modelHelp: 'Choose preset model or enter custom model name',
     modelInputPlaceholder: 'Enter custom model name',
-    detectedModelsTitle: 'Detected Available Models',
+    detectedModelsTitle: 'Detected Models',
     proxyUrl: 'Proxy Server URL (Optional)',
-    proxyHelp: 'Leave empty to use default proxy, recommend using your own reverse proxy for better success rate',
+    proxyHelp: 'Leave empty to use default proxy, recommend using your own reverse proxy',
 
     // Control settings
     concurrencyControl: 'Concurrency Control',
@@ -180,7 +180,7 @@ export const TRANSLATIONS = {
     pasting: 'Pasting',
 
     // Action buttons
-    detectModels: 'Detect Models',
+    detectModels: 'Get Models',
     startTest: 'Start Test',
     cancelTest: 'Cancel Test',
     dedupeKeys: 'Dedupe Keys',
@@ -188,15 +188,16 @@ export const TRANSLATIONS = {
 
     // Status display
     testing: 'Testing API keys...',
-    detecting: 'Detecting available models...',
+    detecting: 'Detecting...',
     completed: 'Test completed',
     total: 'Total',
     valid: 'Valid',
     invalid: 'Invalid',
-    rateLimited: 'Rate Limited',  // 添加这个缺失的翻译
+    rateLimited: 'Throttled',
     testingLabel: 'Testing',
     retrying: 'Retrying',
     pending: 'Pending',
+    models: 'models',
 
     // Gemini Paid Detection
     enablePaidDetection: 'Enable Paid Detection',
@@ -206,23 +207,25 @@ export const TRANSLATIONS = {
     paidDetectionWarning: '⚠️ Enabling paid detection will consume additional API quota and lock model to gemini-2.5-flash',
     paidKeys: 'Paid Keys',
     copyPaidKeys: 'Copy Paid Keys',
+    paidDetectionEnabled: 'Paid detection enabled',
+    paidDetectionDisabled: 'Paid detection disabled',
 
     // Result tabs
     all: 'All',
     validKeys: 'Valid Keys',
     invalidKeys: 'Invalid Keys',
-    rateLimitedKeys: 'Rate Limited',
+    rateLimitedKeys: 'Throttled Keys',
     copyResults: 'Copy Results',
     copyAll: 'Copy All',
     copyValid: 'Copy Valid Keys',
     copyInvalid: 'Copy Invalid Keys',
-    copyRateLimited: 'Copy Rate Limited Keys',
+    copyRateLimited: 'Copy Throttled Keys',
 
     // Status text
     statusValid: 'Valid',
     statusInvalid: 'Invalid',
-    statusRateLimit: 'Rate Limited',
-    statusRateLimited: 'Rate Limited',
+    statusRateLimit: 'Throttled',
+    statusRateLimited: 'Throttled',
     statusTesting: 'Testing',
     statusRetrying: 'Retrying',
     statusPending: 'Pending',
@@ -250,21 +253,21 @@ export const TRANSLATIONS = {
     noKeys: 'No keys',
     noValidKeys: 'No valid keys',
     noInvalidKeys: 'No invalid keys',
-    noRateLimitedKeys: 'No rate limited keys',
+    noRateLimitedKeys: 'No throttled keys',
 
     // Error messages
     authFailed: 'Auth Failed',
     permissionDenied: 'Permission Denied',
     networkFailed: 'Network Failed',
     retry: 'Retry',
-    
+
     // Key status messages
     freeKey: 'Free Key',
     validKey: 'Valid Key',
 
     // Usage instructions
-    usageTitle: '💡 Usage Instructions:',
-    usage1: '• Strongly recommend using custom proxy URL, public proxies may be unstable',
+    usageTitle: 'Usage Instructions:',
+    usage1: '• Strongly recommend using your own reverse proxy URL, public proxies may be unstable',
     usage2: '• Keys are only used for validation during testing, not stored',
 
     // General
@@ -283,6 +286,11 @@ export const TRANSLATIONS = {
     control: 'Controls',
     lightMode: 'Light',
     darkMode: 'Dark',
-    systemMode: 'System'
+    systemMode: 'System',
+
+    // UI Elements
+    advancedSettings: 'Advanced Settings',
+    addProvider: 'Add Provider',
+    appTitle: 'API Key Tester'
   }
 };

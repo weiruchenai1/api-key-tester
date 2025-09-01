@@ -1,6 +1,7 @@
 .navbar {
   height: 60px;
-  background: var(--bg-container);
+  background: #FEFEFD;
+  /* 浅色主题下的导航栏颜色 */
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
@@ -176,6 +177,13 @@
 .checkIcon {
   color: var(--color-success);
   flex-shrink: 0;
+}
+
+/* 深色主题下的导航栏 */
+:global(.dark-theme) .navbar {
+  background: #2a2a2a;
+  /* 深色主题下的导航栏颜色 */
+  border-bottom-color: #444444;
 }
 
 /* 响应式 */

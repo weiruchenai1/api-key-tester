@@ -25,7 +25,12 @@ const Results = () => {
       ) : (
         <div className="function-card">
           <div className="empty-state">
-            <div className="empty-icon">🔍</div>
+            <div className="empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+              </svg>
+            </div>
             <div className="empty-text">检测结果将显示在这里</div>
           </div>
         </div>

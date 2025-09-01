@@ -103,7 +103,7 @@ const ModelSelector = () => {
         {/* 检测到的新模型（去掉🔍图标） */}
         {detectedOnlyModels.length > 0 && (
           <>
-            <option disabled>──────── 检测到的模型 ────────</option>
+            <option disabled>──────── {t('detectedModelsTitle')} ────────</option>
             {detectedOnlyModels.map(model => (
               <option key={model} value={model} className={styles.detectedModelOption}>
                 {model}
@@ -121,7 +121,7 @@ const ModelSelector = () => {
         {t('selectModel')}
         {state.detectedModels.size > 0 && (
           <span className={styles.detectedCount}>
-            {' '}(检测到 {state.detectedModels.size} 个模型)
+            {' '}({t('detecting')} {state.detectedModels.size} {t('models')})
           </span>
         )}
       </label>
@@ -156,7 +156,7 @@ const ModelSelector = () => {
           onClick={toggleModelInput}
           disabled={state.isTesting || state.enablePaidDetection}
         >
-          自定义
+          {isCustomModel ? t('presetModel') : t('customModel')}
         </button>
 
         <button
@@ -166,9 +166,9 @@ const ModelSelector = () => {
           disabled={state.isTesting || isDetecting}
         >
           {isDetecting ? (
-            <>🔄 检测中</>
+            <>{t('detecting')}</>
           ) : (
-            <>获取模型</>
+            <>{t('detectModels')}</>
           )}
         </button>
       </div>
@@ -179,7 +179,7 @@ const ModelSelector = () => {
       {state.apiType === 'gemini' && (
         <div className="paid-detection-status">
           <small className={`form-info ${state.enablePaidDetection ? 'enabled' : 'disabled'}`}>
-            {state.enablePaidDetection ? '✅ 已开启付费检测' : '❌ 未开启付费检测'}
+            {state.enablePaidDetection ? t('paidDetectionEnabled') : t('paidDetectionDisabled')}
           </small>
         </div>
       )}

@@ -14,11 +14,11 @@ const KeyInput = () => {
         <label htmlFor="apiKeys">{t('apiKeys')}</label>
         <div className={styles.inputControls}>
           <FileImport />
-          <PasteButton />
         </div>
       </div>
       <div className={styles.textareaWrapper}>
         <TextareaInput />
+        <PasteButton />
       </div>
     </div>
   );

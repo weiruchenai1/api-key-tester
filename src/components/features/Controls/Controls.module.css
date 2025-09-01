@@ -32,13 +32,16 @@
 }
 
 .btnPrimary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #2563eb;
+  /* 改为蓝色 */
   color: white;
 }
 
 .btnPrimary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  background: #1d4ed8;
+  /* 悬停时的深蓝色 */
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
 }
 
 .btnSecondary {
@@ -64,6 +67,17 @@
 }
 
 /* 深色主题 */
+:global(.dark-theme) .btnPrimary {
+  background: #3b82f6;
+  /* 深色主题下的蓝色 */
+}
+
+:global(.dark-theme) .btnPrimary:hover:not(:disabled) {
+  background: #2563eb;
+  /* 深色主题悬停时的蓝色 */
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
 :global(.dark-theme) .btnSecondary {
   background: linear-gradient(135deg, #3c4269 0%, #2a2d47 100%);
 }

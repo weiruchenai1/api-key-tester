@@ -7,9 +7,9 @@
   --color-info: #17a2b8;
   --color-secondary: #6c757d;
 
-  /* 背景色 */
+  /* 背景色 - 修改为新的背景色 */
   --bg-body: #f5f5f5;
-  --bg-container: #ffffff;
+  --bg-container: #FAF9F5;
   --bg-card: #f8f9fa;
   --bg-input: #ffffff;
 
@@ -23,9 +23,14 @@
   --border-focus: #007bff;
 
   /* 间距 */
+  --spacing-xs: 4px;
   --spacing-sm: 8px;
+  --spacing-base: 12px;
   --spacing-md: 16px;
-  --spacing-lg: 24px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 48px;
 
   /* 圆角 */
   --border-radius: 8px;

@@ -76,7 +76,7 @@ const NavBar = ({ onSidebarToggle, isSidebarCollapsed }) => {
                 <path d="m15.5 7.5 3 3L22 7l-3-3" />
               </svg>
             </div>
-            <span className={styles.brandText}>API Key Tester</span>
+            <span className={styles.brandText}>{t('appTitle')}</span>
           </div>
         </div>
 
@@ -262,5 +262,4 @@ const NavBar = ({ onSidebarToggle, isSidebarCollapsed }) => {
     </nav>
   );
 };
-
 export default NavBar;

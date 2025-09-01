@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useLanguage } from '../../../hooks/useLanguage';
 import ConcurrencyControl from '../ConcurrencyControl';
 import RetryControl from '../RetryControl';
 import PaidDetectionControl from '../PaidDetectionControl';
 import styles from './AdvancedSettings.module.css';
 
 const AdvancedSettings = ({ isOpen, onClose }) => {
+  const { t } = useLanguage();
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -40,11 +43,11 @@ const AdvancedSettings = ({ isOpen, onClose }) => {
     <div className={styles.modalOverlay} onClick={handleOverlayClick}>
       <div className={styles.modalContent}>
         <div className={styles.modalHeader}>
-          <h3>高级设置</h3>
-          <button 
+          <h3>{t('advancedSettings')}</h3>
+          <button
             className={styles.closeButton}
             onClick={onClose}
-            aria-label="关闭"
+            aria-label={t('close')}
           >
             ×
           </button>
