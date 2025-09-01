@@ -37,19 +37,20 @@
   border-radius: 6px;
   cursor: pointer;
   color: var(--text-secondary);
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .sidebarToggle:hover {
-  background: var(--bg-hover);
+  background: rgba(175, 184, 193, 0.12);
   color: var(--text-primary);
+  transform: translateY(-0.5px);
 }
 
 .sidebarToggle:active {
-  transform: scale(0.95);
+  transform: scale(0.95) translateY(0);
 }
 
 /* Brand Section */
@@ -84,6 +85,17 @@
   border: none;
   cursor: pointer;
   color: var(--text-secondary);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.actionBtn:hover {
+  background: rgba(175, 184, 193, 0.12);
+  color: var(--text-primary);
+  transform: translateY(-0.5px);
+}
+
+.actionBtn:active {
+  transform: scale(0.95) translateY(0);
 }
 
 .githubLink {
@@ -94,6 +106,7 @@
   height: 100%;
   color: inherit;
   text-decoration: none;
+  transition: inherit;
 }
 
 /* Language/Theme Combobox */
@@ -109,10 +122,26 @@
   font-size: var(--font-size-base);
   font-weight: 500;
   cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.comboboxBtn:hover {
+  background: rgba(175, 184, 193, 0.12);
+  color: var(--text-primary);
+  transform: translateY(-0.5px);
+}
+
+.comboboxBtn:active {
+  transform: scale(0.98) translateY(0);
 }
 
 .chevron {
   opacity: 0.5;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.comboboxBtn:hover .chevron {
+  opacity: 0.7;
 }
 
 /* Theme Icons */
@@ -147,6 +176,20 @@
   border-radius: var(--border-radius);
   overflow: hidden;
   z-index: 1001;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .dropdownItem {
@@ -161,11 +204,21 @@
   font-size: var(--font-size-base);
   cursor: pointer;
   text-align: left;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdownItem:hover {
+  background: rgba(175, 184, 193, 0.1);
+  transform: translateX(2px);
 }
 
 .dropdownItem.active {
   color: var(--color-primary);
-  background: rgba(59, 130, 246, 0.1);
+  background: rgba(9, 105, 218, 0.08);
+}
+
+.dropdownItem.active:hover {
+  background: rgba(9, 105, 218, 0.12);
 }
 
 .themeItem {
@@ -179,11 +232,39 @@
   flex-shrink: 0;
 }
 
-/* 深色主题下的导航栏 */
+/* 深色主题适配 */
 :global(.dark-theme) .navbar {
   background: #2a2a2a;
   /* 深色主题下的导航栏颜色 */
   border-bottom-color: #444444;
+}
+
+:global(.dark-theme) .sidebarToggle:hover {
+  background: rgba(110, 118, 129, 0.12);
+}
+
+:global(.dark-theme) .actionBtn:hover {
+  background: rgba(110, 118, 129, 0.12);
+}
+
+:global(.dark-theme) .comboboxBtn:hover {
+  background: rgba(110, 118, 129, 0.12);
+}
+
+:global(.dark-theme) .dropdownMenu {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark-theme) .dropdownItem:hover {
+  background: rgba(110, 118, 129, 0.1);
+}
+
+:global(.dark-theme) .dropdownItem.active {
+  background: rgba(88, 166, 255, 0.1);
+}
+
+:global(.dark-theme) .dropdownItem.active:hover {
+  background: rgba(88, 166, 255, 0.15);
 }
 
 /* 响应式 */
@@ -211,6 +292,13 @@
     padding: 6px var(--spacing-sm);
     font-size: 13px;
   }
+
+  /* 移动端减少悬浮效果 */
+  .sidebarToggle:hover,
+  .actionBtn:hover,
+  .comboboxBtn:hover {
+    transform: translateY(-0.25px);
+  }
 }
 
 @media (max-width: 480px) {
@@ -225,5 +313,27 @@
 
   .comboboxBtn span {
     display: none;
+  }
+}
+
+/* 减少动画在低性能设备上的影响 */
+@media (prefers-reduced-motion: reduce) {
+
+  .sidebarToggle,
+  .actionBtn,
+  .comboboxBtn,
+  .dropdownItem {
+    transition: background-color 0.1s ease;
+  }
+
+  .sidebarToggle:hover,
+  .actionBtn:hover,
+  .comboboxBtn:hover,
+  .dropdownItem:hover {
+    transform: none;
+  }
+
+  .dropdownMenu {
+    animation: none;
   }
 }

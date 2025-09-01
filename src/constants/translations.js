@@ -8,8 +8,10 @@ export const TRANSLATIONS = {
     modelHelp: '可以选择预设模型或输入自定义模型名',
     modelInputPlaceholder: '输入自定义模型名',
     detectedModelsTitle: '检测到的模型',
+    detecting: '检测中',
+    detected: '检测到',
     proxyUrl: '代理服务器 URL (可选)',
-    proxyHelp: '留空使用默认代理，建议使用自己的反向代理',
+    proxyHelp: '留空使用默认代理',
 
     // 控制设置
     concurrencyControl: '并发控制',
@@ -84,6 +86,12 @@ export const TRANSLATIONS = {
     statusRetrying: '重试中',
     statusPending: '等待中',
 
+    // 状态信息翻译
+    validKeyInfo: '有效密钥',
+    paidKeyInfo: '付费密钥',
+    freeKeyInfo: '免费密钥',
+    invalidKeyInfo: 'API密钥无效',
+
     // 消息提示
     enterApiKeys: '请输入API密钥！',
     enterValidKeys: '请输入有效的API密钥！',
@@ -119,7 +127,7 @@ export const TRANSLATIONS = {
 
     // 使用说明
     usageTitle: '使用说明：',
-    usage1: '• 强烈建议使用自己的反向代理URL，公共代理可能不稳定',
+    usage1: '• 建议使用自己的反向代理URL，公共代理可能不稳定',
     usage2: '• 测试过程中密钥仅用于验证，不会被存储',
 
     // 通用
@@ -154,8 +162,10 @@ export const TRANSLATIONS = {
     modelHelp: 'Choose preset model or enter custom model name',
     modelInputPlaceholder: 'Enter custom model name',
     detectedModelsTitle: 'Detected Models',
+    detecting: 'Detecting...',
+    detected: 'Detected',
     proxyUrl: 'Proxy Server URL (Optional)',
-    proxyHelp: 'Leave empty to use default proxy, recommend using your own reverse proxy',
+    proxyHelp: 'Leave empty to use default proxy',
 
     // Control settings
     concurrencyControl: 'Concurrency Control',
@@ -230,6 +240,12 @@ export const TRANSLATIONS = {
     statusRetrying: 'Retrying',
     statusPending: 'Pending',
 
+    // Status info translations
+    validKeyInfo: 'Valid Key',
+    paidKeyInfo: 'Paid Key',
+    freeKeyInfo: 'Free Key',
+    invalidKeyInfo: 'Invalid API Key',
+
     // Message prompts
     enterApiKeys: 'Please enter API keys!',
     enterValidKeys: 'Please enter valid API keys!',
@@ -267,7 +283,7 @@ export const TRANSLATIONS = {
 
     // Usage instructions
     usageTitle: 'Usage Instructions:',
-    usage1: '• Strongly recommend using your own reverse proxy URL, public proxies may be unstable',
+    usage1: '• Recommend using your own reverse proxy URL, public proxies may be unstable',
     usage2: '• Keys are only used for validation during testing, not stored',
 
     // General

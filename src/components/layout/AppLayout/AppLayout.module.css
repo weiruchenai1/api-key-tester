@@ -10,14 +10,14 @@
   flex: 1;
   margin-left: 60px;
   margin-top: 60px;
-  transition: margin-left 0.3s ease;
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 60px);
 }
 
+/* PC端不再使用margin-left来适应侧边栏展开，保持固定的60px margin */
 .mainWrapper.sidebarExpanded {
-  margin-left: 160px;
+  margin-left: 60px;
 }
 
 .container {

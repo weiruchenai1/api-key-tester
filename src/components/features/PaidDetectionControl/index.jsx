@@ -78,7 +78,7 @@ const PaidDetectionControl = () => {
         <div className={styles.statusInfo}>
           <div className={styles.statusItem}>
             <span className={styles.statusLabel}>当前API类型:</span>
-            <span className={styles.statusValue}>Google Gemini</span>
+            <span className={styles.statusValue}>Gemini</span>
           </div>
           <div className={styles.statusItem}>
             <span className={styles.statusLabel}>付费检测状态:</span>

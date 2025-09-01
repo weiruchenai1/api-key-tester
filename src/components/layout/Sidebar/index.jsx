@@ -71,7 +71,7 @@ const Sidebar = ({ isCollapsed }) => {
           <path d="M12 24A14.304 14.304 0 000 12 14.304 14.304 0 0012 0a14.305 14.305 0 0012 12 14.305 14.305 0 00-12 12" fill="url(#lobe-icons-gemini-fill)" fillRule="nonzero"></path>
         </svg>
       ),
-      name: 'Google Gemini'
+      name: 'Gemini'
     },
     {
       type: 'claude',

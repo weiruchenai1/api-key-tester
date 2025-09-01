@@ -121,7 +121,7 @@ const ModelSelector = () => {
         {t('selectModel')}
         {state.detectedModels.size > 0 && (
           <span className={styles.detectedCount}>
-            {' '}({t('detecting')} {state.detectedModels.size} {t('models')})
+            {' '}({t('detected')} {state.detectedModels.size} {t('models')})
           </span>
         )}
       </label>
