@@ -10,12 +10,10 @@ const Results = () => {
   const { state } = useAppState();
 
   return (
-    <div className="results-container">
+    <>
       {(state.showResults || state.isTesting || state.keyResults.length > 0) ? (
         <>
           <StatsCards />
-
-          {/* 密钥显示区域 - 包装在卡片中 */}
           <div className="function-card results-card">
             <ResultTabs />
             <div className="results-content">
@@ -34,7 +32,7 @@ const Results = () => {
       )}
 
       <Loading isVisible={state.isTesting && state.keyResults.length === 0} />
-    </div>
+    </>
   );
 };
 

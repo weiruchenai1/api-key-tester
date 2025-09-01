@@ -80,13 +80,66 @@ body {
 /* 基础卡片样式 */
 .function-card {
   background: var(--bg-card);
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   border-radius: var(--border-radius);
   border: 1px solid var(--border-color);
   margin-bottom: var(--spacing-md);
 }
 
-/* 统计容器和卡片样式 - 强制付费密钥在第一行 */
+/* 高级设置按钮样式 - 去掉背景卡片 */
+.settings-card {
+  padding: 0;
+  background: none;
+  /* 去掉背景 */
+  border: none;
+  /* 去掉边框 */
+  margin-bottom: var(--spacing-md);
+}
+
+.settings-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  height: 100%;
+  min-height: 48px;
+  padding: var(--spacing-md) var(--spacing-xl);
+  /* 增加左右内边距 */
+  background: var(--color-secondary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+  margin-bottom: var(--spacing-md);
+}
+
+.settings-icon {
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* 使用说明卡片样式 */
+.usage-card {
+  background: #e3f2fd;
+  border-color: #bbdefb;
+  color: #1976d2;
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+/* 让左右两列底部完全对齐 */
+.leftColumn> :last-child,
+.rightColumn> :last-child {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* 统计容器和卡片样式 */
 .stats-container {
   display: flex;
   flex-direction: column;
@@ -97,11 +150,9 @@ body {
 .stats {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  /* 强制5列，确保付费密钥在第一行 */
   gap: var(--spacing-sm);
 }
 
-/* 当没有付费检测时，使用4列布局 */
 .stats.no-paid-detection {
   grid-template-columns: repeat(4, 1fr);
 }
@@ -117,7 +168,6 @@ body {
   border: 1px solid var(--border-color);
   text-align: center;
   min-width: 80px;
-  /* 减小最小宽度以适应移动端 */
   min-height: 80px;
   flex: 1;
   display: flex;
@@ -133,7 +183,6 @@ body {
 
 .stat-number {
   font-size: clamp(1.4rem, 3vw, 2.2rem);
-  /* 调整字体范围适应移动端 */
   font-weight: 700;
   margin-bottom: 4px;
   line-height: 1;
@@ -142,7 +191,6 @@ body {
 .stat-label {
   color: var(--text-secondary);
   font-size: clamp(10px, 2vw, 14px);
-  /* 让标签字体也响应式调整 */
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.3px;
@@ -177,28 +225,22 @@ body {
   color: var(--color-primary);
 }
 
-/* 结果容器 */
-.results-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-}
-
-/* 结果卡片 - 让高度与左侧保持一致 */
+/* 结果卡片 - 适中的高度与左侧对齐 */
 .results-card {
   display: flex;
   flex-direction: column;
-  min-height: 400px;
-  height: auto;
+  flex: 1;
   margin-bottom: 0;
+  max-height: 377px;
+  min-height: 377px;
+  box-sizing: border-box;
 }
 
-/* 结果内容区域 */
+/* 结果内容区域 - 适中的高度 */
 .results-content {
   flex: 1;
-  min-height: 300px;
-  max-height: 500px;
+  min-height: 0;
+  max-height: 280px;
   overflow: hidden;
   position: relative;
   margin-bottom: var(--spacing-md);
@@ -218,7 +260,7 @@ body {
 .virtualized-list-container {
   height: 100%;
   position: relative;
-  min-height: 300px;
+  min-height: 280px;
 }
 
 /* 密钥项包装器 */
@@ -321,6 +363,7 @@ body {
   display: flex;
   border-bottom: 1px solid var(--border-color);
   margin-bottom: var(--spacing-md);
+  flex-shrink: 0;
 }
 
 .tab {
@@ -338,34 +381,41 @@ body {
   border-bottom-color: var(--color-primary);
 }
 
-/* 空状态样式 */
+/* 空状态样式 - 修复文字遮挡问题 */
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
-  min-height: 200px;
+  min-height: 280px;
+  padding: var(--spacing-lg);
   color: var(--text-secondary);
   text-align: center;
+  overflow: hidden;
 }
 
 .empty-icon {
   font-size: 2rem;
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
   opacity: 0.6;
 }
 
 .empty-text {
   font-size: var(--font-size-base);
   opacity: 0.8;
+  line-height: 1.4;
+  word-wrap: break-word;
+  max-width: 100%;
 }
 
-/* 复制按钮区域 */
+/* 复制按钮区域 - 完全适配宽度并缩短高度 */
 .copy-buttons {
   display: flex;
   justify-content: center;
   flex-shrink: 0;
+  width: 100%;
+  padding: var(--spacing-xs) 0;
 }
 
 .copy-btn {
@@ -380,17 +430,17 @@ body {
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
 }
 
 .copy-btn:hover {
   background: var(--color-primary);
   opacity: 0.9;
   transform: translateY(-1px);
-}
-
-.copy-btn.paid {
-  background: linear-gradient(135deg, #667eea, #764ba2);
 }
 
 /* 滚动条 */
@@ -435,6 +485,16 @@ body {
   color: #fff3cd;
 }
 
+.dark-theme .usage-card {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.dark-theme .settings-button {
+  background: var(--color-secondary);
+}
+
 /* 工具类 */
 .hidden {
   display: none !important;
@@ -452,10 +512,20 @@ body {
   flex-direction: column;
 }
 
-/* 移动端优化 - 保持一行显示 */
+/* 移动端优化 */
 @media (max-width: 768px) {
   .function-card {
-    padding: var(--spacing-md);
+    padding: var(--spacing-sm);
+  }
+
+  .usage-card {
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .settings-button {
+    min-height: 40px;
+    font-size: 14px;
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 
   .key-item {
@@ -487,8 +557,23 @@ body {
   }
 
   .results-content {
-    min-height: 250px;
-    max-height: 400px;
+    max-height: 240px;
+  }
+
+  .results-card {
+    max-height: 340px;
+    min-height: 340px;
+  }
+
+  .empty-state {
+    min-height: 240px;
+    padding: var(--spacing-md);
+  }
+
+  .copy-btn {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-base);
   }
 }
 
@@ -510,5 +595,11 @@ body {
 
   .stats {
     gap: 4px;
+  }
+
+  .copy-btn {
+    width: 100%;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 14px;
   }
 }

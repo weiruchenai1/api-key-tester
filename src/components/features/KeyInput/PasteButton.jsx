@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
+import styles from './KeyInput.module.css';
 
 const PasteButton = () => {
   const { t } = useLanguage();
@@ -37,7 +38,7 @@ const PasteButton = () => {
 
   return (
     <button
-      className="paste-btn"
+      className={`${styles.controlBtn} ${styles.pasteBtn}`}
       onClick={handlePaste}
       disabled={state.isTesting}
       title={t('paste')}

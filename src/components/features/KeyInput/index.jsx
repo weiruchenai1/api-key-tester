@@ -3,19 +3,22 @@ import TextareaInput from './TextareaInput';
 import FileImport from './FileImport';
 import PasteButton from './PasteButton';
 import { useLanguage } from '../../../hooks/useLanguage';
+import styles from './KeyInput.module.css';
 
 const KeyInput = () => {
   const { t } = useLanguage();
 
   return (
     <div className="input-group">
-      <div className="label-with-import">
+      <div className={styles.labelWithControls}>
         <label htmlFor="apiKeys">{t('apiKeys')}</label>
-        <FileImport />
+        <div className={styles.inputControls}>
+          <FileImport />
+          <PasteButton />
+        </div>
       </div>
-      <div className="textarea-wrapper">
+      <div className={styles.textareaWrapper}>
         <TextareaInput />
-        <PasteButton />
       </div>
     </div>
   );

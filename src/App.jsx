@@ -14,20 +14,19 @@ const AppContent = () => {
   const { t } = useLanguage();
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
 
-  // 左侧功能区（移除API类型选择器）
+  // 左侧功能区（移除Controls的function-card包装）
   const leftPanel = (
     <div>
       <div className="function-card">
         <ApiConfig />
       </div>
-      
+
       <div className="function-card">
         <KeyInput />
       </div>
 
-      <div className="function-card">
-        <Controls />
-      </div>
+      {/* Controls组件不再包装在function-card中 */}
+      <Controls />
 
       <div className="function-card usage-card">
         <strong>{t('usageTitle')}</strong>
@@ -36,7 +35,7 @@ const AppContent = () => {
       </div>
 
       <div className="function-card settings-card">
-        <button 
+        <button
           className="settings-button"
           onClick={() => setIsAdvancedSettingsOpen(true)}
         >
@@ -60,7 +59,7 @@ const AppContent = () => {
           rightPanel
         }}
       </AppLayout>
-      <AdvancedSettings 
+      <AdvancedSettings
         isOpen={isAdvancedSettingsOpen}
         onClose={() => setIsAdvancedSettingsOpen(false)}
       />

@@ -1,31 +1,32 @@
-.key-input {
+.keyInput {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.input-group {
-  margin-bottom: 16px;
-}
-
-.label-with-controls {
+.labelWithControls {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
 }
 
-.label-with-controls label {
+.labelWithControls label {
   font-weight: 600;
-  color: #495057;
+  color: var(--text-primary);
   font-size: clamp(0.9rem, 2vw, 1rem);
 }
 
-.textarea-wrapper {
+.inputControls {
+  display: flex;
+  gap: 8px;
+}
+
+.textareaWrapper {
   position: relative;
 }
 
-.form-control.textarea {
+.textareaWrapper .form-control {
   resize: vertical;
   min-height: 120px;
   font-family: 'Courier New', monospace;
@@ -39,75 +40,98 @@
   background: white;
 }
 
-.form-control.textarea:focus {
+.textareaWrapper .form-control:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.form-control.textarea:hover:not(:disabled) {
+.textareaWrapper .form-control:hover:not(:disabled) {
   border-color: #667eea;
   background: #fafbff;
 }
 
-.form-control.textarea:disabled {
+.textareaWrapper .form-control:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   background: #f8f9fa;
 }
 
-.key-input-controls {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-  flex-wrap: wrap;
-}
-
-.import-btn,
-.paste-btn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: auto;
-  padding: 8px 12px;
-  font-size: clamp(12px, 2vw, 14px);
-}
-
 /* 深色主题 */
-:global(.dark-theme) .label-with-controls label {
+:global(.dark-theme) .labelWithControls label {
   color: #e8eaed;
 }
 
-:global(.dark-theme) .form-control.textarea {
+:global(.dark-theme) .textareaWrapper .form-control {
   background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%);
   color: #e8eaed;
   border-color: #3c4269;
 }
 
-:global(.dark-theme) .form-control.textarea:focus {
+:global(.dark-theme) .textareaWrapper .form-control:focus {
   border-color: #4c63d2;
   box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1);
 }
 
-:global(.dark-theme) .form-control.textarea:hover:not(:disabled) {
+:global(.dark-theme) .textareaWrapper .form-control:hover:not(:disabled) {
   border-color: #4c63d2;
   background: linear-gradient(135deg, #252849 0%, #2a2d47 100%);
 }
 
-:global(.dark-theme) .form-control.textarea:disabled {
+:global(.dark-theme) .textareaWrapper .form-control:disabled {
   background: #2a2d47;
 }
 
 /* 移动端优化 */
 @media (max-width: 768px) {
-  .key-input-controls {
-    justify-content: center;
+  .inputControls {
+    gap: 6px;
   }
+}
 
-  .import-btn,
-  .paste-btn {
-    flex: 1;
-    max-width: 120px;
-    justify-content: center;
-  }
+/* 添加到 KeyInput.module.css 末尾 */
+
+.controlBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #dee2e6;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.controlBtn:hover:not(:disabled) {
+  background: #f8f9fa;
+  border-color: #667eea;
+  transform: translateY(-1px);
+}
+
+.controlBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.importBtn:hover:not(:disabled) {
+  background: #e3f2fd;
+}
+
+.pasteBtn:hover:not(:disabled) {
+  background: #fff3e0;
+}
+
+/* 深色主题 */
+:global(.dark-theme) .controlBtn {
+  background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+  border-color: #3c4269;
+  color: #e8eaed;
+}
+
+:global(.dark-theme) .controlBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #3c4269 0%, #2a2d47 100%);
+  border-color: #4c63d2;
 }

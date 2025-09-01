@@ -5,20 +5,23 @@
 }
 
 .urlModelRow {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--spacing-md);
-  align-items: flex-start;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+  /* 允许网格项收缩 */
 }
 
-.urlModelRow > * {
-  flex: 1;
+/* 代理设置容器 - 固定宽度结构 */
+.proxySelectorContainer {
+  width: 100%;
+  min-width: 0;
+  /* 允许收缩 */
 }
 
-.input-group {
-  margin-bottom: var(--spacing-md);
-}
-
-.input-group label {
+.proxySelectorContainer label {
   display: block;
   margin-bottom: var(--spacing-sm);
   font-weight: 600;
@@ -26,19 +29,175 @@
   font-size: var(--font-size-base);
 }
 
-.form-control {
+.proxyInputWrapper {
+  position: relative;
   width: 100%;
-  padding: var(--spacing-md);
+}
+
+.proxyInput {
+  width: 100%;
+  padding: 12px var(--spacing-md);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
   font-size: var(--font-size-base);
   background: var(--bg-input);
   color: var(--text-primary);
+  height: 44px;
+  box-sizing: border-box;
+  padding-right: 40px;
+  min-width: 0;
+  /* 允许收缩 */
 }
 
-.form-control:focus {
+.proxyInput:focus {
   outline: none;
   border-color: var(--border-focus);
+}
+
+.dropdownButton {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6B7280;
+  font-size: 12px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdownHeader {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #6B7280;
+  border-bottom: 1px solid #F3F4F6;
+  background: #F9FAFB;
+}
+
+.dropdownItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 13px;
+  border-bottom: 1px solid #F3F4F6;
+  transition: background-color 0.2s;
+}
+
+.dropdownItem:hover {
+  background-color: #F9FAFB;
+}
+
+.dropdownItem:last-child {
+  border-bottom: none;
+}
+
+/* 模型选择器容器 - 固定宽度结构 */
+.modelSelectorContainer {
+  width: 100%;
+  min-width: 0;
+  /* 允许收缩 */
+}
+
+.modelSelectorContainer label {
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: var(--font-size-base);
+}
+
+.modelInputRow {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  /* 允许收缩 */
+}
+
+.modelSelect,
+.modelInput {
+  flex: 1;
+  padding: 12px var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  height: 44px;
+  box-sizing: border-box;
+  min-width: 0;
+  /* 允许收缩 */
+  width: 0;
+  /* 强制flex计算宽度 */
+}
+
+.modelSelect:focus,
+.modelInput:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+/* 固定按钮宽度，防止挤压模型选择框 */
+.modelButton {
+  padding: 10px 12px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  /* 防止按钮被压缩 */
+  width: 60px;
+  /* 固定宽度 */
+  height: 44px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.modelButton:hover:not(:disabled) {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.modelButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modelButton.active {
+  background: var(--color-primary);
+}
+
+.detectButton {
+  background: #28a745 !important;
+  width: 75px;
+  /* 固定宽度 */
+}
+
+.detectButton:hover:not(:disabled) {
+  background: #218838 !important;
 }
 
 .form-help {
@@ -48,58 +207,15 @@
   line-height: 1.3;
 }
 
-.model-input-group {
-  display: flex;
-  gap: var(--spacing-sm);
-  align-items: flex-end;
-  flex-wrap: wrap;
-}
-
-.model-input-group .form-control {
-  flex: 1;
-  min-width: 120px;
-  max-width: 200px;
-}
-
-.model-toggle-btn {
-  padding: var(--spacing-md) 10px;
-  background: var(--color-secondary);
-  color: white;
-  border: none;
-  border-radius: var(--border-radius);
-  cursor: pointer;
-  font-size: var(--font-size-sm);
-  white-space: nowrap;
-  flex-shrink: 0;
-  min-width: 70px;
-}
-
-.detect-models-btn {
-  background: var(--color-success);
-  min-width: 80px;
-}
-
-.model-toggle-btn.active {
-  background: var(--color-primary);
-}
-
-.paid-detection-btn {
-  background: var(--color-warning);
-  min-width: 120px;
-}
-
-.paid-detection-btn.active {
-  background: var(--color-success);
-}
-
-.detected-models {
+/* 检测到的模型样式 */
+.detectedModels {
   background: #e3f2fd;
   border: 1px solid #bbdefb;
   border-radius: var(--border-radius);
   margin-top: 10px;
 }
 
-.detected-models-header {
+.detectedModelsHeader {
   padding: var(--spacing-md);
   cursor: pointer;
   display: flex;
@@ -108,34 +224,35 @@
   border-bottom: 1px solid #bbdefb;
 }
 
-.detected-models-header h4 {
+.detectedModelsHeader h4 {
   margin: 0;
   color: #1976d2;
   font-size: var(--font-size-base);
 }
 
-.collapse-icon {
+.collapseIcon {
   color: #1976d2;
   font-size: 14px;
+  transition: transform 0.2s ease;
 }
 
-.collapse-icon.collapsed {
+.collapseIcon.collapsed {
   transform: rotate(-90deg);
 }
 
-.model-list-container {
+.modelListContainer {
   padding: var(--spacing-md);
   max-height: 200px;
   overflow-y: auto;
 }
 
-.model-list {
+.modelList {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.model-tag {
+.modelTag {
   background: #2196f3;
   color: white;
   padding: 4px var(--spacing-sm);
@@ -143,62 +260,127 @@
   font-size: var(--font-size-sm);
   cursor: pointer;
   word-break: break-all;
+  transition: background 0.2s ease;
 }
 
-.form-warning {
-  color: var(--color-danger);
-  font-size: var(--font-size-sm);
-  font-weight: 700;
-  margin-top: var(--spacing-sm);
-  background: #ffebee;
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: var(--border-radius);
-  border-left: 4px solid var(--color-danger);
+.modelTag:hover {
+  background: #1976d2;
 }
 
 /* 深色主题 */
-.dark-theme .detected-models {
+:global(.dark-theme) .proxyInput {
+  background: var(--bg-input);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+:global(.dark-theme) .proxyInput:focus {
+  border-color: var(--border-focus);
+}
+
+:global(.dark-theme) .dropdownMenu {
+  background: #2a2d47;
+  border-color: #3c4269;
+}
+
+:global(.dark-theme) .dropdownHeader {
+  background: #1e1e2e;
+  color: #b0b3c1;
+  border-bottom-color: #3c4269;
+}
+
+:global(.dark-theme) .dropdownItem {
+  color: #e8eaed;
+  border-bottom-color: #3c4269;
+}
+
+:global(.dark-theme) .dropdownItem:hover {
+  background-color: #3c4269;
+}
+
+:global(.dark-theme) .modelButton {
+  background: linear-gradient(135deg, #3c4269 0%, #2a2d47 100%);
+}
+
+:global(.dark-theme) .modelButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4a5079 0%, #3c4269 100%);
+}
+
+:global(.dark-theme) .detectButton {
+  background: #28a745 !important;
+}
+
+:global(.dark-theme) .detectButton:hover:not(:disabled) {
+  background: #218838 !important;
+}
+
+:global(.dark-theme) .detectedModels {
   background: var(--bg-card);
   border-color: var(--border-color);
 }
 
-.dark-theme .detected-models-header {
+:global(.dark-theme) .detectedModelsHeader {
   border-bottom-color: var(--border-color);
 }
 
-.dark-theme .detected-models-header h4 {
+:global(.dark-theme) .detectedModelsHeader h4 {
   color: var(--color-primary);
 }
 
-.dark-theme .collapse-icon {
+:global(.dark-theme) .collapseIcon {
   color: var(--color-primary);
 }
 
-.dark-theme .model-tag {
+:global(.dark-theme) .modelTag {
   background: var(--color-primary);
 }
 
-.dark-theme .form-warning {
-  background: var(--bg-card);
-  color: var(--color-danger);
-  border-left-color: var(--color-danger);
-}
-
-/* 移动端 */
+/* 移动端优化 */
 @media (max-width: 768px) {
   .urlModelRow {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: var(--spacing-md);
   }
-  
-  .model-input-group {
-    flex-direction: column;
-    align-items: stretch;
+
+  .modelInputRow {
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
   }
 
-  .model-toggle-btn {
+  .modelSelect,
+  .modelInput {
     width: 100%;
-    margin-top: var(--spacing-sm);
-    min-width: auto;
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .modelButton {
+    flex: 1;
+    width: auto;
+    min-width: 60px;
+  }
+
+  .detectButton {
+    width: auto;
+    min-width: 75px;
+  }
+
+  .proxyInput {
+    padding-right: 40px;
+  }
+}
+
+/* 针对侧边栏展开时的特殊处理 */
+@media (min-width: 769px) {
+
+  /* 确保在较小屏幕下仍能正常显示 */
+  .urlModelRow {
+    min-width: 400px;
+    /* 设置最小宽度 */
+  }
+
+  .modelSelect,
+  .modelInput {
+    min-width: 100px;
+    /* 设置最小宽度 */
   }
 }

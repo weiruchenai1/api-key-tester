@@ -2,11 +2,12 @@ import React, { useRef } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useFileHandler } from '../../../hooks/useFileHandler';
+import styles from './KeyInput.module.css';
 
 const FileImport = () => {
   const { t } = useLanguage();
   const { state } = useAppState();
-  const { importFile } = useFileHandler(); // 移除isImporting，因为它没被使用
+  const { importFile } = useFileHandler();
   const fileInputRef = useRef(null);
 
   const handleImportClick = () => {
@@ -25,7 +26,7 @@ const FileImport = () => {
   return (
     <>
       <button
-        className="import-btn"
+        className={`${styles.controlBtn} ${styles.importBtn}`}
         onClick={handleImportClick}
         disabled={state.isTesting}
         title={t('importFile')}
