@@ -156,10 +156,10 @@
 @media (max-width: 768px) {
   .sidebar {
     width: 160px;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 56px);
     position: fixed;
     left: 0;
-    top: 60px;
+    top: 56px;
     z-index: 999;
     border-right: 1px solid var(--border-color);
     flex-direction: column;
