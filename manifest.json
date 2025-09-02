@@ -1,0 +1,25 @@
+{
+  "short_name": "API Key Tester",
+  "name": "API Key Tester - 批量检测API密钥有效性",
+  "description": "批量检测 OpenAI、Claude、Gemini API 密钥有效性的工具",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#667eea",
+  "background_color": "#ffffff",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": [
+    "productivity",
+    "utilities",
+    "developer"
+  ],
+  "lang": "zh-CN"
+}
