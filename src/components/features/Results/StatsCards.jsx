@@ -44,30 +44,25 @@ const StatsCards = () => {
     });
   }
 
-  // 第二行状态（测试相关）- 计算当前状态和累计重试
+  // 第二行状态（测试相关）
   const testingCount = state.keyResults.filter(k => ['testing', 'pending'].includes(k.status)).length;
   const retryingCount = state.keyResults.filter(k => k.status === 'retrying').length;
-
-  // 计算总重试次数（所有密钥的重试次数总和）
-  const totalRetries = state.keyResults.reduce((sum, k) => sum + (k.retryCount || 0), 0);
 
   const testingStats = [
     {
       key: 'testing',
-      value: state.isTesting ? testingCount : state.keyResults.length, // 测试中显示当前测试数，完成后显示总数
-      className: 'testing',
-      label: state.isTesting ? t('testing') : t('completed') // 动态标签
+      value: testingCount,
+      className: 'testing'
     },
     {
       key: 'retrying',
-      value: state.isTesting ? retryingCount : totalRetries, // 测试中显示当前重试数，完成后显示总重试数
-      className: 'retrying',
-      label: state.isTesting ? t('retrying') : t('totalRetries') // 动态标签
+      value: retryingCount,
+      className: 'retrying'
     }
   ];
 
-  // 修复显示条件 - 只要有测试结果就显示
-  const shouldShowTestingStats = state.keyResults.length > 0;
+  // 修复显示条件：只要开始过测试就一直显示（包括测试完成后）
+  const shouldShowTestingStats = state.showResults;
 
   return (
     <div className="stats-container">
@@ -85,7 +80,7 @@ const StatsCards = () => {
         ))}
       </div>
 
-      {/* 第二行：测试状态（始终显示，有结果时） */}
+      {/* 第二行：测试状态（测试开始后一直显示） */}
       {shouldShowTestingStats && (
         <div className="stats testing-stats">
           {testingStats.map(stat => (
@@ -94,7 +89,7 @@ const StatsCards = () => {
                 {stat.value}
               </div>
               <div className="stat-label">
-                {stat.label || t(stat.key)}
+                {t(stat.key)}
               </div>
             </div>
           ))}
