@@ -5,9 +5,11 @@ import VirtualizedList from './VirtualizedList';
 import Loading from '../../common/Loading';
 import CopyButtons from './CopyButtons';
 import { useAppState } from '../../../contexts/AppStateContext';
+import { useLanguage } from '../../../hooks/useLanguage';
 
 const Results = () => {
   const { state } = useAppState();
+  const { t } = useLanguage();
 
   return (
     <>
@@ -31,7 +33,7 @@ const Results = () => {
                 <path d="m21 21-4.35-4.35" />
               </svg>
             </div>
-            <div className="empty-text">检测结果将显示在这里</div>
+            <div className="empty-text">{t('resultsWillShow')}</div>
           </div>
         </div>
       )}

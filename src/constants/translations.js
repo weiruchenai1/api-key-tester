@@ -116,6 +116,7 @@ export const TRANSLATIONS = {
     noValidKeys: '暂无有效密钥',
     noInvalidKeys: '暂无无效密钥',
     noRateLimitedKeys: '暂无速率限制密钥',
+    resultsWillShow: '检测结果将显示在这里',
 
     // 错误信息
     authFailed: '认证失败',
@@ -270,6 +271,7 @@ export const TRANSLATIONS = {
     noValidKeys: 'No valid keys',
     noInvalidKeys: 'No invalid keys',
     noRateLimitedKeys: 'No throttled keys',
+    resultsWillShow: 'Detection results will be displayed here',
 
     // Error messages
     authFailed: 'Auth Failed',
