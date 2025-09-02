@@ -1,5 +1,4 @@
 import React, { createContext, useReducer, useContext, useEffect } from 'react';
-import { useUserConfig } from '../hooks/useLocalStorage';
 
 // 获取本地存储的初始状态
 const getInitialState = () => {

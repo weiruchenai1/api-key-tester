@@ -19,7 +19,7 @@ const ApiProvider = ({ type, icon, name, isActive, onClick, isCollapsed }) => (
 );
 
 const Sidebar = ({ isCollapsed }) => {
-  const { t } = useLanguage();
+  useLanguage();
   const { state, dispatch } = useAppState();
   const [showPaidDetectionPrompt, setShowPaidDetectionPrompt] = useState(false);
 

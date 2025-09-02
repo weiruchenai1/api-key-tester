@@ -44,7 +44,6 @@ export const TRANSLATIONS = {
 
     // 状态显示
     testing: '测试中',
-    detecting: '检测中',
     completed: '测试完成',
     total: '总计',
     valid: '有效',
@@ -199,7 +198,6 @@ export const TRANSLATIONS = {
 
     // Status display
     testing: 'Testing API keys...',
-    detecting: 'Detecting...',
     completed: 'Test completed',
     total: 'Total',
     valid: 'Valid',

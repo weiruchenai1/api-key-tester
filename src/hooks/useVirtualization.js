@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
 export const useVirtualization = () => {
   const getItemHeight = useCallback((keyData) => {
