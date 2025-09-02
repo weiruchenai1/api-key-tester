@@ -807,4 +807,3 @@ async function testGeminiPaidKey(apiKey, model, config) {
     return { isPaid: null, error: error.message };
   }
 }
-s
