@@ -752,9 +752,6 @@ async function testOpenRouterKey(apiKey, model, config) {
     if (error.name === 'TypeError' && error.message.includes('fetch')) {
       return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false };
     }
-    if (error.name === 'SyntaxError' && error.message.includes('JSON')) {
-      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false };
-    }
     return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
   }
 }

@@ -45,18 +45,24 @@ const StatsCards = () => {
   }
 
   // 第二行状态（测试相关）
+  const testingCount = state.keyResults.filter(k => ['testing', 'pending'].includes(k.status)).length;
+  const retryingCount = state.keyResults.filter(k => k.status === 'retrying').length;
+
   const testingStats = [
     {
       key: 'testing',
-      value: state.keyResults.filter(k => ['testing', 'pending'].includes(k.status)).length,
+      value: testingCount,
       className: 'testing'
     },
     {
       key: 'retrying',
-      value: state.keyResults.filter(k => k.status === 'retrying').length,
+      value: retryingCount,
       className: 'retrying'
     }
   ];
+
+  // 修复显示条件：只要开始过测试就一直显示（包括测试完成后）
+  const shouldShowTestingStats = state.showResults;
 
   return (
     <div className="stats-container">
@@ -74,8 +80,8 @@ const StatsCards = () => {
         ))}
       </div>
 
-      {/* 第二行：测试状态（只在有数据时显示） */}
-      {(testingStats[0].value > 0 || testingStats[1].value > 0) && (
+      {/* 第二行：测试状态（测试开始后一直显示） */}
+      {shouldShowTestingStats && (
         <div className="stats testing-stats">
           {testingStats.map(stat => (
             <div key={stat.key} className="stat-card">
