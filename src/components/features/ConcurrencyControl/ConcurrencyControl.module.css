@@ -172,19 +172,19 @@
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
 }
 
-/* 深色主题 */
+/* 深色主题 - 修改为 #2A2A2A */
 :global(.dark-theme) .concurrencyContainer {
-  background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
+  background: #2A2A2A;
   border-color: #3c4269;
 }
 
 :global(.dark-theme) .concurrencyContainer:hover {
   border-color: #4c63d2;
-  background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
+  background: #323232;
 }
 
 :global(.dark-theme) .concurrencyInputSection .form-control {
-  background: linear-gradient(135deg, #1e1e2e 0%, #232741 100%) !important;
+  background: #1e1e1e !important;
   color: #4c63d2 !important;
   border-color: #3c4269 !important;
 }
@@ -212,14 +212,14 @@
 
 :global(.dark-theme) .concurrencySliderValue {
   color: #4c63d2;
-  background: #232741;
+  background: #1e1e1e;
   border-color: #3c4269;
 }
 
 :global(.dark-theme) .concurrencyPresetBtn {
   border-color: #4c63d2;
   color: #4c63d2;
-  background: #232741;
+  background: #1e1e1e;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 

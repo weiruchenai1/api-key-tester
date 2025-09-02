@@ -1,81 +1,53 @@
 import { useState, useCallback, useEffect } from 'react';
 
 export const useVirtualization = () => {
-  const [listHeight, setListHeight] = useState(350);
-
-  // 动态计算项目高度 - 更精确的计算
   const getItemHeight = useCallback((keyData) => {
-    // 基础高度：padding(12*2=24) + wrapper padding(4*2=8) + 基础内容(40) = 72px
-    let baseHeight = 72;
-    
+    if (!keyData) return 60; // 默认高度
+
+    // 基础高度：padding(12*2=24) + wrapper padding(2*2=4) + 基础内容(40) = 68px
+    let baseHeight = 60;
+
+    // 计算密钥长度对高度的影响
+    const keyLength = keyData.key ? keyData.key.length : 0;
+    if (keyLength > 60) {
+      // 长密钥需要更多行来显示
+      const extraLines = Math.ceil((keyLength - 60) / 60);
+      baseHeight += extraLines * 18; // 每行约18px
+    }
+
     // 每行额外内容的高度
     const lineHeight = 16;
-    
+
     // 如果有模型信息，增加一行
-    if (keyData && keyData.model) {
+    if (keyData.model) {
       baseHeight += lineHeight;
     }
-    
-    // 如果有错误信息，增加一行
-    if (keyData && keyData.error) {
-      baseHeight += lineHeight;
-    }
-    
-    // 如果有重试信息，增加一行
-    if (keyData && keyData.retryCount > 0) {
-      baseHeight += lineHeight;
-    }
-    
-    return baseHeight;
-  }, []);
 
-  const getListHeight = useCallback(() => {
-    // 根据屏幕大小动态调整列表高度
-    if (typeof window !== 'undefined') {
-      const screenHeight = window.innerHeight;
-      if (screenHeight <= 768) {
-        return 300; // 移动端
-      } else if (screenHeight <= 1024) {
-        return 350; // 平板
+    // 如果有错误信息，增加一行（错误信息可能较长）
+    if (keyData.error) {
+      const errorLength = keyData.error.length;
+      if (errorLength > 50) {
+        baseHeight += lineHeight * 2; // 长错误信息占两行
       } else {
-        return 400; // 桌面端
+        baseHeight += lineHeight;
       }
     }
-    return 350;
+
+    // 如果有重试信息，增加一行
+    if (keyData.retryCount > 0) {
+      baseHeight += lineHeight;
+    }
+
+    // 如果有状态信息（有效密钥信息），增加一行
+    if (keyData.status === 'valid' || keyData.status === 'paid') {
+      baseHeight += lineHeight;
+    }
+
+    return Math.max(baseHeight, 68); // 设置最小高度为68px
   }, []);
-
-  const updateListHeight = useCallback(() => {
-    const newHeight = getListHeight();
-    setListHeight(newHeight);
-  }, [getListHeight]);
-
-  useEffect(() => {
-    updateListHeight();
-    let orientationTimeout;
-
-    const handleResize = () => {
-      updateListHeight();
-    };
-
-    const handleOrientationChange = () => {
-      orientationTimeout = setTimeout(updateListHeight, 100);
-    };
-
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('orientationchange', handleOrientationChange);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('orientationchange', handleOrientationChange);
-      if (orientationTimeout) {
-        clearTimeout(orientationTimeout);
-      }
-    };
-  }, [updateListHeight]);
 
   return {
-    listHeight,
     getItemHeight,
-    getListHeight: () => listHeight
+    getListHeight: () => 350
   };
 };

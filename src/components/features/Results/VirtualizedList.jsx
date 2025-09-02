@@ -16,7 +16,7 @@ const KeyItem = ({ index, style, data }) => {
   const getStatusClass = (status) => {
     switch (status) {
       case 'valid': return 'status-valid';
-      case 'paid': return state.enablePaidDetection ? 'status-paid' : 'status-valid';
+      case 'paid': return 'status-paid';
       case 'invalid': return 'status-invalid';
       case 'rate-limited': return 'status-rate-limited';
       case 'retrying': return 'status-retrying';
@@ -27,12 +27,12 @@ const KeyItem = ({ index, style, data }) => {
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'valid': return t('statusValid');
-      case 'paid': return state.enablePaidDetection ? (t('paidKeys') || '付费Key') : t('statusValid');
-      case 'invalid': return t('statusInvalid');
-      case 'rate-limited': return t('statusRateLimit');
-      case 'retrying': return t('statusRetrying');
-      case 'testing': return t('statusTesting');
+      case 'valid': return t('statusValid') || '有效';
+      case 'paid': return t('paidKeys') || '付费';
+      case 'invalid': return t('statusInvalid') || '无效';
+      case 'rate-limited': return t('statusRateLimit') || '速率限制';
+      case 'retrying': return t('statusRetrying') || '重试中';
+      case 'testing': return t('statusTesting') || '测试中';
       default: return status;
     }
   };
@@ -41,7 +41,7 @@ const KeyItem = ({ index, style, data }) => {
     if (!error) return '';
 
     const errorMappings = {
-      'Rate Limited': t('rateLimited'),
+      'Rate Limited': t('rateLimited') || '速率限制',
       '认证失败': t('authFailed') || '认证失败',
       '权限不足': t('permissionDenied') || '权限不足',
       '网络连接失败': t('networkFailed') || '网络连接失败'
@@ -54,6 +54,27 @@ const KeyItem = ({ index, style, data }) => {
     }
 
     return error;
+  };
+
+  // 修复显示逻辑
+  const getKeyStatusInfo = () => {
+    // 如果是有效密钥且没有启用付费检测
+    if (keyData.status === 'valid' && !state.enablePaidDetection) {
+      return `有效密钥 (200)`;
+    }
+
+    // 如果是有效密钥且启用了付费检测但检测为免费密钥
+    if (keyData.status === 'valid' && state.enablePaidDetection && keyData.isPaid === false) {
+      return `免费密钥 (${keyData.cacheApiStatus || 429})`;
+    }
+
+    // 如果是付费密钥
+    if (keyData.status === 'paid' && keyData.isPaid === true) {
+      return `付费密钥 (${keyData.cacheApiStatus || 200})`;
+    }
+
+    // 其他情况返回null，不显示额外信息
+    return null;
   };
 
   return (
@@ -71,14 +92,13 @@ const KeyItem = ({ index, style, data }) => {
           )}
           {keyData.retryCount > 0 && (
             <div className="key-retry">
-              {t('retry') || '重试'}: {keyData.retryCount}
+              重试: {keyData.retryCount}
             </div>
           )}
-          {(keyData.status === 'valid' || keyData.status === 'paid') && !keyData.isPaid && (
+          {/* 修复后的状态信息显示 */}
+          {getKeyStatusInfo() && (
             <div className="key-valid-info">
-              {state.enablePaidDetection && keyData.cacheApiStatus ? 
-                `${t('freeKey')} (${keyData.cacheApiStatus})` : 
-                `${t('validKey')} (${keyData.basicApiStatus || 200})`}
+              {getKeyStatusInfo()}
             </div>
           )}
         </div>
@@ -100,13 +120,14 @@ const EmptyState = ({ message }) => (
 const VirtualizedList = () => {
   const { t } = useLanguage();
   const { state } = useAppState();
-  const { getListHeight, getItemHeight } = useVirtualization();
+  const { getItemHeight } = useVirtualization();
   const listRef = useRef(null);
+  const containerRef = useRef(null);
 
   const filteredKeys = useMemo(() => {
     switch (state.activeTab) {
       case 'valid':
-        return state.enablePaidDetection ? 
+        return state.enablePaidDetection ?
           state.keyResults.filter(k => k.status === 'valid') :
           state.keyResults.filter(k => k.status === 'valid' || k.status === 'paid');
       case 'invalid':
@@ -120,7 +141,8 @@ const VirtualizedList = () => {
     }
   }, [state.keyResults, state.activeTab, state.enablePaidDetection]);
 
-  const listHeight = getListHeight();
+  // 固定高度，与 CSS 中的 max-height 保持一致
+  const listHeight = 350;
 
   // 创建一个函数来获取每个项目的高度
   const getItemSize = (index) => {
@@ -142,23 +164,20 @@ const VirtualizedList = () => {
       'rate-limited': t('noRateLimitedKeys') || '暂无速率限制密钥'
     };
 
-    return (
-      <div className="key-list-container">
-        <EmptyState message={emptyMessages[state.activeTab]} />
-      </div>
-    );
+    return <EmptyState message={emptyMessages[state.activeTab]} />;
   }
 
   return (
-    <div className="key-list-container">
+    <div ref={containerRef} className="virtualized-list-container">
       <List
         ref={listRef}
         height={listHeight}
         itemCount={filteredKeys.length}
         itemSize={getItemSize}
         itemData={filteredKeys}
-        overscanCount={5}
+        overscanCount={3}
         width="100%"
+        className="virtualized-list"
       >
         {KeyItem}
       </List>
@@ -166,4 +185,5 @@ const VirtualizedList = () => {
   );
 };
 
+// 确保正确导出默认组件
 export default VirtualizedList;

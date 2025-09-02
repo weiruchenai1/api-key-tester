@@ -1,0 +1,218 @@
+.sidebar {
+  width: 160px;
+  height: calc(100vh - 60px);
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 60px;
+  z-index: 999;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+
+  /* PC端展开时添加阴影效果 */
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 折叠状态 - 显示为窄条 */
+.sidebar.collapsed {
+  width: 60px;
+  box-shadow: none;
+}
+
+.providersSection {
+  padding: 20px 12px 15px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 折叠时调整内边距 */
+.sidebar.collapsed .providersSection {
+  padding: 20px 8px 15px;
+  align-items: center;
+}
+
+.apiProvider {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 12px;
+  min-height: 36px;
+  justify-content: flex-start;
+  position: relative;
+  font-weight: 500;
+  font-size: 13px;
+  color: var(--text-secondary);
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+/* 折叠时的API提供商样式 */
+.sidebar.collapsed .apiProvider {
+  padding: 8px;
+  justify-content: center;
+  gap: 0;
+  min-width: 36px;
+}
+
+/* GitHub风格的悬浮状态 - 微妙的灰色背景 */
+.apiProvider:hover:not(.active) {
+  background: rgba(175, 184, 193, 0.12);
+  border-color: rgba(175, 184, 193, 0.2);
+  color: var(--text-primary);
+  transform: translateY(-0.5px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* GitHub风格的选中状态 - 无左侧指示条 */
+.apiProvider.active {
+  background: rgba(175, 184, 193, 0.18);
+  border-color: rgba(175, 184, 193, 0.3);
+  color: var(--text-primary);
+  font-weight: 600;
+
+  /* 微妙的内阴影和边框，增加深度感 */
+  background: linear-gradient(135deg,
+      rgba(175, 184, 193, 0.1) 0%,
+      rgba(175, 184, 193, 0.18) 100%);
+
+  box-shadow: 0 0 0 1px rgba(175, 184, 193, 0.15);
+}
+
+/* 深色主题适配 */
+:global(.dark-theme) .sidebar {
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark-theme) .sidebar.collapsed {
+  box-shadow: none;
+}
+
+:global(.dark-theme) .apiProvider:hover:not(.active) {
+  background: rgba(110, 118, 129, 0.12);
+  border-color: rgba(110, 118, 129, 0.2);
+  color: var(--text-primary);
+}
+
+:global(.dark-theme) .apiProvider.active {
+  background: linear-gradient(135deg,
+      rgba(110, 118, 129, 0.12) 0%,
+      rgba(110, 118, 129, 0.2) 100%);
+  border-color: rgba(110, 118, 129, 0.3);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 1px rgba(110, 118, 129, 0.15);
+}
+
+/* 图标样式改进 */
+.providerIcon {
+  font-size: 16px;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.7;
+}
+
+/* 悬浮和选中时的图标状态 */
+.apiProvider:hover .providerIcon,
+.apiProvider.active .providerIcon {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.providerName {
+  font-weight: inherit;
+  font-size: inherit;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.9;
+  letter-spacing: -0.01em;
+}
+
+.apiProvider:hover .providerName,
+.apiProvider.active .providerName {
+  opacity: 1;
+}
+
+/* 折叠时隐藏提供商名称 */
+.sidebar.collapsed .providerName {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+/* 移动端和桌面端统一处理 */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 160px;
+    height: calc(100vh - 56px);
+    position: fixed;
+    left: 0;
+    top: 56px;
+    z-index: 999;
+    border-right: 1px solid var(--border-color);
+    flex-direction: column;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  }
+
+  /* 移动端折叠时完全隐藏 */
+  .sidebar.collapsed {
+    transform: translateX(-160px);
+    width: 160px;
+    box-shadow: none;
+  }
+
+  :global(.dark-theme) .sidebar {
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+  }
+
+  :global(.dark-theme) .sidebar.collapsed {
+    box-shadow: none;
+  }
+}
+
+/* 减少动画在低性能设备上的影响 */
+@media (prefers-reduced-motion: reduce) {
+
+  .apiProvider,
+  .providerIcon,
+  .providerName,
+  .sidebar {
+    transition: none;
+  }
+}
+
+/* 为高对比度模式提供更好的可访问性 */
+@media (prefers-contrast: high) {
+  .apiProvider.active {
+    background: rgba(9, 105, 218, 0.15);
+    border-color: rgba(9, 105, 218, 0.3);
+    color: var(--text-primary);
+  }
+
+  :global(.dark-theme) .apiProvider.active {
+    background: rgba(88, 166, 255, 0.15);
+    border-color: rgba(88, 166, 255, 0.3);
+  }
+}
+
+/* 焦点状态的键盘导航支持 */
+.apiProvider:focus {
+  outline: 2px solid #0969da;
+  outline-offset: -2px;
+}
+
+:global(.dark-theme) .apiProvider:focus {
+  outline-color: #58a6ff;
+}

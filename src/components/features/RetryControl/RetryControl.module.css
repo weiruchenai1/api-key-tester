@@ -166,15 +166,67 @@
   transform: none !important;
 }
 
-/* 深色主题 */
+/* 深色主题 - 修改为 #2A2A2A */
 :global(.dark-theme) .retryContainer {
-  background: linear-gradient(135deg, #3d3314 0%, #2d2a1a 100%);
+  background: #2A2A2A;
   border-color: #5d4e23;
 }
 
 :global(.dark-theme) .retryContainer:hover {
   border-color: #d68910;
-  background: linear-gradient(135deg, #4d4024 0%, #3d3314 100%);
+  background: #323232;
+}
+
+:global(.dark-theme) .retryInputSection .form-control {
+  background: #1e1e1e !important;
+  color: #d68910 !important;
+  border-color: #5d4e23 !important;
+}
+
+:global(.dark-theme) .retryInputSection .form-control:focus {
+  border-color: #d68910 !important;
+  box-shadow: 0 0 0 3px rgba(214, 137, 16, 0.1) !important;
+}
+
+:global(.dark-theme) .retrySlider {
+  background: #5d4e23;
+}
+
+:global(.dark-theme) .retrySlider::-webkit-slider-thumb {
+  background: #d68910;
+}
+
+:global(.dark-theme) .retrySlider::-webkit-slider-thumb:hover {
+  background: #b7791f;
+}
+
+:global(.dark-theme) .retrySlider::-moz-range-thumb {
+  background: #d68910;
+}
+
+:global(.dark-theme) .retrySliderValue {
+  color: #d68910;
+  background: #1e1e1e;
+  border-color: #5d4e23;
+}
+
+:global(.dark-theme) .retryPresetBtn {
+  border-color: #d68910;
+  color: #d68910;
+  background: #1e1e1e;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+:global(.dark-theme) .retryPresetBtn:hover:not(:disabled) {
+  background: #d68910;
+  color: white;
+  box-shadow: 0 4px 12px rgba(214, 137, 16, 0.3);
+}
+
+:global(.dark-theme) .retryPresetBtn.active {
+  background: #d68910;
+  color: white;
+  box-shadow: 0 4px 12px rgba(214, 137, 16, 0.4);
 }
 
 /* 移动端优化 */

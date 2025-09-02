@@ -1,34 +1,57 @@
-import React, { createContext, useReducer, useContext } from 'react';
+import React, { createContext, useReducer, useContext, useEffect } from 'react';
+import { useUserConfig } from '../hooks/useLocalStorage';
 
-// 初始状态
-const initialState = {
-  // API配置
-  apiType: 'openai',
-  model: 'gpt-4o',
-  proxyUrl: '',
+// 获取本地存储的初始状态
+const getInitialState = () => {
+  try {
+    return {
+      // API配置 - 从localStorage获取
+      apiType: localStorage.getItem('apiType') ? JSON.parse(localStorage.getItem('apiType')) : 'openai',
+      model: localStorage.getItem('testModel') ? JSON.parse(localStorage.getItem('testModel')) : 'gpt-4o',
+      proxyUrl: localStorage.getItem('proxyUrl') ? JSON.parse(localStorage.getItem('proxyUrl')) : '',
 
-  // 输入
-  apiKeysText: '',
+      // 输入
+      apiKeysText: '',
 
-  // 并发和重试
-  concurrency: 5,
-  retryCount: 3,
+      // 并发和重试 - 从localStorage获取
+      concurrency: localStorage.getItem('concurrency') ? JSON.parse(localStorage.getItem('concurrency')) : 5,
+      retryCount: localStorage.getItem('maxRetries') ? JSON.parse(localStorage.getItem('maxRetries')) : 3,
 
-  // Gemini付费检测
-  enablePaidDetection: false,
+      // Gemini付费检测 - 从localStorage获取
+      enablePaidDetection: localStorage.getItem('enablePaidDetection') ? JSON.parse(localStorage.getItem('enablePaidDetection')) : false,
 
-  // 测试状态
-  isTesting: false,
-  keyResults: [],
-  progress: 0,
+      // 测试状态
+      isTesting: false,
+      keyResults: [],
+      // progress: 0,  // 删除这行
 
-  // UI状态
-  showResults: false,
-  activeTab: 'all',
-  detectedModels: new Set(),
+      // UI状态
+      showResults: false,
+      activeTab: 'all',
+      detectedModels: new Set(),
 
-  // 消息
-  message: null
+      // 消息
+      message: null
+    };
+  } catch (error) {
+    console.warn('读取本地存储失败，使用默认配置:', error);
+    return {
+      apiType: 'openai',
+      model: 'gpt-4o',
+      proxyUrl: '',
+      apiKeysText: '',
+      concurrency: 5,
+      retryCount: 3,
+      enablePaidDetection: false,
+      isTesting: false,
+      keyResults: [],
+      // progress: 0,  // 删除这行
+      showResults: false,
+      activeTab: 'all',
+      detectedModels: new Set(),
+      message: null
+    };
+  }
 };
 
 // Reducer
@@ -93,7 +116,7 @@ const appReducer = (state, action) => {
           model: state.model,
           isPaid: null // For Gemini paid detection
         })),
-        progress: 0,
+        // progress: 0,  // 删除这行
         activeTab: 'all'
       };
 
@@ -151,7 +174,7 @@ const appReducer = (state, action) => {
 
     case 'CLEAR_ALL':
       return {
-        ...initialState,
+        ...getInitialState(),
         apiType: state.apiType,
         model: getDefaultModel(state.apiType),
         proxyUrl: state.proxyUrl,
@@ -180,7 +203,21 @@ const AppStateContext = createContext();
 
 // Provider组件
 export const AppStateProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(appReducer, initialState);
+  const [state, dispatch] = useReducer(appReducer, getInitialState());
+
+  // 监听状态变化并保存到localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('apiType', JSON.stringify(state.apiType));
+      localStorage.setItem('testModel', JSON.stringify(state.model));
+      localStorage.setItem('proxyUrl', JSON.stringify(state.proxyUrl));
+      localStorage.setItem('concurrency', JSON.stringify(state.concurrency));
+      localStorage.setItem('maxRetries', JSON.stringify(state.retryCount));
+      localStorage.setItem('enablePaidDetection', JSON.stringify(state.enablePaidDetection));
+    } catch (error) {
+      console.warn('保存配置到本地存储失败:', error);
+    }
+  }, [state.apiType, state.model, state.proxyUrl, state.concurrency, state.retryCount, state.enablePaidDetection]);
 
   const value = {
     state,

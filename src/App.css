@@ -1,66 +1,23 @@
+/* App组件基础样式 */
 .App {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  padding: 20px;
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* 使用说明样式 */
+/* 使用说明卡片样式 */
 .alert {
   background: #d1ecf1;
   border: 1px solid #bee5eb;
-  padding: 12px;
-  border-radius: 8px;
-  margin-top: 12px;
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  margin-top: var(--spacing-md);
   color: #0c5460;
-  transition: all 0.3s ease;
-  font-size: clamp(12px, 2vw, 14px);
+  font-size: var(--font-size-base);
   line-height: 1.4;
-}
-
-.alert:hover {
-  border-color: #17a2b8;
-  background: #c3e6ea;
-  box-shadow: 0 2px 12px rgba(23, 162, 184, 0.15);
 }
 
 /* 深色主题 */
 .dark-theme .alert {
-  background: linear-gradient(135deg, #2a2d47 0%, #232741 100%);
-  border-color: #3c4269;
-  color: #e8eaed;
-}
-
-.dark-theme .alert:hover {
-  border-color: #4c63d2;
-  background: linear-gradient(135deg, #323556 0%, #2a2d47 100%);
-  box-shadow: 0 2px 12px rgba(76, 99, 210, 0.2);
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-primary);
 }

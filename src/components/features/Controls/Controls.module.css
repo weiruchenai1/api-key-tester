@@ -1,31 +1,101 @@
-.controls-container {
+.controlsContainer {
   margin-top: 20px;
+  margin-bottom: 20px;
 }
 
-.action-buttons {
-  display: flex;
+.mainActionButtons {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  /* 改为相等的三列 */
   gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
+  width: 100%;
 }
 
-.action-buttons .btn {
+.btn {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  min-width: 140px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 44px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnPrimary {
+  background: #2563eb;
+  /* 改为蓝色 */
+  color: white;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: #1d4ed8;
+  /* 悬停时的深蓝色 */
+  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+}
+
+.btnSecondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btnSecondary:hover:not(:disabled) {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.startTestBtn {
+  font-size: 14px;
+  /* 改为与其他按钮相同的字体大小 */
+  font-weight: 600;
+  /* 改为与其他按钮相同的字体粗细 */
+}
+
+.dedupeBtn,
+.clearBtn {
+  font-size: 14px;
+}
+
+/* 深色主题 */
+:global(.dark-theme) .btnPrimary {
+  background: #3b82f6;
+  /* 深色主题下的蓝色 */
+}
+
+:global(.dark-theme) .btnPrimary:hover:not(:disabled) {
+  background: #2563eb;
+  /* 深色主题悬停时的蓝色 */
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+:global(.dark-theme) .btnSecondary {
+  background: linear-gradient(135deg, #3c4269 0%, #2a2d47 100%);
+}
+
+:global(.dark-theme) .btnSecondary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4a5079 0%, #3c4269 100%);
 }
 
 /* 移动端优化 */
 @media (max-width: 768px) {
-  .action-buttons {
-    flex-direction: column;
+  .mainActionButtons {
+    grid-template-columns: 1fr;
     gap: 12px;
   }
 
-  .action-buttons .btn {
+  .btn {
     width: 100%;
-    justify-content: center;
-    min-width: auto;
+    min-height: 48px;
+    font-size: 16px;
   }
 }

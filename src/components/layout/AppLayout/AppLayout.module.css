@@ -1,48 +1,85 @@
 .appLayout {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg-body);
   min-height: 100vh;
-  padding: 10px;
   line-height: 1.5;
-  position: relative;
+  display: flex;
+}
+
+.mainWrapper {
+  flex: 1;
+  margin-left: 60px;
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 60px);
+}
+
+/* PC端不再使用margin-left来适应侧边栏展开，保持固定的60px margin */
+.mainWrapper.sidebarExpanded {
+  margin-left: 60px;
 }
 
 .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  flex: 1;
+  max-width: none;
+  margin: 0;
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-container);
+  display: flex;
+  flex-direction: column;
 }
 
 .mainContent {
-  padding: 20px;
+  width: 100%;
+  background: transparent;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
-/* 深色主题 */
-:global(.dark-theme) .appLayout {
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+/* 双栏布局 - 确保两列完全等高 */
+.twoColumnLayout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-lg);
+  flex: 1;
+  min-height: 0;
+  align-items: stretch;
 }
 
-:global(.dark-theme) .container {
-  background: linear-gradient(135deg, #232741 0%, #1e1e2e 100%);
-  color: #e8eaed;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+.leftColumn,
+.rightColumn {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-/* 移动端优化 */
+/* 响应式设计 */
+@media (max-width: 992px) {
+  .twoColumnLayout {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+}
+
+/* 移动端响应式 */
 @media (max-width: 768px) {
-  .appLayout {
-    padding: 5px;
+  .mainWrapper {
+    margin-left: 0;
+    margin-top: 56px;
+  }
+
+  .mainWrapper.sidebarExpanded {
+    margin-left: 0;
   }
 
   .container {
-    border-radius: 15px;
-    margin: 0;
+    padding: var(--spacing-md);
   }
 
-  .mainContent {
-    padding: 16px;
+  .twoColumnLayout {
+    min-height: calc(100vh - 120px);
   }
 }

@@ -1,35 +1,66 @@
 export const MODEL_OPTIONS = {
   openai: [
-    'gpt-4o',
     'gpt-4o-mini',
-    'gpt-4-turbo',
-    'gpt-4',
-    'gpt-3.5-turbo'
+    'gpt-4.1-mini',
+    'gpt-4.1-nano',
+    'gpt-5',
+    'gpt-5-mini',
+    'gpt-5-nano'
   ],
   claude: [
-    'claude-3-5-sonnet-20241022',
     'claude-3-5-haiku-20241022',
-    'claude-3-opus-20240229',
-    'claude-3-sonnet-20240229',
-    'claude-3-haiku-20240307'
+    'claude-3-7-sonnet-20250219',
+    'claude-sonnet-4-20250514',
+    'claude-opus-4-20250514',
+    'claude-opus-4-1-20250805'
   ],
   gemini: [
     'gemini-2.0-flash',
-    'gemini-2.5-flash',
+    'gemini-2.5-flash-lite',
     'gemini-2.5-pro'
+  ],
+  deepseek: [
+    'deepseek-chat',
+    'deepseek-reasoner'
+  ],
+  siliconcloud: [
+    'deepseek-ai/DeepSeek-V3',
+    'deepseek-ai/DeepSeek-R1',
+    'Qwen/QwQ-32B',
+    'Qwen/Qwen3-235B-A22B'
+  ],
+  xai: [
+    'grok-2-1212',
+    'grok-2-vision-1212',
+    'grok-3',
+    'grok-3-fast',
+    'grok-3-mini',
+    'grok-3-mini-fast',
+    'grok-4-0709'
+  ],
+  openrouter: [
+    'deepseek/deepseek-chat-v3.1:free'
   ]
 };
 
 export const PROXY_EXAMPLES = {
   openai: 'https://openai.weiruchenai.me/v1',
   claude: 'https://claude.weiruchenai.me/v1',
-  gemini: 'https://gemini.weiruchenai.me/v1beta'
+  gemini: 'https://gemini.weiruchenai.me/v1beta',
+  deepseek: 'https://api.deepseek.com/v1',
+  siliconcloud: 'https://api.siliconflow.cn/v1',
+  xai: 'https://api.x.ai/v1',
+  openrouter: 'https://openrouter.ai/api/v1'
 };
 
 export const DEFAULT_PROXIES = {
   openai: 'https://openai.weiruchenai.me/v1',
   claude: 'https://claude.weiruchenai.me/v1',
-  gemini: 'https://gemini.weiruchenai.me/v1beta'
+  gemini: 'https://gemini.weiruchenai.me/v1beta',
+  deepseek: 'https://api.deepseek.com/v1',
+  siliconcloud: 'https://api.siliconflow.cn/v1',
+  xai: 'https://api.x.ai/v1',
+  openrouter: 'https://openrouter.ai/api/v1'
 };
 
 export const API_ENDPOINTS = {
@@ -42,6 +73,22 @@ export const API_ENDPOINTS = {
   },
   gemini: {
     generateContent: (model) => `/models/${model}:generateContent`,
+    models: '/models'
+  },
+  deepseek: {
+    chat: '/chat/completions',
+    models: '/models'
+  },
+  siliconcloud: {
+    chat: '/chat/completions',
+    models: '/models'
+  },
+  xai: {
+    chat: '/chat/completions',
+    models: '/models'
+  },
+  openrouter: {
+    chat: '/chat/completions',
     models: '/models'
   }
 };

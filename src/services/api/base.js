@@ -1,6 +1,10 @@
 import { testOpenAIKey, getOpenAIModels } from './openai';
 import { testClaudeKey, getClaudeModels } from './claude';
 import { testGeminiKey, getGeminiModels } from './gemini';
+import { testDeepSeekKey, getDeepSeekModels } from './deepseek';
+import { testSiliconCloudKey, getSiliconCloudModels } from './siliconcloud';
+import { testXAIKey, getXAIModels } from './xai';
+import { testOpenRouterKey, getOpenRouterModels } from './openrouter';
 
 export const getApiUrl = (apiType, endpoint, proxyUrl) => {
   if (proxyUrl) {
@@ -14,6 +18,14 @@ export const getApiUrl = (apiType, endpoint, proxyUrl) => {
         return 'https://claude.weiruchenai.me/v1' + endpoint;
       case 'gemini':
         return 'https://gemini.weiruchenai.me/v1beta' + endpoint;
+      case 'deepseek':
+        return 'https://api.deepseek.com/v1' + endpoint;
+      case 'siliconcloud':
+        return 'https://api.siliconflow.cn/v1' + endpoint;
+      case 'xai':
+        return 'https://api.x.ai/v1' + endpoint;
+      case 'openrouter':
+        return 'https://openrouter.ai/api/v1' + endpoint;
       default:
         throw new Error('Unsupported API type: ' + apiType);
     }
@@ -28,6 +40,14 @@ export const testApiKey = async (apiKey, apiType, model, proxyUrl) => {
       return await testClaudeKey(apiKey, model, proxyUrl);
     case 'gemini':
       return await testGeminiKey(apiKey, model, proxyUrl);
+    case 'deepseek':
+      return await testDeepSeekKey(apiKey, model, proxyUrl);
+    case 'siliconcloud':
+      return await testSiliconCloudKey(apiKey, model, proxyUrl);
+    case 'xai':
+      return await testXAIKey(apiKey, model, proxyUrl);
+    case 'openrouter':
+      return await testOpenRouterKey(apiKey, model, proxyUrl);
     default:
       return { valid: false, error: '不支持的API类型', isRateLimit: false };
   }
@@ -42,6 +62,14 @@ export const getAvailableModels = async (apiKey, apiType, proxyUrl) => {
         return await getClaudeModels(apiKey, proxyUrl);
       case 'gemini':
         return await getGeminiModels(apiKey, proxyUrl);
+      case 'deepseek':
+        return await getDeepSeekModels(apiKey, proxyUrl);
+      case 'siliconcloud':
+        return await getSiliconCloudModels(apiKey, proxyUrl);
+      case 'xai':
+        return await getXAIModels(apiKey, proxyUrl);
+      case 'openrouter':
+        return await getOpenRouterModels(apiKey, proxyUrl);
       default:
         return [];
     }
