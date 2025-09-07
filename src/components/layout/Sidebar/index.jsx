@@ -4,22 +4,27 @@ import { useAppState } from '../../../contexts/AppStateContext';
 import PaidDetectionPrompt from '../../features/PaidDetectionPrompt';
 import styles from './Sidebar.module.css';
 
-const ApiProvider = ({ type, icon, name, isActive, onClick, isCollapsed }) => (
-  <div
-    className={`${styles.apiProvider} ${isActive ? styles.active : ''}`}
-    onClick={() => onClick(type)}
-    title={isCollapsed ? name : ''}
-    data-tooltip={name}
-  >
-    <div className={styles.providerIcon}>{icon}</div>
-    <span className={styles.providerName}>
-      {name}
-    </span>
-  </div>
-);
+const ApiProvider = ({ type, icon, name, isActive, onClick, isCollapsed, isDisabled }) => {
+  const { t } = useLanguage();
+  
+  return (
+    <div
+      className={`${styles.apiProvider} ${isActive ? styles.active : ''} ${isDisabled ? styles.disabled : ''}`}
+      onClick={() => !isDisabled && onClick(type)}
+      title={isCollapsed ? name : (isDisabled ? t('cannotSwitchWhileTesting') : '')}
+      data-tooltip={name}
+      style={{ cursor: isDisabled ? 'not-allowed' : 'pointer', opacity: isDisabled ? 0.5 : 1 }}
+    >
+      <div className={styles.providerIcon}>{icon}</div>
+      <span className={styles.providerName}>
+        {name}
+      </span>
+    </div>
+  );
+};
 
 const Sidebar = ({ isCollapsed }) => {
-  useLanguage();
+  const { t } = useLanguage();
   const { state, dispatch } = useAppState();
   const [showPaidDetectionPrompt, setShowPaidDetectionPrompt] = useState(false);
 
@@ -37,6 +42,12 @@ const Sidebar = ({ isCollapsed }) => {
   };
 
   const handleApiTypeChange = (apiType) => {
+    // 如果正在测试，阻止切换并给出提示
+    if (state.isTesting) {
+      alert(t('cannotSwitchWhileTesting'));
+      return;
+    }
+
     dispatch({ type: 'SET_API_TYPE', payload: apiType });
     dispatch({ type: 'CLEAR_DETECTED_MODELS' });
 
@@ -138,6 +149,7 @@ const Sidebar = ({ isCollapsed }) => {
               isActive={state.apiType === provider.type}
               onClick={handleApiTypeChange}
               isCollapsed={isCollapsed}
+              isDisabled={state.isTesting && state.apiType !== provider.type}
             />
           ))}
         </div>

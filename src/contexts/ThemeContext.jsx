@@ -36,17 +36,28 @@ export const ThemeProvider = ({ children }) => {
   }, [theme, resolveActualTheme]); // 现在 resolveActualTheme 被 useCallback 包装，可以安全添加
 
   // 其余代码保持不变...
+  // 优化系统主题监听器，确保兼容性和正确清理
   useEffect(() => {
-    if (theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      const handleChange = () => {
-        setActualTheme(getSystemTheme());
-      };
-
+    if (theme !== 'system') return;
+    
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e) => {
+      setActualTheme(e.matches ? 'dark' : 'light');
+    };
+    
+    // 设置初始值
+    setActualTheme(mediaQuery.matches ? 'dark' : 'light');
+    
+    // 现代浏览器优先使用addEventListener
+    if (mediaQuery.addEventListener) {
       mediaQuery.addEventListener('change', handleChange);
       return () => mediaQuery.removeEventListener('change', handleChange);
+    } else {
+      // 兼容旧浏览器
+      mediaQuery.addListener(handleChange);
+      return () => mediaQuery.removeListener(handleChange);
     }
-  }, [theme, getSystemTheme]);
+  }, [theme]);
 
   useEffect(() => {
     if (actualTheme === 'dark') {
@@ -57,8 +68,13 @@ export const ThemeProvider = ({ children }) => {
     localStorage.setItem('theme', theme);
   }, [actualTheme, theme]);
 
+  // 修复后的主题切换逻辑，支持三个选项循环
   const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+    setTheme(prev => {
+      const themes = ['light', 'dark', 'system'];
+      const currentIndex = themes.indexOf(prev);
+      return themes[(currentIndex + 1) % themes.length];
+    });
   };
 
   const value = {

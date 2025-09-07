@@ -12,10 +12,32 @@ export const LanguageProvider = ({ children }) => {
     if (savedLanguage && ['zh', 'en'].includes(savedLanguage)) {
       setLanguage(savedLanguage);
     } else {
-      // 检测浏览器语言
-      const browserLang = navigator.language.toLowerCase();
-      const detectedLang = browserLang.startsWith('zh') ? 'zh' : 'en';
-      setLanguage(detectedLang);
+      // 增强的浏览器语言检测
+      const detectLanguageFromBrowser = () => {
+        // 检查多个可能的语言来源
+        const languages = [
+          navigator.language,
+          navigator.languages?.[0],
+          navigator.userLanguage, // IE
+          navigator.browserLanguage, // IE
+          'en' // 最终fallback
+        ].filter(Boolean);
+        
+        // 查找第一个匹配的语言
+        for (const lang of languages) {
+          const normalizedLang = lang.toLowerCase();
+          if (normalizedLang.startsWith('zh')) {
+            return 'zh';
+          }
+          if (normalizedLang.startsWith('en')) {
+            return 'en';
+          }
+        }
+        
+        return 'en'; // 默认英文
+      };
+      
+      setLanguage(detectLanguageFromBrowser());
     }
   }, []);
 
@@ -31,15 +53,47 @@ export const LanguageProvider = ({ children }) => {
     setLanguage(prev => prev === 'zh' ? 'en' : 'zh');
   };
 
+  // 增强的翻译函数，支持嵌套键和错误处理
   const t = (key, params = {}) => {
-    let translation = TRANSLATIONS[language]?.[key] || key;
-
-    // 简单的参数替换
-    Object.keys(params).forEach(param => {
-      translation = translation.replace(`{${param}}`, params[param]);
-    });
-
-    return translation;
+    try {
+      let translation;
+      
+      // 支持嵌套键访问，例如 'common.button.save'
+      if (key.includes('.')) {
+        const keys = key.split('.');
+        translation = TRANSLATIONS[language];
+        
+        for (const k of keys) {
+          if (translation && typeof translation === 'object') {
+            translation = translation[k];
+          } else {
+            translation = undefined;
+            break;
+          }
+        }
+      } else {
+        // 简单键访问
+        translation = TRANSLATIONS[language]?.[key];
+      }
+      
+      // 如果没找到翻译，使用fallback
+      if (translation === undefined || translation === null) {
+        translation = key; // 返回原始key作为fallback
+      }
+      
+      // 参数替换
+      if (typeof translation === 'string' && Object.keys(params).length > 0) {
+        Object.keys(params).forEach(param => {
+          const placeholder = new RegExp(`\\{${param}\\}`, 'g');
+          translation = translation.replace(placeholder, params[param]);
+        });
+      }
+      
+      return translation;
+    } catch (error) {
+      console.warn(`Translation error for key: ${key}`, error);
+      return key; // 发生错误时返回原始key
+    }
   };
 
   const value = {
