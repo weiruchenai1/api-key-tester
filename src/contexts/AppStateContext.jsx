@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useContext, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useReducer, useContext, useEffect, useCallback, useRef, useMemo } from 'react';
 import { debounce } from '../utils/debounce';
 
 // 清理旧的localStorage数据
@@ -291,20 +291,16 @@ export const AppStateProvider = ({ children }) => {
     stateRef.current = state;
   }, [state]);
 
-  // 创建防抖的保存函数，避免频繁的localStorage操作
-  const debouncedSaveApiState = useCallback(
-    (() => {
-      const debouncedFn = debounce((apiType, stateToSave) => {
-        try {
-          saveApiTypeState(apiType, stateToSave);
-        } catch (error) {
-          console.warn('保存API状态失败:', error);
-        }
-      }, 300);
-      return debouncedFn;
-    })(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+  // 使用useMemo创建稳定的防抖函数
+  const debouncedSaveApiState = useMemo(
+    () => debounce((apiType, stateToSave) => {
+      try {
+        saveApiTypeState(apiType, stateToSave);
+      } catch (error) {
+        console.warn('保存API状态失败:', error);
+      }
+    }, 300),
+    [] // 空依赖数组，因为saveApiTypeState是稳定的外部函数
   );
 
   // 监听全局配置变化并保存到localStorage（这些变化不频繁，可以立即保存）
