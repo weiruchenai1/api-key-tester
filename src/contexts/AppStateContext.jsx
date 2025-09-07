@@ -293,13 +293,16 @@ export const AppStateProvider = ({ children }) => {
 
   // 创建防抖的保存函数，避免频繁的localStorage操作
   const debouncedSaveApiState = useCallback(
-    debounce((apiType, stateToSave) => {
-      try {
-        saveApiTypeState(apiType, stateToSave);
-      } catch (error) {
-        console.warn('保存API状态失败:', error);
-      }
-    }, 300), // 300ms防抖延迟
+    (() => {
+      const debouncedFn = debounce((apiType, stateToSave) => {
+        try {
+          saveApiTypeState(apiType, stateToSave);
+        } catch (error) {
+          console.warn('保存API状态失败:', error);
+        }
+      }, 300);
+      return debouncedFn;
+    })(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
