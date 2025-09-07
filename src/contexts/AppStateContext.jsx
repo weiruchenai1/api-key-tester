@@ -300,6 +300,7 @@ export const AppStateProvider = ({ children }) => {
         console.warn('保存API状态失败:', error);
       }
     }, 300), // 300ms防抖延迟
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -328,6 +329,7 @@ export const AppStateProvider = ({ children }) => {
     if (shouldSave) {
       debouncedSaveApiState(state.apiType, state);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     state.apiType, 
     state.model, 
