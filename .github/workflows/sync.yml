@@ -1,0 +1,35 @@
+name: Sync Fork
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天午夜运行一次
+  workflow_dispatch:      # 允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # 使用具有 repo 范围的个人访问令牌 (PAT) 以便推送更改
+          # GITHUB_TOKEN 的默认权限是只读的
+          token: ${{ secrets.PAT_TOKEN }}
+          # 获取所有分支和标签的全部历史记录
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote
+        # !!! 重要: 将下面的 URL 替换为你 fork 的原始仓库地址 !!!
+        run: git remote add upstream https://github.com/weiruchenai1/api-key-tester.git
+
+      - name: Sync with upstream
+        run: |
+          git fetch upstream
+          git checkout main # 确保在你的默认分支上
+          git merge upstream/main -m "Merge upstream changes" --no-edit
+          git push origin main

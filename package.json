@@ -2,7 +2,7 @@
   "name": "api-key-tester",
   "version": "1.0.0",
   "private": true,
-  "homepage": ".",
+  "homepage": "https://handsomezhuzhu.github.io/api-key-tester",
   "description": "批量检测 Gemini、Claude、GPT API 密钥有效性的 React 应用",
   "keywords": [
     "api-key",
@@ -15,6 +15,7 @@
     "virtualization"
   ],
   "dependencies": {
+    "gh-pages": "^6.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -28,7 +29,9 @@
     "test:coverage": "react-scripts test --coverage --watchAll=false",
     "test:coverage:watch": "react-scripts test --coverage",
     "eject": "react-scripts eject",
-    "analyze": "npm run build && npx serve -s build"
+    "analyze": "npm run build && npx serve -s build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
