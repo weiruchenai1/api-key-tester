@@ -37,7 +37,13 @@ const PasteButton = () => {
 
   return (
     <button
-      className="btn-base btn-sm btn-ghost absolute top-2 right-2"
+      className="btn-base btn-sm btn-ghost"
+      style={{
+        position: 'absolute',
+        bottom: '8px',
+        left: '630px',
+        zIndex: 10
+      }}
       onClick={handlePaste}
       disabled={state.isTesting}
       title={t('paste')}

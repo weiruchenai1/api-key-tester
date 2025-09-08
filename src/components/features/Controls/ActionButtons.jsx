@@ -93,19 +93,28 @@ const ActionButtons = () => {
       </button>
 
       <button
-        className="btn btn-secondary"
+        className="btn-base btn-secondary flex items-center gap-xs"
         onClick={handleDedupeKeys}
         disabled={state.isTesting}
       >
-        🔄 {t('dedupeKeys')}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="23 4 23 10 17 10"></polyline>
+          <polyline points="1 20 1 14 7 14"></polyline>
+          <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+        </svg>
+        {t('dedupeKeys')}
       </button>
 
       <button
-        className="btn btn-secondary"
+        className="btn-base btn-secondary flex items-center gap-xs"
         onClick={handleClear}
         disabled={state.isTesting}
       >
-        🗑️ {t('clear')}
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="3,6 5,6 21,6"></polyline>
+          <path d="m19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        {t('clear')}
       </button>
     </div>
   );

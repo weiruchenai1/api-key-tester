@@ -75,6 +75,14 @@ body {
 
 .btn-success {
   background: var(--color-success);
+  color: white;
+  border-color: var(--color-success);
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #1e7e34;
+  border-color: #1e7e34;
+  transform: translateY(-1px);
 }
 
 /* 基础卡片样式 */

@@ -41,14 +41,14 @@
 }
 
 .btn-secondary {
-  background: var(--bg-card);
-  color: var(--text-primary);
-  border-color: var(--border-color);
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: #e9ecef;
-  border-color: #adb5bd;
+  background: #5a6268;
+  border-color: #5a6268;
   transform: translateY(-1px);
 }
 
@@ -83,7 +83,35 @@
 }
 
 .btn-lg {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: var(--font-size-lg);
+}
+
+.btn-xl {
+  padding: var(--spacing-md) var(--spacing-2xl);
+  font-size: var(--font-size-lg);
+}
+
+.btn-wide {
+  padding: var(--spacing-md) var(--spacing-3xl);
+  font-size: var(--font-size-lg);
+}
+
+/* 固定宽度按钮 */
+.btn-fixed-sm {
+  width: 120px;
+  padding: var(--spacing-md) var(--spacing-sm);
+  font-size: var(--font-size-lg);
+}
+
+.btn-fixed-md {
+  width: 160px;
+  padding: var(--spacing-md) var(--spacing-sm);
+  font-size: var(--font-size-lg);
+}
+
+.btn-fixed-lg {
+  padding: var(--spacing-md) var(--spacing-sm);
   font-size: var(--font-size-lg);
 }
 
@@ -299,6 +327,24 @@
   z-index: 1000;
   box-shadow: var(--shadow-md);
 }
+
+/* 控制按钮容器 */
+.controls-container {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: nowrap;
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+  /* 确保按钮不会换行 */
+  white-space: nowrap;
+}
+
+.controls-container .btn-fixed-lg {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 连续缩放已通过 clamp() 函数实现，无需媒体查询断点 */
 
 /* 响应式工具类 */
 @media (max-width: 768px) {

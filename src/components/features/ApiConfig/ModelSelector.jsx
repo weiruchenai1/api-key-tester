@@ -153,7 +153,7 @@ const ModelSelector = () => {
 
         <button
           type="button"
-          className="btn-base btn-sm btn-ghost"
+          className="btn-base btn-sm btn-secondary"
           onClick={toggleModelInput}
           disabled={state.isTesting || (state.enablePaidDetection && state.apiType === 'gemini')}
         >

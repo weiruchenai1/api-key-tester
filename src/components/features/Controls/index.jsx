@@ -81,9 +81,9 @@ const Controls = () => {
 
   return (
     <div className="space-y-md">
-      <div className="flex gap-sm flex-wrap">
+      <div className="controls-container">
         <button
-          className={`btn-base ${state.isTesting ? 'btn-danger' : 'btn-primary'} flex items-center gap-xs`}
+          className={`btn-base btn-fixed-lg ${state.isTesting ? 'btn-danger' : 'btn-primary'} flex items-center gap-xs`}
           onClick={handleStartTest}
         >
           {state.isTesting ? (
@@ -105,7 +105,7 @@ const Controls = () => {
         </button>
 
         <button
-          className="btn-base btn-secondary flex items-center gap-xs"
+          className="btn-base btn-fixed-lg btn-secondary flex items-center gap-xs"
           onClick={handleDedupeKeys}
           disabled={state.isTesting}
         >
@@ -118,7 +118,7 @@ const Controls = () => {
         </button>
 
         <button
-          className="btn-base btn-ghost flex items-center gap-xs"
+          className="btn-base btn-fixed-lg btn-secondary flex items-center gap-xs"
           onClick={handleClear}
           disabled={state.isTesting}
         >
