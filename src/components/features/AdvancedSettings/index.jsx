@@ -3,7 +3,6 @@ import { useLanguage } from '../../../hooks/useLanguage';
 import ConcurrencyControl from '../ConcurrencyControl';
 import RetryControl from '../RetryControl';
 import PaidDetectionControl from '../PaidDetectionControl';
-import styles from './AdvancedSettings.module.css';
 
 const AdvancedSettings = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
@@ -40,26 +39,26 @@ const AdvancedSettings = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className={styles.modalOverlay} onClick={handleOverlayClick}>
-      <div className={styles.modalContent}>
-        <div className={styles.modalHeader}>
-          <h3>{t('advancedSettings')}</h3>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={handleOverlayClick}>
+      <div className="card-base w-full max-w-2xl max-h-90vh overflow-y-auto m-md">
+        <div className="flex items-center justify-between p-lg border-b">
+          <h3 className="text-lg font-semibold text-primary">{t('advancedSettings')}</h3>
           <button
-            className={styles.closeButton}
+            className="btn-base btn-ghost btn-sm w-8 h-8 flex items-center justify-center"
             onClick={onClose}
             aria-label={t('close')}
           >
             ×
           </button>
         </div>
-        <div className={styles.modalBody}>
-          <div className={styles.settingItem}>
+        <div className="p-lg space-y-lg">
+          <div className="border-b pb-lg">
             <ConcurrencyControl />
           </div>
-          <div className={styles.settingItem}>
+          <div className="border-b pb-lg">
             <RetryControl />
           </div>
-          <div className={styles.settingItem}>
+          <div>
             <PaidDetectionControl />
           </div>
         </div>

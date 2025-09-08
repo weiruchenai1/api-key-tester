@@ -1,17 +1,16 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useApiTester } from '../../../hooks/useApiTester';
 import { MODEL_OPTIONS } from '../../../constants/api';
 import PaidDetectionPrompt from '../PaidDetectionPrompt';
-import styles from './ApiConfig.module.css';
 
 const ModelSelector = () => {
   const { t } = useLanguage();
   const { state, dispatch } = useAppState();
   const { detectModels, isDetecting } = useApiTester();
-  const [isCustomModel, setIsCustomModel] = useState(false);
   const [showPaidDetectionPrompt, setShowPaidDetectionPrompt] = useState(false);
+  const [isCustomModel, setIsCustomModel] = useState(false);
 
   const currentModels = useMemo(() => MODEL_OPTIONS[state.apiType] || [], [state.apiType]);
 
@@ -31,10 +30,11 @@ const ModelSelector = () => {
   }, [currentModels, state.detectedModels]);
 
   useEffect(() => {
-    if (allAvailableModels.length > 0 && !isCustomModel && !state.model) {
+    // 当API类型切换时，强制重置模型为第一个可用模型
+    if (allAvailableModels.length > 0 && !isCustomModel) {
       dispatch({ type: 'SET_MODEL', payload: allAvailableModels[0] });
     }
-  }, [allAvailableModels, isCustomModel, dispatch, state.model]);
+  }, [allAvailableModels, isCustomModel, dispatch]);
 
   const checkPaidDetectionPrompt = (selectedModel) => {
     if (state.apiType !== 'gemini') return false;
@@ -85,11 +85,12 @@ const ModelSelector = () => {
   };
 
   // 渲染模型选项，区分预设和检测到的模型
-  const renderModelOptions = () => {
-    const presetModels = currentModels;
-    const detectedOnlyModels = Array.from(state.detectedModels).filter(
+  const detectedOnlyModels = Array.from(state.detectedModels).filter(
       model => !currentModels.includes(model)
     );
+
+  const renderModelOptions = () => {
+    const presetModels = currentModels;
 
     return (
       <>
@@ -105,7 +106,7 @@ const ModelSelector = () => {
           <>
             <option disabled>──────── {t('detectedModelsTitle')} ────────</option>
             {detectedOnlyModels.map(model => (
-              <option key={model} value={model} className={styles.detectedModelOption}>
+              <option key={model} value={model}>
                 {model}
               </option>
             ))}
@@ -116,24 +117,24 @@ const ModelSelector = () => {
   };
 
   return (
-    <div className={styles.modelSelectorContainer}>
-      <label>
+    <div className="space-y-sm">
+      <label className="text-sm font-medium text-primary">
         {t('selectModel')}
         {state.detectedModels.size > 0 && (
-          <span className={styles.detectedCount}>
+          <span className="text-xs text-success ml-xs">
             {' '}({t('detected')} {state.detectedModels.size} {t('models')})
           </span>
         )}
       </label>
-      <div className={styles.modelInputRow}>
+      <div className="flex gap-xs">
         {!isCustomModel ? (
           <select
-            value={state.enablePaidDetection ? 'gemini-2.5-flash' : state.model}
+            value={state.enablePaidDetection && state.apiType === 'gemini' ? 'gemini-2.5-flash' : state.model}
             onChange={(e) => handleModelSelect(e.target.value)}
-            disabled={state.isTesting || state.enablePaidDetection}
-            className={styles.modelSelect}
+            disabled={state.isTesting || (state.enablePaidDetection && state.apiType === 'gemini')}
+            className="form-field flex-1"
           >
-            {state.enablePaidDetection ? (
+            {state.enablePaidDetection && state.apiType === 'gemini' ? (
               <option value="gemini-2.5-flash">gemini-2.5-flash</option>
             ) : (
               renderModelOptions()
@@ -142,26 +143,26 @@ const ModelSelector = () => {
         ) : (
           <input
             type="text"
-            className={styles.modelInput}
+            className="form-field flex-1"
             placeholder={t('modelInputPlaceholder')}
-            value={state.enablePaidDetection ? 'gemini-2.5-flash' : state.model}
+            value={state.enablePaidDetection && state.apiType === 'gemini' ? 'gemini-2.5-flash' : state.model}
             onChange={handleCustomModelChange}
-            disabled={state.isTesting || state.enablePaidDetection}
+            disabled={state.isTesting || (state.enablePaidDetection && state.apiType === 'gemini')}
           />
         )}
 
         <button
           type="button"
-          className={`${styles.modelButton} ${isCustomModel ? styles.active : ''}`}
+          className="btn-base btn-sm btn-ghost"
           onClick={toggleModelInput}
-          disabled={state.isTesting || state.enablePaidDetection}
+          disabled={state.isTesting || (state.enablePaidDetection && state.apiType === 'gemini')}
         >
           {isCustomModel ? t('presetModel') : t('customModel')}
         </button>
 
         <button
           type="button"
-          className={`${styles.modelButton} ${styles.detectButton}`}
+          className="btn-base btn-sm btn-success"
           onClick={handleDetectModels}
           disabled={state.isTesting || isDetecting}
         >

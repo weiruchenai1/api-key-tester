@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { PROXY_EXAMPLES } from '../../../constants/api';
-import styles from './ApiConfig.module.css';
 
 const ProxySettings = () => {
   const { t } = useLanguage();
@@ -20,13 +19,13 @@ const ProxySettings = () => {
   };
 
   return (
-    <div className={styles.proxySelectorContainer}>
-      <label htmlFor="proxyUrl">{t('proxyUrl')}</label>
-      <div className={styles.proxyInputWrapper}>
+    <div className="space-y-sm">
+      <label htmlFor="proxyUrl" className="text-sm font-medium text-primary">{t('proxyUrl')}</label>
+      <div className="relative">
         <input
           id="proxyUrl"
           type="text"
-          className={styles.proxyInput}
+          className="form-field"
           placeholder={PROXY_EXAMPLES[state.apiType]}
           value={inputValue}
           onChange={handleProxyChange}
