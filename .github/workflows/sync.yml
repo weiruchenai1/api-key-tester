@@ -13,8 +13,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           # 使用具有 repo 范围的个人访问令牌 (PAT) 以便推送更改
-          # GITHUB_TOKEN 的默认权限是只读的
-          token: ${{ secrets.PAT_TOKEN }}
+          # 如果没有配置 PAT_TOKEN，则使用默认的 GITHUB_TOKEN
+          token: ${{ secrets.PAT_TOKEN || github.token }}
           # 获取所有分支和标签的全部历史记录
           fetch-depth: 0
 
