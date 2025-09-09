@@ -43,7 +43,7 @@ const Results = () => {
           </div>
         </>
       ) : (
-        <div className="function-card">
+        <div className="function-card initial-empty-state-card">
           <div className="empty-state">
             <div className="empty-icon">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

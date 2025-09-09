@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
+import Modal from '../../common/Modal';
 
 const PaidDetectionControl = () => {
   const { t } = useLanguage();
   const { state, dispatch } = useAppState();
+  const [showResetModal, setShowResetModal] = useState(false);
 
   const handleTogglePaidDetection = () => {
     const newValue = !state.enablePaidDetection;
@@ -22,9 +24,13 @@ const PaidDetectionControl = () => {
 
   // 重置弹窗提示设置
   const handleResetPrompt = () => {
+    setShowResetModal(true);
+  };
+
+  const confirmResetPrompt = () => {
     localStorage.removeItem('geminiPaidDetectionPromptDisabled');
     localStorage.removeItem('geminiPaidDetectionDefault');
-    alert('弹窗提示设置已重置，下次选择Gemini时将重新询问');
+    setShowResetModal(false);
   };
 
   return (
@@ -108,6 +114,16 @@ const PaidDetectionControl = () => {
           )}
         </div>
       )}
+
+      <Modal
+        isOpen={showResetModal}
+        onClose={() => setShowResetModal(false)}
+        onConfirm={confirmResetPrompt}
+        title="重置弹窗提示设置"
+        message="确定要重置弹窗提示设置吗？重置后，下次选择Gemini时将重新显示付费检测询问弹窗。"
+        confirmText="确定"
+        cancelText="取消"
+      />
     </div>
   );
 };

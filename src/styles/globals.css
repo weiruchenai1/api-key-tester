@@ -121,7 +121,6 @@ body {
   justify-content: center;
   gap: 8px;
   width: 100%;
-  height: 100%;
   min-height: 48px;
   padding: var(--spacing-md) var(--spacing-xl);
   background: var(--color-secondary);
@@ -133,7 +132,7 @@ body {
   cursor: pointer;
   text-decoration: none;
   box-sizing: border-box;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
@@ -263,6 +262,15 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+/* 初始空状态卡片样式 */
+.initial-empty-state-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin-bottom: 0;
+}
+
 /* 结果内容区域 */
 .results-content {
   flex: 1;
@@ -273,6 +281,8 @@ body {
   margin-bottom: var(--spacing-md);
   background: #f8f9fa;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 虚拟化列表容器 */
@@ -282,6 +292,8 @@ body {
   min-height: 120px;
   max-height: 350px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 虚拟化列表 */
@@ -478,7 +490,8 @@ body {
   align-items: center;
   justify-content: center;
   height: 100%;
-  min-height: 350px;
+  min-height: 120px;
+  max-height: 350px;
   padding: var(--spacing-lg);
   color: var(--text-secondary);
   text-align: center;

@@ -158,6 +158,10 @@
 .bg-warning { background: var(--warning-color-alpha); }
 .bg-info { background: var(--info-color-alpha); }
 
+.bg-black { background: black; }
+.bg-white { background: white; }
+.bg-opacity-50 { background-color: rgba(0, 0, 0, 0.5); }
+
 /* 边框工具类 */
 .border { border: 1px solid var(--border-color); }
 .border-t { border-top: 1px solid var(--border-color); }
@@ -208,20 +212,34 @@
 .left-0 { left: 0; }
 .right-0 { right: 0; }
 
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+
+/* Z-index工具类 */
+.z-10 { z-index: 10; }
+.z-20 { z-index: 20; }
+.z-30 { z-index: 30; }
+.z-40 { z-index: 40; }
+.z-50 { z-index: 50; }
+
 /* 尺寸工具类 */
 .w-full { width: 100%; }
 .w-auto { width: auto; }
 .w-fit { width: fit-content; }
+.w-8 { width: 32px; }
 
 .h-full { height: 100%; }
 .h-auto { height: auto; }
 .h-fit { height: fit-content; }
+.h-8 { height: 32px; }
 
 .min-w-0 { min-width: 0; }
 .min-h-0 { min-height: 0; }
+.min-h-32 { min-height: 128px; }
 
 .max-w-full { max-width: 100%; }
 .max-h-full { max-height: 100%; }
+.max-h-90vh { max-height: 90vh; }
+.max-w-2xl { max-width: 672px; }
 
 /* 溢出工具类 */
 .overflow-hidden { overflow: hidden; }

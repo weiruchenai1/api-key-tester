@@ -149,6 +149,14 @@
   transition: border-color var(--transition-fast);
 }
 
+/* 只对textarea类型的form-field应用特殊样式 */
+.form-field.textarea, 
+textarea.form-field {
+  resize: vertical;
+  min-height: 120px;
+  font-family: 'Courier New', monospace;
+}
+
 .form-field:focus {
   outline: none;
   border-color: var(--primary-color);
@@ -274,13 +282,7 @@
   margin: 0 var(--spacing-md);
 }
 
-/* 空状态 */
-.empty-state {
-  text-align: center;
-  padding: var(--spacing-xl);
-  color: var(--text-tertiary);
-}
-
+/* 空状态图标样式 */
 .empty-state-icon {
   font-size: 2rem;
   margin-bottom: var(--spacing-sm);
@@ -359,4 +361,62 @@
   .mobile-stack {
     flex-direction: column !important;
   }
+}
+
+/* 暗色主题按钮样式 */
+.dark-theme .btn-ghost {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+.dark-theme .btn-ghost:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.dark-theme .btn-secondary {
+  background: #5a6268;
+  color: white;
+  border-color: #5a6268;
+}
+
+.dark-theme .btn-secondary:hover:not(:disabled) {
+  background: #484e53;
+  border-color: #484e53;
+}
+
+.dark-theme .btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.dark-theme .btn-primary:hover:not(:disabled) {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+/* 暗色主题开关样式 */
+.dark-theme .switch-slider {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+.dark-theme .switch-slider:before {
+  background: var(--text-secondary);
+}
+
+.dark-theme .switch-input:checked + .switch-slider {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.dark-theme .switch-input:focus + .switch-slider {
+  box-shadow: 0 0 0 2px var(--primary-color-alpha);
+}
+
+.dark-theme .switch-input:checked + .switch-slider:before {
+  background: white;
 }

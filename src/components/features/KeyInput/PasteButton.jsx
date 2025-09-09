@@ -40,8 +40,8 @@ const PasteButton = () => {
       className="btn-base btn-sm btn-ghost"
       style={{
         position: 'absolute',
-        bottom: '8px',
-        left: '630px',
+        top: '8px',
+        right: '8px',
         zIndex: 10
       }}
       onClick={handlePaste}
