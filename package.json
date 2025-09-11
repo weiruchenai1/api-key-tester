@@ -2,7 +2,7 @@
   "name": "api-key-tester",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://handsomezhuzhu.github.io/api-key-tester",
+  "homepage": "https://handsomezhuzhu.github.io/api-key-tester/",
   "description": "批量检测 Gemini、Claude、GPT API 密钥有效性的 React 应用",
   "keywords": [
     "api-key",
