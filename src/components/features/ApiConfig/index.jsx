@@ -1,12 +1,11 @@
 import React from 'react';
 import ModelSelector from './ModelSelector';
 import ProxySettings from './ProxySettings';
-import styles from './ApiConfig.module.css';
 
 const ApiConfig = () => {
   return (
-    <div className={styles.apiConfig}>
-      <div className={styles.urlModelRow}>
+    <div className="space-y-md">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-md">
         <ProxySettings />
         <ModelSelector />
       </div>

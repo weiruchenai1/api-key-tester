@@ -34,11 +34,33 @@
 
   /* 圆角 */
   --border-radius: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-full: 50%;
 
   /* 字体大小 */
-  --font-size-sm: 12px;
-  --font-size-base: 14px;
-  --font-size-lg: 16px;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+
+  /* 阴影 */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  /* 颜色别名 */
+  --primary-color: var(--color-primary);
+  --success-color: var(--color-success);
+  --error-color: var(--color-danger);
+  --warning-color: var(--color-warning);
+  --info-color: var(--color-info);
+
+  /* 背景色别名 */
+  --bg-primary: var(--color-primary);
+  --bg-tertiary: #f1f3f4;
+
+  /* 过渡动画 */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
 }
 
 /* 深色主题 */
@@ -47,6 +69,7 @@
   --bg-container: #1a1a1a;
   --bg-card: #2a2a2a;
   --bg-input: #1a1a1a;
+  --bg-hover: #3a3a3a;
 
   --text-primary: #ffffff;
   --text-secondary: #b0b0b0;

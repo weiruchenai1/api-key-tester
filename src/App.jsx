@@ -40,23 +40,21 @@ const AppContent = () => {
         <div>{t('usage2')}</div>
       </div>
 
-      <div className="function-card settings-card">
-        <button
-          className="settings-button"
-          onClick={() => setIsAdvancedSettingsOpen(true)}
-        >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="3" />
-            <path d="m12 1v6m0 6v6" />
-            <path d="m17.196 6.804 4.243-4.243" />
-            <path d="m6.804 17.196-4.243 4.243" />
-            <path d="m6.804 6.804-4.243-4.243" />
-            <path d="m17.196 17.196 4.243 4.243" />
-            <path d="m1 12h6m6 0h6" />
-          </svg>
-          {t('advancedSettings')}
-        </button>
-      </div>
+      <button
+        className="settings-button"
+        onClick={() => setIsAdvancedSettingsOpen(true)}
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="3" />
+          <path d="m12 1v6m0 6v6" />
+          <path d="m17.196 6.804 4.243-4.243" />
+          <path d="m6.804 17.196-4.243 4.243" />
+          <path d="m6.804 6.804-4.243-4.243" />
+          <path d="m17.196 17.196 4.243 4.243" />
+          <path d="m1 12h6m6 0h6" />
+        </svg>
+        {t('advancedSettings')}
+      </button>
     </div>
   );
 

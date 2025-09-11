@@ -1,0 +1,422 @@
+/* ==========================================================================
+   通用组件样式 - 统一的设计系统
+   ========================================================================== */
+
+/* 按钮基础样式 */
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid transparent;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  user-select: none;
+}
+
+.btn-base:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* 按钮变体 */
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #5a6268;
+  border-color: #5a6268;
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: white;
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.btn-danger {
+  background: var(--color-danger);
+  color: white;
+  border-color: var(--color-danger);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #c82333;
+  border-color: #c82333;
+  transform: translateY(-1px);
+}
+
+/* 按钮尺寸 */
+.btn-sm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.btn-lg {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: var(--font-size-lg);
+}
+
+.btn-xl {
+  padding: var(--spacing-md) var(--spacing-2xl);
+  font-size: var(--font-size-lg);
+}
+
+.btn-wide {
+  padding: var(--spacing-md) var(--spacing-3xl);
+  font-size: var(--font-size-lg);
+}
+
+/* 固定宽度按钮 */
+.btn-fixed-sm {
+  width: 120px;
+  padding: var(--spacing-md) var(--spacing-sm);
+  font-size: var(--font-size-lg);
+}
+
+.btn-fixed-md {
+  width: 160px;
+  padding: var(--spacing-md) var(--spacing-sm);
+  font-size: var(--font-size-lg);
+}
+
+.btn-fixed-lg {
+  padding: var(--spacing-md) var(--spacing-sm);
+  font-size: var(--font-size-lg);
+}
+
+/* 卡片基础样式 */
+.card-base {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xs);
+  transition: all var(--transition-normal);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-padding {
+  padding: var(--spacing-lg);
+}
+
+.card-padding-sm {
+  padding: var(--spacing-md);
+}
+
+/* 表单基础样式 */
+.form-field {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  transition: border-color var(--transition-fast);
+}
+
+/* 只对textarea类型的form-field应用特殊样式 */
+.form-field.textarea, 
+textarea.form-field {
+  resize: vertical;
+  min-height: 120px;
+  font-family: 'Courier New', monospace;
+}
+
+.form-field:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-color-alpha);
+}
+
+.form-field:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-field.error {
+  border-color: var(--error-color);
+}
+
+.form-field.error:focus {
+  box-shadow: 0 0 0 3px var(--error-color-alpha);
+}
+
+/* 标签样式 */
+.label-base {
+  display: block;
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* 状态徽章 */
+.badge-base {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.badge-success {
+  background: var(--success-color-alpha);
+  color: var(--success-color);
+}
+
+.badge-error {
+  background: var(--error-color-alpha);
+  color: var(--error-color);
+}
+
+.badge-warning {
+  background: var(--warning-color-alpha);
+  color: var(--warning-color);
+}
+
+.badge-info {
+  background: var(--info-color-alpha);
+  color: var(--info-color);
+}
+
+/* 开关组件 */
+.switch-base {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  transition: var(--transition-fast);
+  border-radius: 12px;
+}
+
+.switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background: var(--text-secondary);
+  transition: var(--transition-fast);
+  border-radius: 50%;
+}
+
+.switch-input:checked + .switch-slider {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.switch-input:focus + .switch-slider {
+  box-shadow: 0 0 0 2px var(--primary-color-alpha);
+}
+
+.switch-input:checked + .switch-slider:before {
+  transform: translateX(20px);
+  background: white;
+}
+
+/* 分隔线 */
+.divider {
+  height: 1px;
+  background: var(--border-color);
+  margin: var(--spacing-md) 0;
+}
+
+.divider-vertical {
+  width: 1px;
+  background: var(--border-color);
+  margin: 0 var(--spacing-md);
+}
+
+/* 空状态图标样式 */
+.empty-state-icon {
+  font-size: 2rem;
+  margin-bottom: var(--spacing-sm);
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: var(--font-size-sm);
+}
+
+/* 加载状态 */
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 工具提示 */
+.tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-tooltip);
+  color: var(--text-tooltip);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  z-index: 1000;
+  box-shadow: var(--shadow-md);
+}
+
+/* 控制按钮容器 */
+.controls-container {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: nowrap;
+  margin-bottom: var(--spacing-lg);
+  width: 100%;
+  /* 确保按钮不会换行 */
+  white-space: nowrap;
+}
+
+.controls-container .btn-fixed-lg {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 连续缩放已通过 clamp() 函数实现，无需媒体查询断点 */
+
+/* 响应式工具类 */
+@media (max-width: 768px) {
+  .mobile-hidden {
+    display: none !important;
+  }
+  
+  .mobile-full-width {
+    width: 100% !important;
+  }
+  
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+}
+
+/* 暗色主题按钮样式 */
+.dark-theme .btn-ghost {
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+.dark-theme .btn-ghost:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.dark-theme .btn-secondary {
+  background: #5a6268;
+  color: white;
+  border-color: #5a6268;
+}
+
+.dark-theme .btn-secondary:hover:not(:disabled) {
+  background: #484e53;
+  border-color: #484e53;
+}
+
+.dark-theme .btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+.dark-theme .btn-primary:hover:not(:disabled) {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+/* 暗色主题开关样式 */
+.dark-theme .switch-slider {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+.dark-theme .switch-slider:before {
+  background: var(--text-secondary);
+}
+
+.dark-theme .switch-input:checked + .switch-slider {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.dark-theme .switch-input:focus + .switch-slider {
+  box-shadow: 0 0 0 2px var(--primary-color-alpha);
+}
+
+.dark-theme .switch-input:checked + .switch-slider:before {
+  background: white;
+}

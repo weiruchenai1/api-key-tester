@@ -1,5 +1,4 @@
 import React from 'react';
-import './Button.module.css';
 
 const Button = ({
   children,
@@ -11,9 +10,13 @@ const Button = ({
   className = '',
   ...props
 }) => {
-  const baseClass = 'btn';
-  const variantClass = `btn-${variant}`;
-  const sizeClass = `btn-${size}`;
+  const baseClass = 'btn-base';
+  const variantClass = variant === 'primary' ? 'btn-primary' : 
+                      variant === 'secondary' ? 'btn-secondary' : 
+                      variant === 'ghost' ? 'btn-ghost' : 
+                      variant === 'danger' ? 'btn-danger' : 'btn-primary';
+  const sizeClass = size === 'small' ? 'btn-sm' : 
+                   size === 'large' ? 'btn-lg' : '';
   const classes = [baseClass, variantClass, sizeClass, className]
     .filter(Boolean)
     .join(' ');

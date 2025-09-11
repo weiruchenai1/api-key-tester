@@ -1,18 +1,101 @@
-import React, { createContext, useReducer, useContext, useEffect } from 'react';
+import React, { createContext, useReducer, useContext, useEffect, useRef, useMemo } from 'react';
+import { debounce } from '../utils/debounce';
+
+// 清理旧的localStorage数据
+const cleanupOldData = () => {
+  try {
+    // 直接删除旧的键，不进行迁移
+    // 这样可以确保使用正确的默认模型
+    if (localStorage.getItem('testModel')) {
+      localStorage.removeItem('testModel');
+    }
+    if (localStorage.getItem('proxyUrl')) {
+      localStorage.removeItem('proxyUrl');
+    }
+  } catch (error) {
+    console.warn('清理旧数据失败:', error);
+  }
+};
+
+// 获取特定API类型的完整状态
+const getApiTypeState = (apiType) => {
+  try {
+    const key = `apiState_${apiType}`;
+    const stored = localStorage.getItem(key);
+    return stored ? JSON.parse(stored) : {
+      model: getDefaultModelForApiType(apiType),
+      proxyUrl: '',
+      apiKeysText: '',
+      keyResults: [],
+      showResults: false,
+      activeTab: 'all'
+    };
+  } catch (error) {
+    return {
+      model: getDefaultModelForApiType(apiType),
+      proxyUrl: '',
+      apiKeysText: '',
+      keyResults: [],
+      showResults: false,
+      activeTab: 'all'
+    };
+  }
+};
+
+// 保存特定API类型的状态
+const saveApiTypeState = (apiType, state) => {
+  try {
+    const key = `apiState_${apiType}`;
+    const stateToSave = {
+      model: state.model,
+      proxyUrl: state.proxyUrl,
+      apiKeysText: state.apiKeysText || '',
+      keyResults: state.keyResults || [],
+      showResults: state.showResults || false,
+      activeTab: state.activeTab || 'all'
+    };
+    localStorage.setItem(key, JSON.stringify(stateToSave));
+  } catch (error) {
+    console.warn('保存API状态失败:', error);
+  }
+};
+
+// 获取默认模型
+const getDefaultModelForApiType = (apiType) => {
+  const defaultModels = {
+    openai: 'gpt-4o-mini',
+    claude: 'claude-3-5-sonnet-20241022',
+    gemini: 'gemini-2.0-flash',
+    deepseek: 'deepseek-chat',
+    siliconcloud: 'deepseek-ai/DeepSeek-V3',
+    xai: 'grok-2-1212',
+    openrouter: 'deepseek/deepseek-chat-v3.1:free'
+  };
+  return defaultModels[apiType] || '';
+};
 
 // 获取本地存储的初始状态
 const getInitialState = () => {
   try {
+    // 清理旧数据
+    cleanupOldData();
+    
+    const apiType = localStorage.getItem('apiType') ? JSON.parse(localStorage.getItem('apiType')) : 'openai';
+    const currentApiState = getApiTypeState(apiType);
+    
     return {
-      // API配置 - 从localStorage获取
-      apiType: localStorage.getItem('apiType') ? JSON.parse(localStorage.getItem('apiType')) : 'openai',
-      model: localStorage.getItem('testModel') ? JSON.parse(localStorage.getItem('testModel')) : 'gpt-4o',
-      proxyUrl: localStorage.getItem('proxyUrl') ? JSON.parse(localStorage.getItem('proxyUrl')) : '',
+      // 当前选中的API类型
+      apiType,
+      
+      // 当前API类型的状态
+      model: currentApiState.model,
+      proxyUrl: currentApiState.proxyUrl,
+      apiKeysText: currentApiState.apiKeysText,
+      keyResults: currentApiState.keyResults,
+      showResults: currentApiState.showResults,
+      activeTab: currentApiState.activeTab,
 
-      // 输入
-      apiKeysText: '',
-
-      // 并发和重试 - 从localStorage获取
+      // 全局设置 - 从localStorage获取
       concurrency: localStorage.getItem('concurrency') ? JSON.parse(localStorage.getItem('concurrency')) : 5,
       retryCount: localStorage.getItem('maxRetries') ? JSON.parse(localStorage.getItem('maxRetries')) : 3,
 
@@ -21,12 +104,6 @@ const getInitialState = () => {
 
       // 测试状态
       isTesting: false,
-      keyResults: [],
-      // progress: 0,  // 删除这行
-
-      // UI状态
-      showResults: false,
-      activeTab: 'all',
       detectedModels: new Set(),
 
       // 消息
@@ -36,7 +113,7 @@ const getInitialState = () => {
     console.warn('读取本地存储失败，使用默认配置:', error);
     return {
       apiType: 'openai',
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
       proxyUrl: '',
       apiKeysText: '',
       concurrency: 5,
@@ -44,7 +121,6 @@ const getInitialState = () => {
       enablePaidDetection: false,
       isTesting: false,
       keyResults: [],
-      // progress: 0,  // 删除这行
       showResults: false,
       activeTab: 'all',
       detectedModels: new Set(),
@@ -57,11 +133,21 @@ const getInitialState = () => {
 const appReducer = (state, action) => {
   switch (action.type) {
     case 'SET_API_TYPE':
+      // 先保存当前API类型的状态
+      saveApiTypeState(state.apiType, state);
+      
+      // 加载新API类型的状态
+      const newApiState = getApiTypeState(action.payload);
+      
       return {
         ...state,
         apiType: action.payload,
-        // 重置模型选择
-        model: getDefaultModel(action.payload)
+        model: newApiState.model,
+        proxyUrl: newApiState.proxyUrl,
+        apiKeysText: newApiState.apiKeysText,
+        keyResults: newApiState.keyResults,
+        showResults: newApiState.showResults,
+        activeTab: newApiState.activeTab
       };
 
     case 'SET_MODEL':
@@ -115,7 +201,6 @@ const appReducer = (state, action) => {
           model: state.model,
           isPaid: null // For Gemini paid detection
         })),
-        // progress: 0,  // 删除这行
         activeTab: 'all'
       };
 
@@ -175,11 +260,16 @@ const appReducer = (state, action) => {
       return {
         ...getInitialState(),
         apiType: state.apiType,
-        model: getDefaultModel(state.apiType),
+        model: getDefaultModelForApiType(state.apiType),
         proxyUrl: state.proxyUrl,
         concurrency: state.concurrency,
         retryCount: state.retryCount,
-        enablePaidDetection: state.enablePaidDetection
+        enablePaidDetection: state.enablePaidDetection,
+        // 清空测试相关的数据
+        apiKeysText: '', // 清空密钥列表
+        keyResults: [],
+        showResults: false,
+        activeTab: 'all'
       };
 
     default:
@@ -187,15 +277,6 @@ const appReducer = (state, action) => {
   }
 };
 
-// 获取默认模型
-const getDefaultModel = (apiType) => {
-  const defaultModels = {
-    openai: 'gpt-4o',
-    claude: 'claude-3-5-sonnet-20241022',
-    gemini: 'gemini-2.0-flash'
-  };
-  return defaultModels[apiType] || '';
-};
 
 // Context
 const AppStateContext = createContext();
@@ -203,20 +284,73 @@ const AppStateContext = createContext();
 // Provider组件
 export const AppStateProvider = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, getInitialState());
+  const stateRef = useRef(state);
 
-  // 监听状态变化并保存到localStorage
+  // 保持stateRef同步
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
+  // 使用useMemo创建稳定的防抖函数
+  const debouncedSaveApiState = useMemo(
+    () => debounce((apiType, stateToSave) => {
+      try {
+        saveApiTypeState(apiType, stateToSave);
+      } catch (error) {
+        console.warn('保存API状态失败:', error);
+      }
+    }, 300),
+    [] // 空依赖数组，因为saveApiTypeState是稳定的外部函数
+  );
+
+  // 监听全局配置变化并保存到localStorage（这些变化不频繁，可以立即保存）
   useEffect(() => {
     try {
       localStorage.setItem('apiType', JSON.stringify(state.apiType));
-      localStorage.setItem('testModel', JSON.stringify(state.model));
-      localStorage.setItem('proxyUrl', JSON.stringify(state.proxyUrl));
       localStorage.setItem('concurrency', JSON.stringify(state.concurrency));
       localStorage.setItem('maxRetries', JSON.stringify(state.retryCount));
       localStorage.setItem('enablePaidDetection', JSON.stringify(state.enablePaidDetection));
     } catch (error) {
-      console.warn('保存配置到本地存储失败:', error);
+      console.warn('保存全局配置到本地存储失败:', error);
     }
-  }, [state.apiType, state.model, state.proxyUrl, state.concurrency, state.retryCount, state.enablePaidDetection]);
+  }, [state.apiType, state.concurrency, state.retryCount, state.enablePaidDetection]);
+
+  // 监听API状态变化并防抖保存（避免频繁保存，如输入时的每个字符变化）
+  useEffect(() => {
+    // 只在非初始渲染时保存，避免初始化时的无效保存
+    const shouldSave = state.apiType && (
+      state.model || 
+      state.proxyUrl || 
+      state.apiKeysText || 
+      state.keyResults.length > 0
+    );
+    
+    if (shouldSave) {
+      debouncedSaveApiState(state.apiType, state);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    state.apiType, 
+    state.model, 
+    state.proxyUrl, 
+    state.apiKeysText, 
+    state.keyResults, 
+    state.showResults, 
+    state.activeTab,
+    debouncedSaveApiState
+  ]);
+
+  // 组件卸载时立即保存任何待保存的数据
+  useEffect(() => {
+    return () => {
+      try {
+        const currentState = stateRef.current;
+        saveApiTypeState(currentState.apiType, currentState);
+      } catch (error) {
+        console.warn('组件卸载时保存状态失败:', error);
+      }
+    };
+  }, []); // 空依赖数组，只在组件挂载时设置cleanup
 
   const value = {
     state,

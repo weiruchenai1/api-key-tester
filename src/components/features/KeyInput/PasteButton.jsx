@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
-import styles from './KeyInput.module.css';
 
 const PasteButton = () => {
   const { t } = useLanguage();
@@ -38,7 +37,13 @@ const PasteButton = () => {
 
   return (
     <button
-      className={`${styles.controlBtn} ${styles.pasteBtn}`}
+      className="btn-base btn-sm btn-ghost"
+      style={{
+        position: 'absolute',
+        top: '8px',
+        right: '8px',
+        zIndex: 10
+      }}
       onClick={handlePaste}
       disabled={state.isTesting}
       title={t('paste')}

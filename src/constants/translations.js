@@ -101,8 +101,8 @@ export const TRANSLATIONS = {
     dedupeSuccess: '已去除 {removed} 个重复密钥，保留 {kept} 个唯一密钥。',
     noDuplicatesFound: '未发现重复密钥。',
     cannotDedupeWhileTesting: '测试正在进行中，无法去重！',
-    cannotClearWhileTesting: '测试正在进行中，无法清空！',
-    cleared: '已清空所有内容。',
+    cannotSwitchWhileTesting: '测试正在进行中，请等待测试完成后再切换API类型！',
+    cleared: '已清空密钥列表和测试结果。',
     importSuccess: '成功导入 {count} 个API密钥',
     noValidKeysFound: '未找到有效的API密钥',
     importFailed: '文件导入失败，请检查文件格式',
@@ -115,6 +115,7 @@ export const TRANSLATIONS = {
     noValidKeys: '暂无有效密钥',
     noInvalidKeys: '暂无无效密钥',
     noRateLimitedKeys: '暂无速率限制密钥',
+    noPaidKeys: '暂无付费密钥',
     resultsWillShow: '检测结果将显示在这里',
 
     // 错误信息
@@ -255,8 +256,8 @@ export const TRANSLATIONS = {
     dedupeSuccess: 'Removed {removed} duplicate keys, kept {kept} unique keys.',
     noDuplicatesFound: 'No duplicate keys found.',
     cannotDedupeWhileTesting: 'Testing in progress, cannot dedupe!',
-    cannotClearWhileTesting: 'Testing in progress, cannot clear!',
-    cleared: 'All content cleared.',
+    cannotSwitchWhileTesting: 'Testing in progress, please wait for completion before switching API type!',
+    cleared: 'API keys and test results cleared.',
     importSuccess: 'Successfully imported {count} API keys',
     noValidKeysFound: 'No valid API keys found',
     importFailed: 'File import failed, please check file format',
@@ -269,6 +270,7 @@ export const TRANSLATIONS = {
     noValidKeys: 'No valid keys',
     noInvalidKeys: 'No invalid keys',
     noRateLimitedKeys: 'No throttled keys',
+    noPaidKeys: 'No paid keys',
     resultsWillShow: 'Detection results will be displayed here',
 
     // Error messages

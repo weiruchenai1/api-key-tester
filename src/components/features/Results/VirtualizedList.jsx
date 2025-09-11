@@ -161,10 +161,15 @@ const VirtualizedList = () => {
       all: t('noKeys') || '暂无密钥',
       valid: t('noValidKeys') || '暂无有效密钥',
       invalid: t('noInvalidKeys') || '暂无无效密钥',
-      'rate-limited': t('noRateLimitedKeys') || '暂无速率限制密钥'
+      'rate-limited': t('noRateLimitedKeys') || '暂无速率限制密钥',
+      paid: t('noPaidKeys') || '暂无付费密钥'
     };
 
-    return <EmptyState message={emptyMessages[state.activeTab]} />;
+    return (
+      <div ref={containerRef} className="virtualized-list-container">
+        <EmptyState message={emptyMessages[state.activeTab]} />
+      </div>
+    );
   }
 
   return (

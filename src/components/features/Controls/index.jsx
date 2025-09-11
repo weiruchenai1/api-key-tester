@@ -3,7 +3,6 @@ import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useApiTester } from '../../../hooks/useApiTester';
 import { deduplicateAndCleanKeys } from '../../../utils/keyProcessor';
-import styles from './Controls.module.css';
 
 const Controls = () => {
   const { t } = useLanguage();
@@ -81,10 +80,10 @@ const Controls = () => {
   };
 
   return (
-    <div className={styles.controlsContainer}>
-      <div className={styles.mainActionButtons}>
+    <div className="space-y-md">
+      <div className="controls-container">
         <button
-          className={`${styles.btn} ${styles.btnPrimary} ${styles.startTestBtn}`}
+          className={`btn-base btn-fixed-lg ${state.isTesting ? 'btn-danger' : 'btn-primary'} flex items-center gap-xs`}
           onClick={handleStartTest}
         >
           {state.isTesting ? (
@@ -106,7 +105,7 @@ const Controls = () => {
         </button>
 
         <button
-          className={`${styles.btn} ${styles.btnSecondary} ${styles.dedupeBtn}`}
+          className="btn-base btn-fixed-lg btn-secondary flex items-center gap-xs"
           onClick={handleDedupeKeys}
           disabled={state.isTesting}
         >
@@ -119,7 +118,7 @@ const Controls = () => {
         </button>
 
         <button
-          className={`${styles.btn} ${styles.btnSecondary} ${styles.clearBtn}`}
+          className="btn-base btn-fixed-lg btn-secondary flex items-center gap-xs"
           onClick={handleClear}
           disabled={state.isTesting}
         >

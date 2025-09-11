@@ -3,8 +3,3 @@ body {
   background: var(--bg-body);
   color: var(--text-primary);
 }
-
-/* 深色主题特定覆盖 */
-.dark-theme {
-  /* 深色主题的特殊颜色值在variables.css中定义 */
-}
