@@ -1,10 +1,29 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { TRANSLATIONS } from '../constants/translations';
 
 export const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState('zh');
+  const [translations, setTranslations] = useState({});
+
+  useEffect(() => {
+    // 加载翻译文件
+    const loadTranslations = async () => {
+      try {
+        const response = await fetch(`/locales/${language}.json`);
+        if (response.ok) {
+          const translationData = await response.json();
+          setTranslations(translationData);
+        } else {
+          console.warn(`Failed to load translations for ${language}`);
+        }
+      } catch (error) {
+        console.error('Error loading translations:', error);
+      }
+    };
+
+    loadTranslations();
+  }, [language]);
 
   useEffect(() => {
     // 从本地存储加载语言设置
@@ -61,7 +80,7 @@ export const LanguageProvider = ({ children }) => {
       // 支持嵌套键访问，例如 'common.button.save'
       if (key.includes('.')) {
         const keys = key.split('.');
-        translation = TRANSLATIONS[language];
+        translation = translations;
         
         for (const k of keys) {
           if (translation && typeof translation === 'object') {
@@ -73,7 +92,7 @@ export const LanguageProvider = ({ children }) => {
         }
       } else {
         // 简单键访问
-        translation = TRANSLATIONS[language]?.[key];
+        translation = translations[key];
       }
       
       // 如果没找到翻译，使用fallback
