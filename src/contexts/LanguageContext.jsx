@@ -7,18 +7,23 @@ export const LanguageProvider = ({ children }) => {
   const [translations, setTranslations] = useState({});
 
   useEffect(() => {
-    // 加载翻译文件
+    // 使用动态导入加载翻译文件
     const loadTranslations = async () => {
       try {
-        const response = await fetch(`/locales/${language}.json`);
-        if (response.ok) {
-          const translationData = await response.json();
-          setTranslations(translationData);
-        } else {
-          console.warn(`Failed to load translations for ${language}`);
-        }
+        const translationModule = await import(`../locales/${language}.json`);
+        setTranslations(translationModule.default);
       } catch (error) {
         console.error('Error loading translations:', error);
+        // 尝试加载备用语言或默认的空对象
+        try {
+          const fallbackLang = language === 'zh' ? 'en' : 'zh';
+          const fallbackModule = await import(`../locales/${fallbackLang}.json`);
+          setTranslations(fallbackModule.default);
+          console.warn(`Loaded fallback translations for ${fallbackLang}`);
+        } catch (fallbackError) {
+          console.error('Failed to load fallback translations:', fallbackError);
+          setTranslations({});
+        }
       }
     };
 
