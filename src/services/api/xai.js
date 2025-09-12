@@ -41,8 +41,10 @@ export const getXAIModels = async (apiKey, proxyUrl) => {
     const url = getApiUrl('xai', '/models', proxyUrl);
 
     const response = await fetch(url, {
+      method: 'GET',
       headers: {
-        'Authorization': `Bearer ${apiKey}`
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
       }
     });
 
