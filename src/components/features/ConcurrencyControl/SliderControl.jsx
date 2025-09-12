@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useConcurrency } from '../../../hooks/useConcurrency';
-import './ConcurrencyControl.module.css';
 
 const SliderControl = () => {
   const { state } = useAppState();

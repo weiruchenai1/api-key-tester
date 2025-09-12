@@ -1,6 +1,5 @@
 import React from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
-import './Loading.module.css';
 
 const Loading = ({ isVisible, message }) => {
   const { t } = useLanguage();
@@ -8,9 +7,9 @@ const Loading = ({ isVisible, message }) => {
   if (!isVisible) return null;
 
   return (
-    <div className="loading">
-      <div className="spinner"></div>
-      <p>{message || t('testing')}</p>
+    <div className="flex flex-col items-center justify-center p-lg">
+      <div className="loading-spinner mb-md"></div>
+      <p className="text-sm text-secondary">{message || t('testing')}</p>
     </div>
   );
 };

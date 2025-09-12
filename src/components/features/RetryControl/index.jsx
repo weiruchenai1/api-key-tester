@@ -74,7 +74,7 @@ const RetryControl = () => {
           </div>
         </div>
       </div>
-      <small className="form-help">{t('retryHelp')}</small>
+      <small className="text-xs text-tertiary">{t('retryHelp')}</small>
     </div>
   );
 };

@@ -2,7 +2,6 @@ import React from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useConcurrency } from '../../../hooks/useConcurrency';
-import styles from './ConcurrencyControl.module.css';
 
 const PresetButtons = () => {
   const { t } = useLanguage();

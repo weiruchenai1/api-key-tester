@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import PaidDetectionPrompt from '../PaidDetectionPrompt';
-import './ApiConfig.module.css';
 
 const ApiTypeSelector = () => {
   const { t } = useLanguage();
@@ -39,17 +38,21 @@ const ApiTypeSelector = () => {
   };
 
   return (
-    <div className="input-group">
-      <label htmlFor="apiType">{t('selectApi')}</label>
+    <div className="space-y-sm">
+      <label htmlFor="apiType" className="text-sm font-medium text-primary">{t('selectApi')}</label>
       <select
         id="apiType"
-        className="form-control"
+        className="form-field"
         value={state.apiType}
         onChange={handleApiTypeChange}
       >
         <option value="openai">OpenAI GPT</option>
         <option value="claude">Claude</option>
         <option value="gemini">Google Gemini</option>
+        <option value="deepseek">DeepSeek</option>
+        <option value="siliconcloud">SiliconCloud</option>
+        <option value="xai">xAI</option>
+        <option value="openrouter">OpenRouter</option>
       </select>
 
       {/* Gemini付费检测弹窗 */}
