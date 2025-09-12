@@ -43,10 +43,12 @@ export const getOpenRouterModels = async (apiKey, proxyUrl) => {
     const url = getApiUrl('openrouter', '/models', proxyUrl);
 
     const response = await fetch(url, {
+      method: 'GET',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'HTTP-Referer': window.location.origin,
-        'X-Title': 'API测试工具'
+        'X-Title': 'API测试工具',
+        'Content-Type': 'application/json'
       }
     });
 

@@ -41,8 +41,10 @@ export const getSiliconCloudModels = async (apiKey, proxyUrl) => {
     const url = getApiUrl('siliconcloud', '/models', proxyUrl);
 
     const response = await fetch(url, {
+      method: 'GET',
       headers: {
-        'Authorization': `Bearer ${apiKey}`
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
       }
     });
 
