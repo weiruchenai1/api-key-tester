@@ -17,15 +17,15 @@ export const testOpenAIKey = async (apiKey, model, proxyUrl) => {
     });
 
     if (!response.ok) {
-      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
-      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
-      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
-      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429 };
+      if (response.status === 401) return { valid: false, error: 'errorMessages.authFailed401', isRateLimit: false };
+      if (response.status === 403) return { valid: false, error: 'errorMessages.permissionDenied403', isRateLimit: false };
+      if (response.status === 429) return { valid: false, error: 'errorMessages.rateLimited429', isRateLimit: true };
+      return { valid: false, error: 'errorMessages.httpError', isRateLimit: response.status === 429 };
     }
 
     const responseText = await response.text();
     if (!responseText || responseText.trim() === '') {
-      return { valid: false, error: '空响应', isRateLimit: false };
+      return { valid: false, error: 'errorMessages.emptyResponse', isRateLimit: false };
     }
 
     let data;

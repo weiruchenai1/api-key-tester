@@ -10,7 +10,7 @@ const KeyItem = ({ index, style, data }) => {
   const keyData = data[index];
 
   if (!keyData) {
-    return <div style={style} className="key-item loading-item">Loading...</div>;
+    return <div style={style} className="key-item loading-item">{t('ui.loading')}</div>;
   }
 
   const getStatusClass = (status) => {
@@ -40,19 +40,12 @@ const KeyItem = ({ index, style, data }) => {
   const getLocalizedError = (error) => {
     if (!error) return '';
 
-    const errorMappings = {
-      'Rate Limited': t('rateLimited') || '速率限制',
-      '认证失败': t('authFailed') || '认证失败',
-      '权限不足': t('permissionDenied') || '权限不足',
-      '网络连接失败': t('networkFailed') || '网络连接失败'
-    };
-
-    for (const [key, value] of Object.entries(errorMappings)) {
-      if (error.includes(key)) {
-        return error.replace(key, value);
-      }
+    // 如果错误是翻译键，直接使用翻译
+    if (error.startsWith('errorMessages.')) {
+      return t(error) || error;
     }
 
+    // 直接翻译显示
     return error;
   };
 
@@ -60,17 +53,17 @@ const KeyItem = ({ index, style, data }) => {
   const getKeyStatusInfo = () => {
     // 如果是有效密钥且没有启用付费检测
     if (keyData.status === 'valid' && !state.enablePaidDetection) {
-      return `有效密钥 (200)`;
+      return `${t('keyStatus.validKey')} (200)`;
     }
 
     // 如果是有效密钥且启用了付费检测但检测为免费密钥
     if (keyData.status === 'valid' && state.enablePaidDetection && keyData.isPaid === false) {
-      return `免费密钥 (${keyData.cacheApiStatus || 429})`;
+      return `${t('keyStatus.freeKey')} (${keyData.cacheApiStatus || 429})`;
     }
 
     // 如果是付费密钥
     if (keyData.status === 'paid' && keyData.isPaid === true) {
-      return `付费密钥 (${keyData.cacheApiStatus || 200})`;
+      return `${t('keyStatus.paidKey')} (${keyData.cacheApiStatus || 200})`;
     }
 
     // 其他情况返回null，不显示额外信息
@@ -83,7 +76,7 @@ const KeyItem = ({ index, style, data }) => {
         <div className="key-content">
           <div className="key-text">{keyData.key}</div>
           {keyData.model && (
-            <div className="key-model">Model: {keyData.model}</div>
+            <div className="key-model">{t('keyStatus.model')}: {keyData.model}</div>
           )}
           {keyData.error && (
             <div className={`key-error ${keyData.status === 'rate-limited' ? 'rate-limited-error' : ''}`}>
@@ -92,7 +85,7 @@ const KeyItem = ({ index, style, data }) => {
           )}
           {keyData.retryCount > 0 && (
             <div className="key-retry">
-              重试: {keyData.retryCount}
+              {t('ui.retry')}: {keyData.retryCount}
             </div>
           )}
           {/* 修复后的状态信息显示 */}

@@ -135,5 +135,56 @@
 
   "advancedSettings": "Advanced Settings",
   "addProvider": "Add Provider",
-  "appTitle": "API Key Tester"
+  "appTitle": "API Key Tester",
+
+  "errorMessages": {
+    "invalidApiKey": "Invalid API Key (400)",
+    "authFailed401": "Auth Failed (401)",
+    "permissionDenied403": "Permission Denied (403)", 
+    "rateLimited429": "Rate Limited (429)",
+    "emptyResponse": "Empty Response",
+    "httpError": "HTTP Error",
+    "networkError": "Network Error",
+    "parseError": "JSON Parse Error", 
+    "timeoutError": "Request Timeout"
+  },
+
+  "paidDetectionDialog": {
+    "title": "Test Gemini Paid Keys",
+    "description": "To test Gemini paid keys, some tokens need to be consumed to detect if the key has access to paid features.",
+    "warning": "⚠️ Paid detection will use Cache API and may consume additional API quota.",
+    "dontShowAgain": "Don't show this message again (can be changed in advanced settings)",
+    "confirmButton": "Yes, enable paid detection",
+    "cancelButton": "No, don't detect paid features"
+  },
+
+  "keyStatus": {
+    "validKey": "Valid Key",
+    "paidKey": "Paid Key",
+    "freeKey": "Free Key", 
+    "model": "Model"
+  },
+
+  "ui": {
+    "expandSidebar": "Expand Sidebar",
+    "collapseSidebar": "Collapse Sidebar", 
+    "chineseName": "简体中文",
+    "englishName": "English",
+    "loading": "Loading...",
+    "retry": "Retry"
+  },
+
+  "paidDetectionSettings": {
+    "description": "When enabled, Cache API will be used to detect paid functionality of Gemini keys, consuming additional quota",
+    "popupSettings": "Popup Settings",
+    "resetPopup": "Reset Popup",
+    "resetDescription": "After reset, the paid detection dialog will show again next time you select Gemini",
+    "currentApiType": "Current API Type",
+    "detectionStatus": "Detection Status",
+    "fixedModel": "Fixed Model",
+    "resetModalTitle": "Reset Popup Settings",
+    "resetModalMessage": "Are you sure to reset popup settings? After reset, the paid detection dialog will show again next time you select Gemini.",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  }
 }
