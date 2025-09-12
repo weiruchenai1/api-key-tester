@@ -8,9 +8,7 @@ export const testOpenRouterKey = async (apiKey, model, proxyUrl) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': window.location.origin,
-        'X-Title': 'API测试工具'
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
         model: model,
@@ -45,19 +43,24 @@ export const getOpenRouterModels = async (apiKey, proxyUrl) => {
     const response = await fetch(url, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': window.location.origin,
-        'X-Title': 'API测试工具',
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${apiKey}`
       }
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      return [];
     }
 
     const data = await response.json();
-    return data.data?.map(model => model.id) || [];
+    
+    if (data && data.data && Array.isArray(data.data)) {
+      return data.data
+        .map(model => model.id)
+        .filter(id => id)
+        .sort();
+    }
+    
+    return [];
   } catch (error) {
     console.error('获取OpenRouter模型失败:', error);
     return [];
