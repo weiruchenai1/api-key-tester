@@ -1,10 +1,34 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { TRANSLATIONS } from '../constants/translations';
 
 export const LanguageContext = createContext();
 
 export const LanguageProvider = ({ children }) => {
   const [language, setLanguage] = useState('zh');
+  const [translations, setTranslations] = useState({});
+
+  useEffect(() => {
+    // 使用动态导入加载翻译文件
+    const loadTranslations = async () => {
+      try {
+        const translationModule = await import(`../locales/${language}.json`);
+        setTranslations(translationModule.default);
+      } catch (error) {
+        console.error('Error loading translations:', error);
+        // 尝试加载备用语言或默认的空对象
+        try {
+          const fallbackLang = language === 'zh' ? 'en' : 'zh';
+          const fallbackModule = await import(`../locales/${fallbackLang}.json`);
+          setTranslations(fallbackModule.default);
+          console.warn(`Loaded fallback translations for ${fallbackLang}`);
+        } catch (fallbackError) {
+          console.error('Failed to load fallback translations:', fallbackError);
+          setTranslations({});
+        }
+      }
+    };
+
+    loadTranslations();
+  }, [language]);
 
   useEffect(() => {
     // 从本地存储加载语言设置
@@ -61,7 +85,7 @@ export const LanguageProvider = ({ children }) => {
       // 支持嵌套键访问，例如 'common.button.save'
       if (key.includes('.')) {
         const keys = key.split('.');
-        translation = TRANSLATIONS[language];
+        translation = translations;
         
         for (const k of keys) {
           if (translation && typeof translation === 'object') {
@@ -73,7 +97,7 @@ export const LanguageProvider = ({ children }) => {
         }
       } else {
         // 简单键访问
-        translation = TRANSLATIONS[language]?.[key];
+        translation = translations[key];
       }
       
       // 如果没找到翻译，使用fallback
