@@ -135,5 +135,56 @@
 
   "advancedSettings": "高级设置",
   "addProvider": "添加服务商",
-  "appTitle": "API Key 测活工具"
+  "appTitle": "API Key 测活工具",
+
+  "errorMessages": {
+    "invalidApiKey": "API密钥无效 (400)",
+    "authFailed401": "认证失败 (401)", 
+    "permissionDenied403": "权限不足 (403)",
+    "rateLimited429": "速率限制 (429)",
+    "emptyResponse": "空响应",
+    "httpError": "HTTP错误",
+    "networkError": "网络连接失败",
+    "parseError": "JSON解析失败",
+    "timeoutError": "请求超时"
+  },
+
+  "paidDetectionDialog": {
+    "title": "测试Gemini付费Key",
+    "description": "如果要测试Gemini的付费Key，需要消耗一定的Token来检测Key是否有访问付费功能的能力。",
+    "warning": "⚠️ 付费检测会使用Cache API，可能会消耗额外的API配额。",
+    "dontShowAgain": "不再提示此消息（可在高级设置中更改）",
+    "confirmButton": "是，启用付费检测",
+    "cancelButton": "否，不检测付费功能"
+  },
+
+  "keyStatus": {
+    "validKey": "有效密钥",
+    "paidKey": "付费密钥", 
+    "freeKey": "免费密钥",
+    "model": "模型"
+  },
+
+  "ui": {
+    "expandSidebar": "展开侧边栏",
+    "collapseSidebar": "折叠侧边栏",
+    "chineseName": "简体中文",
+    "englishName": "English",
+    "loading": "加载中...",
+    "retry": "重试"
+  },
+
+  "paidDetectionSettings": {
+    "description": "启用后将使用Cache API检测Gemini密钥的付费功能，会消耗额外配额",
+    "popupSettings": "弹窗提示设置",
+    "resetPopup": "重置弹窗提示",
+    "resetDescription": "重置后，下次选择Gemini时将重新显示付费检测询问弹窗",
+    "currentApiType": "当前API类型",
+    "detectionStatus": "付费检测状态",
+    "fixedModel": "固定模型",
+    "resetModalTitle": "重置弹窗提示设置",
+    "resetModalMessage": "确定要重置弹窗提示设置吗？重置后，下次选择Gemini时将重新显示付费检测询问弹窗。",
+    "confirm": "确定",
+    "cancel": "取消"
+  }
 }
