@@ -37,7 +37,7 @@ const PaidDetectionControl = () => {
     <div className="space-y-lg">
       <div className="space-y-sm">
         <label className="text-sm font-medium text-primary">
-          Gemini付费检测
+          {t('paidDetection')}
         </label>
         <div className="space-y-sm">
           <div className="flex items-center gap-sm">
@@ -55,7 +55,7 @@ const PaidDetectionControl = () => {
             </span>
           </div>
           <p className="text-xs text-tertiary">
-            启用后将使用Cache API检测Gemini密钥的付费功能，会消耗额外配额
+            {t('paidDetectionSettings.description')}
           </p>
         </div>
       </div>
@@ -63,17 +63,17 @@ const PaidDetectionControl = () => {
       {/* 弹窗设置重置 */}
       <div className="space-y-sm">
         <label className="text-sm font-medium text-primary">
-          弹窗提示设置
+          {t('paidDetectionSettings.popupSettings')}
         </label>
         <div className="space-y-sm">
           <button
             className="btn-base btn-sm btn-ghost"
             onClick={handleResetPrompt}
           >
-            重置弹窗提示
+            {t('paidDetectionSettings.resetPopup')}
           </button>
           <p className="text-xs text-tertiary">
-            重置后，下次选择Gemini时将重新显示付费检测询问弹窗
+            {t('paidDetectionSettings.resetDescription')}
           </p>
         </div>
       </div>
@@ -82,11 +82,11 @@ const PaidDetectionControl = () => {
       {state.apiType === 'gemini' && (
         <div className="card-base card-padding-sm bg-secondary">
           <div className="flex items-center justify-between mb-xs">
-            <span className="text-xs text-tertiary">当前API类型:</span>
+            <span className="text-xs text-tertiary">{t('paidDetectionSettings.currentApiType')}:</span>
             <span className="text-xs font-medium text-primary">Gemini</span>
           </div>
           <div className="flex items-center justify-between mb-xs">
-            <span className="text-xs text-tertiary">付费检测状态:</span>
+            <span className="text-xs text-tertiary">{t('paidDetectionSettings.detectionStatus')}:</span>
             {state.enablePaidDetection ? (
               <span className="text-xs text-success flex items-center gap-xs">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -108,7 +108,7 @@ const PaidDetectionControl = () => {
           </div>
           {state.enablePaidDetection && (
             <div className="flex items-center justify-between">
-              <span className="text-xs text-tertiary">固定模型:</span>
+              <span className="text-xs text-tertiary">{t('paidDetectionSettings.fixedModel')}:</span>
               <span className="text-xs font-medium text-primary">gemini-2.5-flash</span>
             </div>
           )}
@@ -119,10 +119,10 @@ const PaidDetectionControl = () => {
         isOpen={showResetModal}
         onClose={() => setShowResetModal(false)}
         onConfirm={confirmResetPrompt}
-        title="重置弹窗提示设置"
-        message="确定要重置弹窗提示设置吗？重置后，下次选择Gemini时将重新显示付费检测询问弹窗。"
-        confirmText="确定"
-        cancelText="取消"
+        title={t('paidDetectionSettings.resetModalTitle')}
+        message={t('paidDetectionSettings.resetModalMessage')}
+        confirmText={t('paidDetectionSettings.confirm')}
+        cancelText={t('paidDetectionSettings.cancel')}
       />
     </div>
   );

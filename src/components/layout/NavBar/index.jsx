@@ -49,7 +49,8 @@ const NavBar = ({ onSidebarToggle, isSidebarCollapsed }) => {
           <button
             className={styles.sidebarToggle}
             onClick={handleSidebarToggle}
-            aria-label={isSidebarCollapsed ? '展开侧边栏' : '折叠侧边栏'}
+            aria-label={isSidebarCollapsed ? t('ui.expandSidebar') : t('ui.collapseSidebar')}
+            title={isSidebarCollapsed ? t('ui.expandSidebar') : t('ui.collapseSidebar')}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -109,7 +110,7 @@ const NavBar = ({ onSidebarToggle, isSidebarCollapsed }) => {
                 <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
                 <path d="M2 12h20" />
               </svg>
-              <span>{language === 'zh' ? '简体中文' : 'English'}</span>
+              <span>{language === 'zh' ? t('ui.chineseName') : t('ui.englishName')}</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={styles.chevron}>
                 <path d="m6 9 6 6 6-6" />
               </svg>
@@ -123,7 +124,7 @@ const NavBar = ({ onSidebarToggle, isSidebarCollapsed }) => {
                     setShowLanguageMenu(false);
                   }}
                 >
-                  <span>English</span>
+                  <span>{t('ui.englishName')}</span>
                   {language === 'en' && (
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className={styles.checkIcon}>
                       <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
@@ -137,7 +138,7 @@ const NavBar = ({ onSidebarToggle, isSidebarCollapsed }) => {
                     setShowLanguageMenu(false);
                   }}
                 >
-                  <span>简体中文</span>
+                  <span>{t('ui.chineseName')}</span>
                   {language === 'zh' && (
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className={styles.checkIcon}>
                       <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />

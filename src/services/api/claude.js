@@ -17,9 +17,9 @@ export const testClaudeKey = async (apiKey, model, proxyUrl) => {
       })
     });
 
-    if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
-    if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
-    if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
+    if (response.status === 401) return { valid: false, error: 'errorMessages.authFailed401', isRateLimit: false };
+    if (response.status === 403) return { valid: false, error: 'errorMessages.permissionDenied403', isRateLimit: false };
+    if (response.status === 429) return { valid: false, error: 'errorMessages.rateLimited429', isRateLimit: true };
 
     const responseText = await response.text();
 
@@ -55,27 +55,33 @@ export const testClaudeKey = async (apiKey, model, proxyUrl) => {
 };
 
 export const getClaudeModels = async (apiKey, proxyUrl) => {
-  const commonModels = [
-    'claude-3-5-sonnet-20241022',
-    'claude-3-5-sonnet-20240620',
-    'claude-3-5-haiku-20241022',
-    'claude-3-opus-20240229',
-    'claude-3-sonnet-20240229',
-    'claude-3-haiku-20240307',
-  ];
-
-  const availableModels = [];
-
-  for (const model of commonModels) {
-    try {
-      const result = await testClaudeKey(apiKey, model, proxyUrl);
-      if (result.valid) {
-        availableModels.push(model);
+  try {
+    const apiUrl = getApiUrl('claude', '/models', proxyUrl);
+    
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'x-api-key': apiKey,
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01'
       }
-    } catch (error) {
-      continue;
-    }
-  }
+    });
 
-  return availableModels;
+    if (!response.ok) {
+      return [];
+    }
+
+    const data = await response.json();
+    
+    if (data && data.data && Array.isArray(data.data)) {
+      return data.data
+        .map(model => model.id)
+        .sort();
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('获取Claude模型失败:', error);
+    return [];
+  }
 };

@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useUserConfig } from '../../../hooks/useLocalStorage';
+import { useLanguage } from '../../../hooks/useLanguage';
 import styles from './PaidDetectionPrompt.module.css';
 
 const PaidDetectionPrompt = ({ isOpen, onClose, onConfirm }) => {
   const { setEnablePaidDetection } = useUserConfig();
+  const { t } = useLanguage();
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
   const handleConfirm = (enablePaidDetection) => {
@@ -26,7 +28,7 @@ const PaidDetectionPrompt = ({ isOpen, onClose, onConfirm }) => {
     <div className={styles.overlay} onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className={styles.modal}>
         <div className={styles.header}>
-          <h3>测试Gemini付费Key</h3>
+          <h3>{t('paidDetectionDialog.title')}</h3>
           <button className={styles.closeBtn} onClick={onClose}>×</button>
         </div>
         
@@ -41,10 +43,10 @@ const PaidDetectionPrompt = ({ isOpen, onClose, onConfirm }) => {
           
           <div className={styles.message}>
             <p className={styles.description}>
-              如果要测试Gemini的付费Key，需要消耗一定的Token来检测Key是否有访问付费功能的能力。
+              {t('paidDetectionDialog.description')}
             </p>
             <p className={styles.warning}>
-              ⚠️ 付费检测会使用Cache API，可能会消耗额外的API配额。
+              {t('paidDetectionDialog.warning')}
             </p>
           </div>
 
@@ -56,7 +58,7 @@ const PaidDetectionPrompt = ({ isOpen, onClose, onConfirm }) => {
                 onChange={(e) => setDontShowAgain(e.target.checked)}
                 className={styles.checkboxInput}
               />
-              <span className={styles.checkboxText}>不再提示此消息（可在高级设置中更改）</span>
+              <span className={styles.checkboxText}>{t('paidDetectionDialog.dontShowAgain')}</span>
             </label>
           </div>
         </div>
@@ -66,13 +68,13 @@ const PaidDetectionPrompt = ({ isOpen, onClose, onConfirm }) => {
             className={styles.cancelBtn} 
             onClick={() => handleConfirm(false)}
           >
-            否，不检测付费功能
+            {t('paidDetectionDialog.cancelButton')}
           </button>
           <button 
             className={styles.confirmBtn} 
             onClick={() => handleConfirm(true)}
           >
-            是，启用付费检测
+            {t('paidDetectionDialog.confirmButton')}
           </button>
         </div>
       </div>
