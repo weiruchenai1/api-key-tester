@@ -76,6 +76,42 @@
   "statusRetrying": "重试中",
   "statusPending": "等待中",
 
+  "logs": "日志",
+  "logsHelp": "记录并查看每次 API 调用的详细日志",
+  "enabled": "已启用",
+  "disabled": "未启用",
+
+  "logViewer": {
+    "title": "日志详情",
+    "noData": "暂无日志数据",
+    "noEvents": "暂无事件记录",
+    "request": "请求",
+    "response": "响应",
+    "duration": "耗时",
+    "attempt": "尝试",
+    "freeKey": "免费",
+    "errorStatus": "错误",
+    "cancelled": "已取消",
+    "summary": {
+      "status": "最终状态",
+      "duration": "总耗时",
+      "attempts": "尝试次数",
+      "context": "上下文"
+    },
+    "stages": {
+      "testStart": "开始测试",
+      "attemptStart": "开始尝试",
+      "attemptResult": "尝试结果",
+      "retryWait": "等待重试",
+      "retryScheduled": "准备重试",
+      "retry": "重试",
+      "attemptException": "尝试异常",
+      "paidDetection": "付费检测",
+      "final": "最终结果",
+      "cancelled": "已取消"
+    }
+  },
+
   "validKeyInfo": "有效密钥",
   "paidKeyInfo": "付费密钥",
   "freeKeyInfo": "免费密钥",

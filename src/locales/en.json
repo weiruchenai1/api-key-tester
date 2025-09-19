@@ -76,6 +76,42 @@
   "statusRetrying": "Retrying",
   "statusPending": "Pending",
 
+  "logs": "Logs",
+  "logsHelp": "Collect and review detailed API call logs",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+
+  "logViewer": {
+    "title": "Log Details",
+    "noData": "No log data",
+    "noEvents": "No events recorded",
+    "request": "Request",
+    "response": "Response",
+    "duration": "Duration",
+    "attempt": "Attempt",
+    "freeKey": "Free",
+    "errorStatus": "Error",
+    "cancelled": "Cancelled",
+    "summary": {
+      "status": "Final Status",
+      "duration": "Total Duration",
+      "attempts": "Attempts",
+      "context": "Context"
+    },
+    "stages": {
+      "testStart": "Test Started",
+      "attemptStart": "Attempt Started",
+      "attemptResult": "Attempt Result",
+      "retryWait": "Waiting Before Retry",
+      "retryScheduled": "Retry Scheduled",
+      "retry": "Retry",
+      "attemptException": "Attempt Exception",
+      "paidDetection": "Paid Detection",
+      "final": "Final Result",
+      "cancelled": "Cancelled"
+    }
+  },
+
   "validKeyInfo": "Valid Key",
   "paidKeyInfo": "Paid Key",
   "freeKeyInfo": "Free Key",

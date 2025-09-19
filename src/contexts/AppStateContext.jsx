@@ -98,6 +98,9 @@ const getInitialState = () => {
       // 全局设置 - 从localStorage获取
       concurrency: localStorage.getItem('concurrency') ? JSON.parse(localStorage.getItem('concurrency')) : 5,
       retryCount: localStorage.getItem('maxRetries') ? JSON.parse(localStorage.getItem('maxRetries')) : 3,
+      logs: [],
+      activeLogKey: null,
+      isLogModalOpen: false,
 
       // Gemini付费检测 - 从localStorage获取
       enablePaidDetection: localStorage.getItem('enablePaidDetection') ? JSON.parse(localStorage.getItem('enablePaidDetection')) : false,
@@ -118,6 +121,9 @@ const getInitialState = () => {
       apiKeysText: '',
       concurrency: 5,
       retryCount: 3,
+      logs: [],
+      activeLogKey: null,
+      isLogModalOpen: false,
       enablePaidDetection: false,
       isTesting: false,
       keyResults: [],
@@ -265,11 +271,57 @@ const appReducer = (state, action) => {
         concurrency: state.concurrency,
         retryCount: state.retryCount,
         enablePaidDetection: state.enablePaidDetection,
+        logs: [],
+        activeLogKey: null,
+        isLogModalOpen: false,
         // 清空测试相关的数据
         apiKeysText: '', // 清空密钥列表
         keyResults: [],
         showResults: false,
         activeTab: 'all'
+      };
+
+    // 日志相关
+    case 'ADD_LOG': {
+      const newLogs = [
+        ...(state.logs || []),
+        action.payload
+      ];
+      // 可选：限制最大日志数量，避免内存无限增长
+      const MAX_LOGS = 200;
+      return {
+        ...state,
+        logs: newLogs.length > MAX_LOGS ? newLogs.slice(newLogs.length - MAX_LOGS) : newLogs
+      };
+    }
+    case 'UPDATE_LOG': {
+      const { id, ...rest } = action.payload || {};
+      if (!id) return state;
+      return {
+        ...state,
+        logs: (state.logs || []).map(l => l.id === id ? { ...l, ...rest } : l)
+      };
+    }
+    case 'CLEAR_LOGS':
+      return {
+        ...state,
+        logs: [],
+        activeLogKey: null,
+        isLogModalOpen: false
+      };
+
+    case 'OPEN_LOG_MODAL':
+      return {
+        ...state,
+        activeLogKey: action.payload,
+        isLogModalOpen: true
+      };
+
+    case 'CLOSE_LOG_MODAL':
+      return {
+        ...state,
+        activeLogKey: null,
+        isLogModalOpen: false
       };
 
     default:
@@ -285,6 +337,8 @@ const AppStateContext = createContext();
 export const AppStateProvider = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, getInitialState());
   const stateRef = useRef(state);
+  // 日志收集器
+  const logCollectorRef = useRef(null);
 
   // 保持stateRef同步
   useEffect(() => {
@@ -351,6 +405,23 @@ export const AppStateProvider = ({ children }) => {
       }
     };
   }, []); // 空依赖数组，只在组件挂载时设置cleanup
+
+  // 初始化日志收集器
+  useEffect(() => {
+    import('../utils/logCollector')
+      .then(({ initializeLogCollector, getLogCollector }) => {
+        if (!logCollectorRef.current) {
+          logCollectorRef.current = initializeLogCollector(dispatch);
+        }
+        const collector = getLogCollector();
+        if (collector && typeof collector.setEnabled === 'function') {
+          collector.setEnabled(true);
+        }
+      })
+      .catch(() => {
+        // 安静失败，不影响主要功能
+      });
+  }, [dispatch]);
 
   const value = {
     state,
