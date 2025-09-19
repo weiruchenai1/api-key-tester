@@ -65,12 +65,11 @@ const KeyLogModal = () => {
 
   const isOpen = state.isLogModalOpen;
   const activeKey = state.activeLogKey;
-  const logs = state.logs || [];
-
   const logEntry = useMemo(() => {
     if (!activeKey) return null;
-    return logs.find((log) => log.key === activeKey || log.keyId === activeKey) || null;
-  }, [activeKey, logs]);
+    const sourceLogs = state.logs || [];
+    return sourceLogs.find((log) => log.key === activeKey || log.keyId === activeKey) || null;
+  }, [activeKey, state.logs]);
 
   const events = useMemo(() => {
     if (!logEntry || !logEntry.events) return [];
