@@ -1016,3 +1016,19 @@ body {
 .dark-theme .results-tooltip__close:focus {
   color: #93c5fd;
 }
+
+.log-modal-content {
+  width: 100%;
+  max-width: 672px;
+  max-height: 90vh;
+  margin: var(--spacing-md);
+}
+
+@media (max-width: 640px) {
+  .log-modal-content {
+    width: 92vw;
+    max-width: 360px;
+    max-height: 80vh;
+    margin: var(--spacing-sm) auto;
+  }
+}

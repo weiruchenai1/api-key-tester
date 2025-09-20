@@ -131,7 +131,7 @@ const KeyLogModal = () => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ zIndex: 10000 }} onClick={handleClose}>
-      <div className="card-base w-full max-w-2xl max-h-90vh overflow-y-auto m-md" onClick={(e) => e.stopPropagation()}>
+      <div className="card-base log-modal-content max-w-2xl overflow-y-auto m-md" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between p-lg border-b">
           <div>
             <h3 className="text-lg font-semibold text-primary">{t('logViewer.title') || '日志详情'}</h3>
