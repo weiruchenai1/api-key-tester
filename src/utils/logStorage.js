@@ -5,9 +5,24 @@ const STORE_NAME = 'logs';
 const isIndexedDBAvailable = () => typeof window !== 'undefined' && typeof window.indexedDB !== 'undefined';
 
 let dbPromise = null;
+let hasWarnedIndexedDbUnavailable = false;
+
+const warnIndexedDbUnavailable = () => {
+  if (hasWarnedIndexedDbUnavailable) return;
+  hasWarnedIndexedDbUnavailable = true;
+  if (typeof window !== 'undefined') {
+    if (typeof window.alert === 'function') {
+      window.alert('当前浏览器不支持日志持久化，刷新或关闭页面后历史日志将丢失。\nIndexedDB is unavailable, so logs will not be saved.');
+    }
+    console.warn('IndexedDB is not available; logs will not be persisted.');
+  } else {
+    console.warn('IndexedDB is not available; logs will not be persisted.');
+  }
+};
 
 const openDatabase = () => {
   if (!isIndexedDBAvailable()) {
+    warnIndexedDbUnavailable();
     return Promise.resolve(null);
   }
 
