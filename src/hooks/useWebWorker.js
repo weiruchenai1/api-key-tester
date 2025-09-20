@@ -104,6 +104,7 @@ export const useWebWorker = () => {
         workerRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
   // 监听语言变化
@@ -165,3 +166,9 @@ export const useWebWorker = () => {
     cancelWorkerTesting
   };
 };
+
+
+
+
+
+

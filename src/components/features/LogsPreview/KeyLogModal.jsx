@@ -90,7 +90,9 @@ const KeyLogModal = () => {
 
   const events = useMemo(() => {
     if (!logEntry || !logEntry.events) return [];
-    return [...(logEntry.events || [])].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+    return [...(logEntry.events || [])]
+      .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0))
+      .map((event) => (event.stage === 'test_start' ? { ...event, request: null, response: null } : event));
   }, [logEntry]);
 
   useEffect(() => {
