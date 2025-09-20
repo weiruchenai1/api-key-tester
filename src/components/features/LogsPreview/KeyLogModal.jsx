@@ -18,27 +18,58 @@ const formatDuration = (ms) => {
   return (ms / 1000).toFixed(2) + ' s';
 };
 
-const stringify = (value) => {
-  if (value == null) return '';
-  if (typeof value === 'string') {
-    const trimmed = value.trim();
-    if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
-      try {
-        const parsed = JSON.parse(trimmed);
-        return JSON.stringify(parsed, null, 2);
-      } catch (error) {
-        // fall through to return original string
-      }
-    }
-    return value;
-  }
+const tryParseJson = (str) => {
   try {
-    return JSON.stringify(value, null, 2);
+    return JSON.parse(str);
   } catch (error) {
-    return String(value);
+    return null;
   }
 };
 
+const normalizePayload = (input) => {
+  if (input == null) return input;
+
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+      const parsed = tryParseJson(trimmed);
+      if (parsed !== null) {
+        return normalizePayload(parsed);
+      }
+    }
+    return input;
+  }
+
+  if (Array.isArray(input)) {
+    return input.map((item) => normalizePayload(item));
+  }
+
+  if (typeof input === 'object') {
+    const result = {};
+    Object.entries(input).forEach(([key, value]) => {
+      result[key] = normalizePayload(value);
+    });
+    return result;
+  }
+
+  return input;
+};
+
+const stringify = (value) => {
+  if (value == null) return '';
+
+  const normalized = normalizePayload(value);
+
+  if (typeof normalized === 'string') {
+    return normalized;
+  }
+
+  try {
+    return JSON.stringify(normalized, null, 2);
+  } catch (error) {
+    return String(normalized);
+  }
+};
 const stageLabel = (stage, t) => {
   const labels = {
     test_start: t('logViewer.stages.testStart') || '开始测试',
@@ -260,4 +291,5 @@ const KeyLogModal = () => {
 };
 
 export default KeyLogModal;
+
 
