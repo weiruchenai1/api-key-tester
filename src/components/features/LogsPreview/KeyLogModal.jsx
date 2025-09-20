@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useLanguage } from '../../../hooks/useLanguage';
+import { getLogEntryByKey } from '../../../utils/logStorage';
 
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return '';
@@ -63,18 +64,61 @@ const KeyLogModal = () => {
   const { state, dispatch } = useAppState();
   const { t } = useLanguage();
 
+  const [persistedLog, setPersistedLog] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const isOpen = state.isLogModalOpen;
   const activeKey = state.activeLogKey;
-  const logEntry = useMemo(() => {
+  const stateLogEntry = useMemo(() => {
     if (!activeKey) return null;
     const sourceLogs = state.logs || [];
     return sourceLogs.find((log) => log.key === activeKey || log.keyId === activeKey) || null;
   }, [activeKey, state.logs]);
 
+  const logEntry = stateLogEntry || persistedLog;
+
   const events = useMemo(() => {
     if (!logEntry || !logEntry.events) return [];
-    return [...logEntry.events].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+    return [...(logEntry.events || [])].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
   }, [logEntry]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!isOpen || !activeKey) {
+      setPersistedLog(null);
+      setIsLoading(false);
+      return;
+    }
+
+    if (stateLogEntry) {
+      setPersistedLog(null);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    getLogEntryByKey(activeKey)
+      .then((entry) => {
+        if (!cancelled) {
+          setPersistedLog(entry || null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setPersistedLog(null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, activeKey, stateLogEntry]);
 
   if (!isOpen) return null;
 
@@ -103,7 +147,11 @@ const KeyLogModal = () => {
         </div>
 
         <div className="p-lg space-y-lg">
-          {logEntry ? (
+          {isLoading ? (
+            <div className="empty-state">
+              <div className="empty-state-text">{t('loading') || '加载中...'}</div>
+            </div>
+          ) : logEntry ? (
             <>
               <div className="grid gap-md grid-cols-1 md:grid-cols-2">
                 <div className="card-base card-padding">
@@ -199,3 +247,4 @@ const KeyLogModal = () => {
 };
 
 export default KeyLogModal;
+

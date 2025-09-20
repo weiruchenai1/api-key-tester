@@ -1,5 +1,6 @@
 import React, { createContext, useReducer, useContext, useEffect, useRef, useMemo } from 'react';
 import { debounce } from '../utils/debounce';
+import { getAllLogEntries } from '../utils/logStorage';
 
 // 清理旧的localStorage数据
 const cleanupOldData = () => {
@@ -282,16 +283,20 @@ const appReducer = (state, action) => {
       };
 
     // 日志相关
+    case 'SET_LOGS':
+      return {
+        ...state,
+        logs: Array.isArray(action.payload) ? action.payload : []
+      };
+
     case 'ADD_LOG': {
       const newLogs = [
         ...(state.logs || []),
         action.payload
       ];
-      // 可选：限制最大日志数量，避免内存无限增长
-      const MAX_LOGS = 200;
       return {
         ...state,
-        logs: newLogs.length > MAX_LOGS ? newLogs.slice(newLogs.length - MAX_LOGS) : newLogs
+        logs: newLogs
       };
     }
     case 'UPDATE_LOG': {
@@ -339,11 +344,31 @@ export const AppStateProvider = ({ children }) => {
   const stateRef = useRef(state);
   // 日志收集器
   const logCollectorRef = useRef(null);
+  const hasHydratedLogsRef = useRef(false);
 
   // 保持stateRef同步
   useEffect(() => {
     stateRef.current = state;
   }, [state]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    getAllLogEntries()
+      .then((storedLogs) => {
+        if (!isMounted) return;
+        if (Array.isArray(storedLogs) && storedLogs.length > 0) {
+          dispatch({ type: 'SET_LOGS', payload: storedLogs });
+        }
+      })
+      .catch((error) => {
+        console.warn('加载持久化日志失败:', error);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dispatch]);
 
   // 使用useMemo创建稳定的防抖函数
   const debouncedSaveApiState = useMemo(
@@ -394,6 +419,26 @@ export const AppStateProvider = ({ children }) => {
     debouncedSaveApiState
   ]);
 
+  useEffect(() => {
+    const collector = logCollectorRef.current;
+    if (!collector) return;
+
+    if (!state.logs || state.logs.length === 0) {
+      if (typeof collector.clearCache === 'function') {
+        collector.clearCache();
+      }
+      hasHydratedLogsRef.current = false;
+      return;
+    }
+
+    if (hasHydratedLogsRef.current) return;
+
+    if (typeof collector.hydrateLogs === 'function') {
+      collector.hydrateLogs(state.logs);
+      hasHydratedLogsRef.current = true;
+    }
+  }, [state.logs]);
+
   // 组件卸载时立即保存任何待保存的数据
   useEffect(() => {
     return () => {
@@ -414,8 +459,14 @@ export const AppStateProvider = ({ children }) => {
           logCollectorRef.current = initializeLogCollector(dispatch);
         }
         const collector = getLogCollector();
-        if (collector && typeof collector.setEnabled === 'function') {
-          collector.setEnabled(true);
+        if (collector) {
+          if (typeof collector.setEnabled === 'function') {
+            collector.setEnabled(true);
+          }
+          if (typeof collector.hydrateLogs === 'function' && (stateRef.current.logs || []).length > 0) {
+            collector.hydrateLogs(stateRef.current.logs || []);
+            hasHydratedLogsRef.current = true;
+          }
         }
       })
       .catch(() => {

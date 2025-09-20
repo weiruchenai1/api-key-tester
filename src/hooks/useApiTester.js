@@ -2,6 +2,8 @@ import { useState, useCallback } from 'react';
 import { useAppState } from '../contexts/AppStateContext';
 import { useWebWorker } from './useWebWorker';
 import { getAvailableModels as getAvailableModelsFromApi } from '../services/api/base';
+import { getLogCollector } from '../utils/logCollector';
+import { clearLogEntries } from '../utils/logStorage';
 
 export const useApiTester = () => {
   const { state, dispatch } = useAppState();
@@ -11,6 +13,27 @@ export const useApiTester = () => {
   const startTesting = useCallback(async (apiKeys) => {
     if (!apiKeys || apiKeys.length === 0) {
       return;
+    }
+
+    let logsCleared = false;
+
+    try {
+      const collector = typeof getLogCollector === 'function' ? getLogCollector() : null;
+      if (collector && typeof collector.clearLogs === 'function') {
+        await collector.clearLogs();
+        logsCleared = true;
+      }
+    } catch (error) {
+      console.warn('清理内存日志缓存失败:', error);
+    }
+
+    if (!logsCleared) {
+      dispatch({ type: 'CLEAR_LOGS' });
+      try {
+        await clearLogEntries();
+      } catch (error) {
+        console.warn('清理持久化日志失败:', error);
+      }
     }
 
     dispatch({ type: 'START_TESTING', payload: { keys: apiKeys } });

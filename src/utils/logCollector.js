@@ -1,3 +1,5 @@
+import { saveLogEntry, clearLogEntries } from './logStorage';
+
 /**
  * 日志收集工具
  * 负责接收结构化事件并维护前端可展示的日志数据
@@ -126,6 +128,15 @@ export class LogCollector {
     this.logsByKey.clear();
   }
 
+  hydrateLogs(logs = []) {
+    if (!Array.isArray(logs)) return;
+    logs.forEach((log) => {
+      if (log && log.key) {
+        this.logsByKey.set(log.key, log);
+      }
+    });
+  }
+
   recordEvent({ key, apiType, model, metadata = {}, event = {} }) {
     if (!this.enabled || !key) return;
 
@@ -185,6 +196,13 @@ export class LogCollector {
       type: actionType,
       payload: updatedEntry
     });
+
+    const persistPromise = saveLogEntry(updatedEntry);
+    if (persistPromise && typeof persistPromise.catch === 'function') {
+      persistPromise.catch((error) => {
+        console.warn('Failed to persist log entry:', error);
+      });
+    }
   }
 
   logApiStart(apiType, key, model, request) {
@@ -293,6 +311,13 @@ export class LogCollector {
   clearLogs() {
     this.clearCache();
     this.dispatch({ type: 'CLEAR_LOGS' });
+    const promise = clearLogEntries();
+    if (promise && typeof promise.catch === 'function') {
+      promise.catch((error) => {
+        console.warn('Failed to clear persisted logs:', error);
+      });
+    }
+    return promise;
   }
 }
 
@@ -312,3 +337,4 @@ export const logApiCall = (apiType, key, status, error = null, model = null) => 
 };
 
 export default LogCollector;
+
