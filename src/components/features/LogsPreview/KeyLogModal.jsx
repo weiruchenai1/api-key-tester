@@ -20,7 +20,18 @@ const formatDuration = (ms) => {
 
 const stringify = (value) => {
   if (value == null) return '';
-  if (typeof value === 'string') return value;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        return JSON.stringify(parsed, null, 2);
+      } catch (error) {
+        // fall through to return original string
+      }
+    }
+    return value;
+  }
   try {
     return JSON.stringify(value, null, 2);
   } catch (error) {
