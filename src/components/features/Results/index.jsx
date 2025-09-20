@@ -9,8 +9,12 @@ import { useAppState } from '../../../contexts/AppStateContext';
 import { useLanguage } from '../../../hooks/useLanguage';
 
 const Results = () => {
-  const { state } = useAppState();
+  const { state, dispatch } = useAppState();
   const { t } = useLanguage();
+
+  const handleTooltipDismiss = () => {
+    dispatch({ type: 'DISMISS_LOG_TOOLTIP' });
+  };
 
   return (
     <>
@@ -19,6 +23,19 @@ const Results = () => {
           <StatsCards />
           
           <div className="function-card results-card">
+            {state.showLogTooltip && (
+              <div className="results-tooltip" role="note">
+                <div className="results-tooltip__text">{t('results.logTooltip')}</div>
+                <button
+                  type="button"
+                  className="results-tooltip__close"
+                  onClick={handleTooltipDismiss}
+                  aria-label={t('close') || 'Close'}
+                >
+                  &times;
+                </button>
+              </div>
+            )}
             <ResultTabs />
             <div className="results-content">
               <VirtualizedList />

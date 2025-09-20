@@ -83,6 +83,7 @@ const getInitialState = () => {
     
     const apiType = localStorage.getItem('apiType') ? JSON.parse(localStorage.getItem('apiType')) : 'openai';
     const currentApiState = getApiTypeState(apiType);
+    const hasSeenLogTooltip = localStorage.getItem('hasSeenLogTooltip') ? JSON.parse(localStorage.getItem('hasSeenLogTooltip')) : false;
     
     return {
       // 当前选中的API类型
@@ -111,7 +112,9 @@ const getInitialState = () => {
       detectedModels: new Set(),
 
       // 消息
-      message: null
+      message: null,
+      showLogTooltip: false,
+      hasSeenLogTooltip
     };
   } catch (error) {
     console.warn('读取本地存储失败，使用默认配置:', error);
@@ -131,7 +134,9 @@ const getInitialState = () => {
       showResults: false,
       activeTab: 'all',
       detectedModels: new Set(),
-      message: null
+      message: null,
+      showLogTooltip: false,
+      hasSeenLogTooltip: false
     };
   }
 };
@@ -208,7 +213,9 @@ const appReducer = (state, action) => {
           model: state.model,
           isPaid: null // For Gemini paid detection
         })),
-        activeTab: 'all'
+        activeTab: 'all',
+        showLogTooltip: state.hasSeenLogTooltip ? state.showLogTooltip : true,
+        hasSeenLogTooltip: state.hasSeenLogTooltip
       };
 
     case 'UPDATE_KEY_STATUS':
@@ -275,6 +282,8 @@ const appReducer = (state, action) => {
         logs: [],
         activeLogKey: null,
         isLogModalOpen: false,
+        showLogTooltip: false,
+        hasSeenLogTooltip: state.hasSeenLogTooltip,
         // 清空测试相关的数据
         apiKeysText: '', // 清空密钥列表
         keyResults: [],
@@ -313,6 +322,13 @@ const appReducer = (state, action) => {
         logs: [],
         activeLogKey: null,
         isLogModalOpen: false
+      };
+
+    case 'DISMISS_LOG_TOOLTIP':
+      return {
+        ...state,
+        showLogTooltip: false,
+        hasSeenLogTooltip: true
       };
 
     case 'OPEN_LOG_MODAL':
@@ -389,10 +405,11 @@ export const AppStateProvider = ({ children }) => {
       localStorage.setItem('concurrency', JSON.stringify(state.concurrency));
       localStorage.setItem('maxRetries', JSON.stringify(state.retryCount));
       localStorage.setItem('enablePaidDetection', JSON.stringify(state.enablePaidDetection));
+      localStorage.setItem('hasSeenLogTooltip', JSON.stringify(state.hasSeenLogTooltip));
     } catch (error) {
       console.warn('保存全局配置到本地存储失败:', error);
     }
-  }, [state.apiType, state.concurrency, state.retryCount, state.enablePaidDetection]);
+  }, [state.apiType, state.concurrency, state.retryCount, state.enablePaidDetection, state.hasSeenLogTooltip]);
 
   // 监听API状态变化并防抖保存（避免频繁保存，如输入时的每个字符变化）
   useEffect(() => {
