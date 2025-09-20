@@ -104,7 +104,7 @@ export const useWebWorker = () => {
         workerRef.current = null;
       }
     };
-  }, [dispatch, language]);
+  }, [dispatch]);
 
   // 监听语言变化
   useEffect(() => {
