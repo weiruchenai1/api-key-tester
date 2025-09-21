@@ -1022,6 +1022,15 @@ body {
   max-width: 672px;
   max-height: 90vh;
   margin: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.log-modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 @media (max-width: 640px) {
@@ -1032,3 +1041,4 @@ body {
     margin: var(--spacing-sm) auto;
   }
 }
+

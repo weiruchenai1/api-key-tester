@@ -175,7 +175,7 @@ const KeyLogModal = () => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ zIndex: 10000 }} onClick={handleClose}>
-      <div className="card-base log-modal-content max-w-2xl overflow-y-auto m-md" onClick={(e) => e.stopPropagation()}>
+      <div className="card-base log-modal-content max-w-2xl m-md" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between p-lg border-b">
           <div>
             <h3 className="text-lg font-semibold text-primary">{t('logViewer.title') || '日志详情'}</h3>
@@ -190,7 +190,7 @@ const KeyLogModal = () => {
           </button>
         </div>
 
-        <div className="p-lg space-y-lg">
+        <div className="log-modal-body p-lg space-y-lg">
           {isLoading ? (
             <div className="empty-state">
               <div className="empty-state-text">{t('loading') || '加载中...'}</div>
@@ -291,5 +291,6 @@ const KeyLogModal = () => {
 };
 
 export default KeyLogModal;
+
 
 
