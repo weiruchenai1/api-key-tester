@@ -203,5 +203,15 @@
   },
   "results": {
     "logTooltip": "Tip: Click a test result card to view the log for that key."
+  },
+  "balance": {
+    "title": "Balance",
+    "refresh": "Refresh",
+    "refreshing": "Querying...",
+    "accountBalance": "Account Balance",
+    "userNickname": "User Nickname",
+    "email": "Email",
+    "fetchFailed": "Query Failed",
+    "clickToRefresh": "Click refresh button to query balance information"
   }
 }

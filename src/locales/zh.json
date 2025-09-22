@@ -203,5 +203,15 @@
   },
   "results": {
     "logTooltip": "提示：点击测试结果卡片即可查看对应 key 的测试日志。"
+  },
+  "balance": {
+    "title": "余额",
+    "refresh": "刷新",
+    "refreshing": "查询中...",
+    "accountBalance": "账户余额",
+    "userNickname": "用户昵称",
+    "email": "邮箱",
+    "fetchFailed": "查询失败",
+    "clickToRefresh": "点击刷新按钮查询余额信息"
   }
 }
