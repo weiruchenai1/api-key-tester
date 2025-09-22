@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useAppState } from '../contexts/AppStateContext';
 import { useLanguage } from './useLanguage';
+import { getLogCollector } from '../utils/logCollector';
 
 export const useWebWorker = () => {
   const { dispatch } = useAppState();
@@ -36,7 +37,7 @@ export const useWebWorker = () => {
         workerRef.current = new Worker(workerPath);
 
         workerRef.current.onmessage = (e) => {
-          const { type, payload } = e.data;
+          const { type, payload } = e.data || {};
 
           switch (type) {
             case 'PONG':
@@ -45,6 +46,16 @@ export const useWebWorker = () => {
               break;
             case 'KEY_STATUS_UPDATE':
               dispatch({ type: 'UPDATE_KEY_STATUS', payload });
+              break;
+            case 'LOG_EVENT':
+              try {
+                const collector = getLogCollector && getLogCollector();
+                if (collector && collector.enabled) {
+                  collector.recordEvent(payload || {});
+                }
+              } catch (err) {
+                console.warn('记录日志事件失败:', err);
+              }
               break;
             case 'TESTING_COMPLETE':
               dispatch({ type: 'TESTING_COMPLETE' });
@@ -93,7 +104,8 @@ export const useWebWorker = () => {
         workerRef.current = null;
       }
     };
-  }, [dispatch, language]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch]);
 
   // 监听语言变化
   useEffect(() => {
@@ -154,3 +166,9 @@ export const useWebWorker = () => {
     cancelWorkerTesting
   };
 };
+
+
+
+
+
+

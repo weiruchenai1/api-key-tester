@@ -2,6 +2,81 @@
 let isProcessing = false;
 let shouldCancel = false;
 let currentLanguage = 'zh'; // 默认中文
+const keyGlobalStartTime = new Map();
+
+const MAX_LOG_BODY_LENGTH = 4000;
+
+const truncateForLog = (value, maxLength = MAX_LOG_BODY_LENGTH) => {
+  if (value == null) return value;
+  const str = typeof value === 'string' ? value : JSON.stringify(value);
+  if (str.length <= maxLength) return str;
+  return str.slice(0, maxLength) + '\n...(+' + (str.length - maxLength) + ' chars)';
+};
+
+const headersToObject = (headers) => {
+  if (!headers) return null;
+  try {
+    if (typeof headers.forEach === 'function') {
+      const result = {};
+      headers.forEach((value, key) => {
+        result[key] = value;
+      });
+      return result;
+    }
+    return { ...headers };
+  } catch (error) {
+    return { error: 'serialize_headers_failed', message: error.message };
+  }
+};
+
+const createRequestLog = ({ url, method, headers, body }) => ({
+  url,
+  method,
+  headers: headersToObject(headers),
+  body: truncateForLog(body)
+});
+
+const createResponseLog = async (response) => {
+  if (!response) return null;
+  const clone = response.clone ? response.clone() : response;
+  let bodyText = null;
+  try {
+    bodyText = await clone.text();
+  } catch (error) {
+    bodyText = '<<无法读取响应正文: ' + error.message + '>>';
+  }
+  let parsed = null;
+  try {
+    parsed = bodyText ? JSON.parse(bodyText) : null;
+  } catch (error) {
+    parsed = null;
+  }
+  return {
+    status: response.status,
+    statusText: response.statusText,
+    headers: headersToObject(response.headers),
+    body: truncateForLog(bodyText),
+    parsed
+  };
+};
+
+const postLogEvent = (key, config, event) => {
+  if (!key) return;
+  self.postMessage({
+    type: 'LOG_EVENT',
+    payload: {
+      key,
+      apiType: config.apiType,
+      model: config.model,
+      metadata: {
+        proxyUrl: config.proxyUrl,
+        enablePaidDetection: config.enablePaidDetection,
+        concurrency: config.concurrency
+      },
+      event
+    }
+  });
+};
 
 // 错误信息翻译
 const ERROR_MESSAGES = {
@@ -132,7 +207,9 @@ async function waitForAnySlotCompletion(activeSlots) {
 async function processKeyWithRetry(apiKey, config, slotIndex) {
   const { maxRetries } = config;
 
-  // 通知主线程开始测试
+  const globalStart = Date.now();
+  keyGlobalStartTime.set(apiKey, globalStart);
+
   self.postMessage({
     type: 'KEY_STATUS_UPDATE',
     payload: {
@@ -142,12 +219,45 @@ async function processKeyWithRetry(apiKey, config, slotIndex) {
     }
   });
 
+  postLogEvent(apiKey, config, {
+    stage: 'test_start',
+    attempt: 1,
+    slotIndex,
+    status: 'testing',
+    timestamp: globalStart,
+    message: '开始测试'
+  });
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
-    if (shouldCancel) return;
+    if (shouldCancel) {
+      postLogEvent(apiKey, config, {
+        stage: 'cancelled',
+        attempt: attempt + 1,
+        slotIndex,
+        status: 'cancelled',
+        isFinal: true,
+        finalStatus: 'cancelled',
+        totalDurationMs: Date.now() - globalStart,
+        message: '任务被取消'
+      });
+      keyGlobalStartTime.delete(apiKey);
+      return;
+    }
+
+    const attemptIndex = attempt + 1;
+    const attemptStart = Date.now();
+
+    postLogEvent(apiKey, config, {
+      stage: 'attempt_start',
+      attempt: attemptIndex,
+      slotIndex,
+      status: attempt === 0 ? 'testing' : 'retrying',
+      timestamp: attemptStart,
+      message: '第' + attemptIndex + '次尝试'
+    });
 
     try {
       if (attempt > 0) {
-        // 重试状态
         self.postMessage({
           type: 'KEY_STATUS_UPDATE',
           payload: {
@@ -157,68 +267,112 @@ async function processKeyWithRetry(apiKey, config, slotIndex) {
           }
         });
 
-        // 重试延迟
+        postLogEvent(apiKey, config, {
+          stage: 'retry_wait',
+          attempt: attemptIndex,
+          slotIndex,
+          status: 'retrying',
+          message: '等待重试'
+        });
+
         await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 500));
       }
 
       const result = await testApiKey(apiKey, config);
+      const attemptDuration = Date.now() - attemptStart;
 
-      // 成功或速率限制：继续处理
+      postLogEvent(apiKey, config, {
+        stage: 'attempt_result',
+        attempt: attemptIndex,
+        slotIndex,
+        status: result.valid ? 'success' : (result.isRateLimit ? 'rate-limited' : 'error'),
+        durationMs: attemptDuration,
+        request: result.requestLog,
+        response: result.responseLog,
+        error: result.error,
+        extra: result.extra || null
+      });
+
       if (result.valid || result.isRateLimit) {
         let finalResult = result;
 
-        // 如果是Gemini且启用了付费检测，进行二阶段检测
         if (result.valid && config.apiType === 'gemini' && config.enablePaidDetection) {
           try {
+            const paidStart = Date.now();
             const paidResult = await testGeminiPaidKey(apiKey, config.model, config);
 
+            postLogEvent(apiKey, config, {
+              stage: 'paid_detection',
+              attempt: attemptIndex,
+              slotIndex,
+              status: paidResult.isPaid === true ? 'paid' : (paidResult.isPaid === false ? 'free' : 'unknown'),
+              durationMs: Date.now() - paidStart,
+              request: paidResult.requestLog,
+              response: paidResult.responseLog,
+              error: paidResult.error,
+              extra: { cacheApiStatus: paidResult.cacheApiStatus }
+            });
+
             if (paidResult.isPaid === true) {
-              // 付费key：设置为付费状态
               finalResult = { ...result, isPaid: true, cacheApiStatus: paidResult.cacheApiStatus };
-            } else {
-              // 免费key：保持valid=true，isPaid=false，显示为有效key
+            } else if (paidResult.isPaid === false) {
               finalResult = { ...result, isPaid: false, cacheApiStatus: paidResult.cacheApiStatus };
+            } else {
+              finalResult = { ...result, isPaid: null, cacheApiStatus: paidResult.cacheApiStatus };
             }
           } catch (error) {
-            // 付费检测失败，默认为免费key
+            postLogEvent(apiKey, config, {
+              stage: 'paid_detection',
+              attempt: attemptIndex,
+              slotIndex,
+              status: 'error',
+              error: error.message || error,
+              extra: { phase: 'paid_detection_failed' }
+            });
             finalResult = { ...result, isPaid: false };
           }
-        } else {
-          // 没有开启付费检测，使用正常结果
-          finalResult = result;
         }
 
-        // 确定最终状态
         let finalStatus;
         if (finalResult.isPaid === true) {
-          finalStatus = 'paid'; // 付费key
+          finalStatus = 'paid';
         } else if (result.valid) {
-          finalStatus = 'valid'; // 免费key（有效key）
+          finalStatus = 'valid';
         } else {
           finalStatus = 'rate-limited';
         }
 
-        const payload = {
-          key: apiKey,
-          status: finalStatus,
-          error: result.error,
-          retryCount: attempt,
-          isPaid: finalResult.isPaid
-        };
-
-        // 只有在开启付费检测时才添加cacheApiStatus
-        if (config.apiType === 'gemini' && config.enablePaidDetection) {
-          payload.cacheApiStatus = finalResult.cacheApiStatus;
-        }
-
         self.postMessage({
           type: 'KEY_STATUS_UPDATE',
-          payload
+          payload: {
+            key: apiKey,
+            status: finalStatus,
+            error: result.error,
+            retryCount: attempt,
+            isPaid: finalResult.isPaid,
+            cacheApiStatus: finalResult.cacheApiStatus
+          }
         });
+
+        postLogEvent(apiKey, config, {
+          stage: 'final',
+          attempt: attemptIndex,
+          slotIndex,
+          status: finalStatus,
+          finalStatus,
+          isFinal: true,
+          totalDurationMs: Date.now() - globalStart,
+          error: result.error,
+          extra: {
+            isPaid: finalResult.isPaid,
+            cacheApiStatus: finalResult.cacheApiStatus
+          }
+        });
+
+        keyGlobalStartTime.delete(apiKey);
         return finalResult;
       }
 
-      // 最后一次尝试：无论结果如何都返回
       if (attempt === maxRetries) {
         self.postMessage({
           type: 'KEY_STATUS_UPDATE',
@@ -229,10 +383,22 @@ async function processKeyWithRetry(apiKey, config, slotIndex) {
             retryCount: attempt
           }
         });
+
+        postLogEvent(apiKey, config, {
+          stage: 'final',
+          attempt: attemptIndex,
+          slotIndex,
+          status: 'invalid',
+          finalStatus: 'invalid',
+          isFinal: true,
+          totalDurationMs: Date.now() - globalStart,
+          error: result.error
+        });
+
+        keyGlobalStartTime.delete(apiKey);
         return result;
       }
 
-      // 检查是否需要重试
       const statusCode = extractStatusCode(result.error);
       if (!shouldRetry(result.error, statusCode)) {
         self.postMessage({
@@ -244,21 +410,66 @@ async function processKeyWithRetry(apiKey, config, slotIndex) {
             retryCount: attempt
           }
         });
+
+        postLogEvent(apiKey, config, {
+          stage: 'final',
+          attempt: attemptIndex,
+          slotIndex,
+          status: 'invalid',
+          finalStatus: 'invalid',
+          isFinal: true,
+          totalDurationMs: Date.now() - globalStart,
+          error: result.error
+        });
+
+        keyGlobalStartTime.delete(apiKey);
         return result;
       }
 
+      postLogEvent(apiKey, config, {
+        stage: 'retry_scheduled',
+        attempt: attemptIndex + 1,
+        slotIndex,
+        status: 'retrying',
+        error: result.error,
+        message: '准备进行下一次重试'
+      });
+
     } catch (error) {
+      postLogEvent(apiKey, config, {
+        stage: 'attempt_exception',
+        attempt: attempt + 1,
+        slotIndex,
+        status: 'error',
+        error: error.message || error,
+        durationMs: Date.now() - attemptStart
+      });
+
       if (attempt === maxRetries) {
+        const finalError = '测试异常: ' + (error.message || error);
         self.postMessage({
           type: 'KEY_STATUS_UPDATE',
           payload: {
             key: apiKey,
             status: 'invalid',
-            error: '测试异常: ' + error.message,
+            error: finalError,
             retryCount: attempt
           }
         });
-        return { valid: false, error: error.message, isRateLimit: false };
+
+        postLogEvent(apiKey, config, {
+          stage: 'final',
+          attempt: attempt + 1,
+          slotIndex,
+          status: 'invalid',
+          finalStatus: 'invalid',
+          isFinal: true,
+          totalDurationMs: Date.now() - globalStart,
+          error: finalError
+        });
+
+        keyGlobalStartTime.delete(apiKey);
+        return { valid: false, error: finalError, isRateLimit: false };
       }
     }
   }
@@ -351,459 +562,482 @@ async function testApiKey(apiKey, config) {
 }
 
 async function testOpenAIKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('openai', '/chat/completions', config.proxyUrl);
+  const payload = {
+    model: model,
+    messages: [{ role: 'user', content: 'Hi' }],
+    max_tokens: 1
+  };
+  const headers = {
+    'Authorization': 'Bearer ' + apiKey,
+    'Content-Type': 'application/json'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
   try {
-    const apiUrl = getApiUrl('openai', '/chat/completions', config.proxyUrl);
     const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + apiKey,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [{ role: 'user', content: 'Hi' }],
-        max_tokens: 1
-      })
+      headers,
+      body: JSON.stringify(payload)
     });
+    const responseLog = await createResponseLog(response);
 
     if (!response.ok) {
-      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
-      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
-      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
-      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429 };
+      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true, requestLog, responseLog };
+      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429, requestLog, responseLog };
     }
 
-    const responseText = await response.text();
-    if (!responseText || responseText.trim() === '') {
-      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false };
+    if (!responseLog.body || responseLog.body.trim() === '') {
+      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false, requestLog, responseLog };
     }
 
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (parseError) {
-      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false };
+    const data = responseLog.parsed;
+    if (!data) {
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog };
     }
 
     if (data && data.error) {
       const errorMessage = data.error.message || data.error.toString();
-      if (errorMessage.toLowerCase().includes('rate limit') ||
-        errorMessage.toLowerCase().includes('too many requests') ||
-        errorMessage.toLowerCase().includes('quota exceeded')) {
-        return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true };
+      if (typeof errorMessage === 'string') {
+        const lower = errorMessage.toLowerCase();
+        if (lower.includes('rate limit') || lower.includes('too many requests') || lower.includes('quota exceeded')) {
+          return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true, requestLog, responseLog };
+        }
       }
     }
 
-    if (data && data.choices && Array.isArray(data.choices)) {
-      return { valid: true, error: null, isRateLimit: false };
-    } else {
-      return { valid: false, error: '响应格式错误', isRateLimit: false };
+    if (data && Array.isArray(data.choices)) {
+      return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
     }
+
+    return { valid: false, error: '响应格式错误', isRateLimit: false, requestLog, responseLog };
   } catch (error) {
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false };
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
     }
-    return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
   }
 }
 
 async function testClaudeKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('claude', '/messages', config.proxyUrl);
+  const payload = {
+    model: model,
+    max_tokens: 1,
+    messages: [{ role: 'user', content: 'Hi' }]
+  };
+  const headers = {
+    'x-api-key': apiKey,
+    'Content-Type': 'application/json',
+    'anthropic-version': '2023-06-01'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
   try {
-    const apiUrl = getApiUrl('claude', '/messages', config.proxyUrl);
     const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01'
-      },
-      body: JSON.stringify({
-        model: model,
-        max_tokens: 1,
-        messages: [{ role: 'user', content: 'Hi' }]
-      })
+      headers,
+      body: JSON.stringify(payload)
     });
+    const responseLog = await createResponseLog(response);
 
-    if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
-    if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
-    if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
-
-    const responseText = await response.text();
+    if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false, requestLog, responseLog };
+    if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false, requestLog, responseLog };
+    if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true, requestLog, responseLog };
 
     if (response.status === 400) {
-      try {
-        const errorData = JSON.parse(responseText);
-        if (errorData.error && errorData.error.type === 'authentication_error') {
-          return { valid: false, error: '认证错误', isRateLimit: false };
+      const errorData = responseLog.parsed;
+      if (errorData && errorData.error) {
+        if (errorData.error.type === 'authentication_error') {
+          return { valid: false, error: '认证错误', isRateLimit: false, requestLog, responseLog };
         }
-        if (errorData.error && errorData.error.type === 'rate_limit_error') {
-          return { valid: false, error: 'Rate Limit Error', isRateLimit: true };
+        if (errorData.error.type === 'rate_limit_error') {
+          return { valid: false, error: 'Rate Limit Error', isRateLimit: true, requestLog, responseLog };
         }
-        if (errorData.error && errorData.error.type === 'invalid_request_error') {
-          return { valid: true, error: null, isRateLimit: false };
+        if (errorData.error.type === 'invalid_request_error') {
+          return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
         }
-        return { valid: false, error: 'API错误: ' + (errorData.error.type || 'unknown'), isRateLimit: false };
-      } catch {
-        return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false };
+        return { valid: false, error: 'API错误: ' + (errorData.error.type || 'unknown'), isRateLimit: false, requestLog, responseLog };
       }
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog };
     }
 
     if (response.ok) {
-      return { valid: true, error: null, isRateLimit: false };
-    } else {
-      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: false };
+      return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
     }
+
+    return { valid: false, error: 'HTTP ' + response.status, isRateLimit: false, requestLog, responseLog };
   } catch (error) {
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false };
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
     }
-    return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
   }
 }
 
 async function testGeminiKey(apiKey, model, config) {
-  try {
-    const apiUrl = getApiUrl('gemini', '/models/' + model + ':generateContent?key=' + apiKey, config.proxyUrl);
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        contents: [
+  const apiUrl = getApiUrl('gemini', '/models/' + model + ':generateContent?key=' + apiKey, config.proxyUrl);
+  const payload = {
+    contents: [
+      {
+        parts: [
           {
-            parts: [
-              {
-                text: "Hi"
-              }
-            ]
+            text: 'Hi'
           }
         ]
-      })
+      }
+    ]
+  };
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
     });
+    const responseLog = await createResponseLog(response);
 
     if (!response.ok) {
-      if (response.status === 400) return { valid: false, error: getErrorMessage('invalidKey', 400), isRateLimit: false };
-      if (response.status === 401) return { valid: false, error: getErrorMessage('authFailed', 401), isRateLimit: false };
-      if (response.status === 403) return { valid: false, error: getErrorMessage('permissionDenied', 403), isRateLimit: false };
-      if (response.status === 429) return { valid: false, error: getErrorMessage('rateLimited', 429), isRateLimit: true };
-      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429 };
+      if (response.status === 400) return { valid: false, error: getErrorMessage('invalidKey', 400), isRateLimit: false, requestLog, responseLog };
+      if (response.status === 401) return { valid: false, error: getErrorMessage('authFailed', 401), isRateLimit: false, requestLog, responseLog };
+      if (response.status === 403) return { valid: false, error: getErrorMessage('permissionDenied', 403), isRateLimit: false, requestLog, responseLog };
+      if (response.status === 429) return { valid: false, error: getErrorMessage('rateLimited', 429), isRateLimit: true, requestLog, responseLog };
+      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429, requestLog, responseLog };
     }
 
-    const responseText = await response.text();
-    if (!responseText || responseText.trim() === '') {
-      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false };
+    const data = responseLog.parsed;
+    if (!responseLog.body || responseLog.body.trim() === '') {
+      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false, requestLog, responseLog };
     }
 
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (parseError) {
-      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false };
+    if (!data) {
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog };
     }
 
-    if (data && data.candidates && Array.isArray(data.candidates) && data.candidates.length > 0) {
-      return { valid: true, error: null, isRateLimit: false };
-    } else if (data && data.error) {
+    if (data && Array.isArray(data.candidates) && data.candidates.length > 0) {
+      return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
+    }
+
+    if (data && data.error) {
       const errorMessage = data.error.message || data.error.toString();
-      if (errorMessage.toLowerCase().includes('quota exceeded') ||
-        errorMessage.toLowerCase().includes('rate limit') ||
-        errorMessage.toLowerCase().includes('too many requests')) {
-        return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true };
+      if (typeof errorMessage === 'string') {
+        const lower = errorMessage.toLowerCase();
+        if (lower.includes('quota exceeded') || lower.includes('rate limit') || lower.includes('too many requests')) {
+          return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true, requestLog, responseLog };
+        }
       }
-      return { valid: false, error: 'API错误: ' + errorMessage, isRateLimit: false };
-    } else {
-      return { valid: false, error: '响应格式错误', isRateLimit: false };
+      return { valid: false, error: 'API错误: ' + errorMessage, isRateLimit: false, requestLog, responseLog };
     }
+
+    return { valid: false, error: '响应格式错误', isRateLimit: false, requestLog, responseLog };
   } catch (error) {
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false };
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
     }
-    if (error.name === 'SyntaxError' && error.message.includes('JSON')) {
-      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false };
+    if (error.name === 'SyntaxError' && message.includes('JSON')) {
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog: null };
     }
-    return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
   }
 }
 
 async function testDeepSeekKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('deepseek', '/chat/completions', config.proxyUrl);
+  const payload = {
+    model: model,
+    messages: [{ role: 'user', content: 'Hi' }],
+    max_tokens: 1
+  };
+  const headers = {
+    'Authorization': 'Bearer ' + apiKey,
+    'Content-Type': 'application/json'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
   try {
-    const apiUrl = getApiUrl('deepseek', '/chat/completions', config.proxyUrl);
     const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + apiKey,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [{ role: 'user', content: 'Hi' }],
-        max_tokens: 1
-      })
+      headers,
+      body: JSON.stringify(payload)
     });
+    const responseLog = await createResponseLog(response);
 
     if (!response.ok) {
-      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
-      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
-      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
-      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429 };
-    }
-
-    const responseText = await response.text();
-    if (!responseText || responseText.trim() === '') {
-      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false };
-    }
-
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (parseError) {
-      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false };
-    }
-
-    if (data && data.error) {
-      const errorMessage = data.error.message || data.error.toString();
-      if (errorMessage.toLowerCase().includes('rate limit') ||
-        errorMessage.toLowerCase().includes('too many requests') ||
-        errorMessage.toLowerCase().includes('quota exceeded')) {
-        return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true };
+      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true, requestLog, responseLog };
+      if (responseLog.parsed && responseLog.parsed.error && responseLog.parsed.error.message) {
+        return { valid: false, error: responseLog.parsed.error.message, isRateLimit: false, requestLog, responseLog };
       }
+      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429, requestLog, responseLog };
     }
 
-    if (data && data.choices && Array.isArray(data.choices)) {
-      return { valid: true, error: null, isRateLimit: false };
-    } else {
-      return { valid: false, error: '响应格式错误', isRateLimit: false };
-    }
+    return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
   } catch (error) {
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false };
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
     }
-    return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
   }
 }
 
 async function testSiliconCloudKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('siliconcloud', '/chat/completions', config.proxyUrl);
+  const payload = {
+    model: model,
+    messages: [{ role: 'user', content: 'Hi' }],
+    max_tokens: 1
+  };
+  const headers = {
+    'Authorization': 'Bearer ' + apiKey,
+    'Content-Type': 'application/json'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
   try {
-    const apiUrl = getApiUrl('siliconcloud', '/chat/completions', config.proxyUrl);
     const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + apiKey,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [{ role: 'user', content: 'Hi' }],
-        max_tokens: 1
-      })
+      headers,
+      body: JSON.stringify(payload)
     });
+    const responseLog = await createResponseLog(response);
 
     if (!response.ok) {
-      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
-      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
-      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
-      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429 };
+      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true, requestLog, responseLog };
+      if (responseLog.parsed && responseLog.parsed.error && responseLog.parsed.error.message) {
+        return { valid: false, error: responseLog.parsed.error.message, isRateLimit: false, requestLog, responseLog };
+      }
+      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429, requestLog, responseLog };
     }
 
-    const responseText = await response.text();
-    if (!responseText || responseText.trim() === '') {
-      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false };
+    const data = responseLog.parsed;
+    if (!responseLog.body || responseLog.body.trim() === '') {
+      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false, requestLog, responseLog };
     }
 
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (parseError) {
-      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false };
+    if (!data) {
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog };
     }
 
     if (data && data.error) {
       const errorMessage = data.error.message || data.error.toString();
-      if (errorMessage.toLowerCase().includes('rate limit') ||
-        errorMessage.toLowerCase().includes('too many requests') ||
-        errorMessage.toLowerCase().includes('quota exceeded')) {
-        return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true };
+      if (typeof errorMessage === 'string') {
+        const lower = errorMessage.toLowerCase();
+        if (lower.includes('rate limit') || lower.includes('too many requests') || lower.includes('quota exceeded')) {
+          return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true, requestLog, responseLog };
+        }
       }
     }
 
-    if (data && data.choices && Array.isArray(data.choices)) {
-      return { valid: true, error: null, isRateLimit: false };
-    } else {
-      return { valid: false, error: '响应格式错误', isRateLimit: false };
+    if (data && Array.isArray(data.choices)) {
+      return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
     }
+
+    return { valid: false, error: '响应格式错误', isRateLimit: false, requestLog, responseLog };
   } catch (error) {
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false };
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
     }
-    return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
   }
 }
 
 async function testXAIKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('xai', '/chat/completions', config.proxyUrl);
+  const payload = {
+    model: model,
+    messages: [{ role: 'user', content: 'Hi' }],
+    max_tokens: 1
+  };
+  const headers = {
+    'Authorization': 'Bearer ' + apiKey,
+    'Content-Type': 'application/json'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
   try {
-    const apiUrl = getApiUrl('xai', '/chat/completions', config.proxyUrl);
     const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + apiKey,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [{ role: 'user', content: 'Hi' }],
-        max_tokens: 1
-      })
+      headers,
+      body: JSON.stringify(payload)
     });
+    const responseLog = await createResponseLog(response);
 
     if (!response.ok) {
-      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
-      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
-      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
-      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429 };
+      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true, requestLog, responseLog };
+      if (responseLog.parsed && responseLog.parsed.error && responseLog.parsed.error.message) {
+        return { valid: false, error: responseLog.parsed.error.message, isRateLimit: false, requestLog, responseLog };
+      }
+      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429, requestLog, responseLog };
     }
 
-    const responseText = await response.text();
-    if (!responseText || responseText.trim() === '') {
-      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false };
+    const data = responseLog.parsed;
+    if (!responseLog.body || responseLog.body.trim() === '') {
+      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false, requestLog, responseLog };
     }
 
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (parseError) {
-      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false };
+    if (!data) {
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog };
     }
 
     if (data && data.error) {
       const errorMessage = data.error.message || data.error.toString();
-      if (errorMessage.toLowerCase().includes('rate limit') ||
-        errorMessage.toLowerCase().includes('too many requests') ||
-        errorMessage.toLowerCase().includes('quota exceeded')) {
-        return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true };
+      if (typeof errorMessage === 'string') {
+        const lower = errorMessage.toLowerCase();
+        if (lower.includes('rate limit') || lower.includes('too many requests') || lower.includes('quota exceeded')) {
+          return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true, requestLog, responseLog };
+        }
       }
     }
 
-    if (data && data.choices && Array.isArray(data.choices)) {
-      return { valid: true, error: null, isRateLimit: false };
-    } else {
-      return { valid: false, error: '响应格式错误', isRateLimit: false };
+    if (data && Array.isArray(data.choices)) {
+      return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
     }
+
+    return { valid: false, error: '响应格式错误', isRateLimit: false, requestLog, responseLog };
   } catch (error) {
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false };
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
     }
-    return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
   }
 }
 
 async function testOpenRouterKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('openrouter', '/chat/completions', config.proxyUrl);
+  const payload = {
+    model: model,
+    messages: [{ role: 'user', content: 'Hi' }],
+    max_tokens: 1
+  };
+  const headers = {
+    'Authorization': 'Bearer ' + apiKey,
+    'Content-Type': 'application/json',
+    'HTTP-Referer': 'https://api-key-tester.com',
+    'X-Title': 'API Key Tester'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
   try {
-    const apiUrl = getApiUrl('openrouter', '/chat/completions', config.proxyUrl);
     const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + apiKey,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://api-key-tester.com',
-        'X-Title': 'API Key Tester'
-      },
-      body: JSON.stringify({
-        model: model,
-        messages: [{ role: 'user', content: 'Hi' }],
-        max_tokens: 1
-      })
+      headers,
+      body: JSON.stringify(payload)
     });
+    const responseLog = await createResponseLog(response);
 
     if (!response.ok) {
-      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false };
-      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false };
-      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true };
-      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429 };
+      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true, requestLog, responseLog };
+      if (responseLog.parsed && responseLog.parsed.error && responseLog.parsed.error.message) {
+        return { valid: false, error: responseLog.parsed.error.message, isRateLimit: false, requestLog, responseLog };
+      }
+      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429, requestLog, responseLog };
     }
 
-    const responseText = await response.text();
-    if (!responseText || responseText.trim() === '') {
-      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false };
+    const data = responseLog.parsed;
+    if (!responseLog.body || responseLog.body.trim() === '') {
+      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false, requestLog, responseLog };
     }
 
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (parseError) {
-      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false };
+    if (!data) {
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog };
     }
 
     if (data && data.error) {
       const errorMessage = data.error.message || data.error.toString();
-      if (errorMessage.toLowerCase().includes('rate limit') ||
-        errorMessage.toLowerCase().includes('too many requests') ||
-        errorMessage.toLowerCase().includes('quota exceeded')) {
-        return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true };
+      if (typeof errorMessage === 'string') {
+        const lower = errorMessage.toLowerCase();
+        if (lower.includes('rate limit') || lower.includes('too many requests') || lower.includes('quota exceeded')) {
+          return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true, requestLog, responseLog };
+        }
       }
     }
 
-    if (data && data.choices && Array.isArray(data.choices)) {
-      return { valid: true, error: null, isRateLimit: false };
-    } else {
-      return { valid: false, error: '响应格式错误', isRateLimit: false };
+    if (data && Array.isArray(data.choices)) {
+      return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
     }
+
+    return { valid: false, error: '响应格式错误', isRateLimit: false, requestLog, responseLog };
   } catch (error) {
-    if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false };
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
     }
-    return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
   }
 }
 
 async function testGeminiPaidKey(apiKey, model, config) {
-  try {
-    // 生成长文本内容用于Cache API检测 (参考项目的做法)
-    const longText = "You are an expert at analyzing transcripts.".repeat(128);
-
-    const apiUrl = getApiUrl('gemini', '/cachedContents', config.proxyUrl);
-    const response = await fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-goog-api-key': apiKey
-      },
-      body: JSON.stringify({
-        model: 'models/gemini-2.5-flash', // 固定使用 gemini-2.5-flash
-        contents: [
+  const longText = 'You are an expert at analyzing transcripts.'.repeat(128);
+  const apiUrl = getApiUrl('gemini', '/cachedContents', config.proxyUrl);
+  const payload = {
+    model: 'models/gemini-2.5-flash',
+    contents: [
+      {
+        parts: [
           {
-            parts: [
-              {
-                text: longText
-              }
-            ],
-            role: "user"
+            text: longText
           }
         ],
-        ttl: "30s"
-      })
-    });
+        role: 'user'
+      }
+    ],
+    ttl: '30s'
+  };
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-goog-api-key': apiKey
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
 
-    // 付费Key可以成功访问Cache API
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+    const responseLog = await createResponseLog(response);
+
     if (response.ok) {
-      return { isPaid: true, error: null, cacheApiStatus: response.status };
+      return { isPaid: true, error: null, cacheApiStatus: response.status, requestLog, responseLog };
     }
 
-    // 严格按照参考项目的错误处理逻辑
     if (response.status === 429) {
-      // 429 Rate Limit = 免费Key
-      return { isPaid: false, error: null, cacheApiStatus: response.status };
+      return { isPaid: false, error: null, cacheApiStatus: response.status, requestLog, responseLog };
     }
 
     if (response.status === 400 || response.status === 401 || response.status === 403) {
-      // 4xx错误通常表示Key无效或权限不足，归类为免费Key
-      return { isPaid: false, error: null, cacheApiStatus: response.status };
+      return { isPaid: false, error: null, cacheApiStatus: response.status, requestLog, responseLog };
     }
 
-    // 其他错误无法确定付费状态
-    const errorText = await response.text().catch(() => '');
-    return { isPaid: null, error: `HTTP ${response.status}: ${errorText}`, cacheApiStatus: response.status };
+    const bodyText = responseLog.body || '';
+    return {
+      isPaid: null,
+      error: 'HTTP ' + response.status + ': ' + bodyText,
+      cacheApiStatus: response.status,
+      requestLog,
+      responseLog
+    };
   } catch (error) {
-    return { isPaid: null, error: error.message };
+    const message = error && error.message ? error.message : String(error);
+    return { isPaid: null, error: message, requestLog, responseLog: null };
   }
 }

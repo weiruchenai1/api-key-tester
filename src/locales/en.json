@@ -10,7 +10,6 @@
   "detected": "Detected",
   "proxyUrl": "Proxy Server URL (Optional)",
   "proxyHelp": "Leave empty to use default proxy",
-
   "concurrencyControl": "Concurrency Control",
   "retryControl": "Retry Control",
   "retryHelp": "Number of retries when encountering temporary errors (like 403), helps improve detection accuracy",
@@ -22,7 +21,6 @@
   "lightRetry": "Light",
   "normalRetry": "Normal",
   "heavyRetry": "Heavy",
-
   "apiKeys": "API Key List (one per line)",
   "apiKeysPlaceholder": "Enter API keys, one per line:\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n...",
   "import": "Import",
@@ -30,13 +28,11 @@
   "importFile": "Import File",
   "paste": "Paste",
   "pasting": "Pasting",
-
   "detectModels": "Get Models",
   "startTest": "Start Test",
   "cancelTest": "Cancel Test",
   "dedupeKeys": "Dedupe Keys",
   "clear": "Clear",
-
   "testing": "Testing API keys...",
   "completed": "Test completed",
   "total": "Total",
@@ -47,7 +43,6 @@
   "retrying": "Retrying",
   "pending": "Pending",
   "models": "models",
-
   "enablePaidDetection": "Enable Paid Detection",
   "enablePaidKeyDetection": "Enable Paid Key Detection",
   "paidDetection": "Paid Detection",
@@ -57,7 +52,6 @@
   "copyPaidKeys": "Copy Paid Keys",
   "paidDetectionEnabled": "Paid detection enabled",
   "paidDetectionDisabled": "Paid detection disabled",
-
   "all": "All",
   "validKeys": "Valid Keys",
   "invalidKeys": "Invalid Keys",
@@ -67,7 +61,6 @@
   "copyValid": "Copy Valid Keys",
   "copyInvalid": "Copy Invalid Keys",
   "copyRateLimited": "Copy Throttled Keys",
-
   "statusValid": "Valid",
   "statusInvalid": "Invalid",
   "statusRateLimit": "Throttled",
@@ -75,12 +68,44 @@
   "statusTesting": "Testing",
   "statusRetrying": "Retrying",
   "statusPending": "Pending",
-
+  "logs": "Logs",
+  "logsHelp": "Collect and review detailed API call logs",
+  "enabled": "Enabled",
+  "disabled": "Disabled",
+  "logViewer": {
+    "title": "Log Details",
+    "noData": "No log data",
+    "noEvents": "No events recorded",
+    "request": "Request",
+    "response": "Response",
+    "duration": "Duration",
+    "attempt": "Attempt",
+    "freeKey": "Free",
+    "errorStatus": "Error",
+    "cancelled": "Cancelled",
+    "summary": {
+      "status": "Final Status",
+      "duration": "Total Duration",
+      "attempts": "Attempts",
+      "context": "Context"
+    },
+    "stages": {
+      "testStart": "Test Started",
+      "attemptStart": "Attempt Started",
+      "attemptResult": "Attempt Result",
+      "retryWait": "Waiting Before Retry",
+      "retryScheduled": "Retry Scheduled",
+      "retry": "Retry",
+      "attemptException": "Attempt Exception",
+      "paidDetection": "Paid Detection",
+      "final": "Final Result",
+      "cancelled": "Cancelled"
+    }
+  },
   "validKeyInfo": "Valid Key",
   "paidKeyInfo": "Paid Key",
   "freeKeyInfo": "Free Key",
   "invalidKeyInfo": "Invalid API Key",
-
   "enterApiKeys": "Please enter API keys!",
   "enterValidKeys": "Please enter valid API keys!",
   "enterApiKeysFirst": "Please enter API keys first!",
@@ -98,25 +123,21 @@
   "selectTextFile": "Please select a .txt file",
   "fileTooLarge": "File too large, please select a file smaller than 10MB",
   "clipboardError": "Cannot read clipboard content, please ensure clipboard access is authorized",
-
   "noKeys": "No keys",
   "noValidKeys": "No valid keys",
   "noInvalidKeys": "No invalid keys",
   "noRateLimitedKeys": "No throttled keys",
   "noPaidKeys": "No paid keys",
   "resultsWillShow": "Detection results will be displayed here",
-
   "authFailed": "Auth Failed",
   "permissionDenied": "Permission Denied",
   "networkFailed": "Network Failed",
   "retry": "Retry",
   "freeKey": "Free Key",
   "validKey": "Valid Key",
-
   "usageTitle": "Usage Instructions:",
   "usage1": "• Recommend using your own reverse proxy URL, public proxies may be unstable",
   "usage2": "• Keys are only used for validation during testing, not stored",
-
   "ok": "OK",
   "cancel": "Cancel",
   "confirm": "Confirm",
@@ -127,28 +148,24 @@
   "warning": "Warning",
   "success": "Success",
   "info": "Info",
-
   "control": "Controls",
   "lightMode": "Light",
   "darkMode": "Dark",
   "systemMode": "System",
-
   "advancedSettings": "Advanced Settings",
   "addProvider": "Add Provider",
   "appTitle": "API Key Tester",
-
   "errorMessages": {
     "invalidApiKey": "Invalid API Key (400)",
     "authFailed401": "Auth Failed (401)",
-    "permissionDenied403": "Permission Denied (403)", 
+    "permissionDenied403": "Permission Denied (403)",
     "rateLimited429": "Rate Limited (429)",
     "emptyResponse": "Empty Response",
     "httpError": "HTTP Error",
     "networkError": "Network Error",
-    "parseError": "JSON Parse Error", 
+    "parseError": "JSON Parse Error",
     "timeoutError": "Request Timeout"
   },
-
   "paidDetectionDialog": {
     "title": "Test Gemini Paid Keys",
     "description": "To test Gemini paid keys, some tokens need to be consumed to detect if the key has access to paid features.",
@@ -157,23 +174,20 @@
     "confirmButton": "Yes, enable paid detection",
     "cancelButton": "No, don't detect paid features"
   },
-
   "keyStatus": {
     "validKey": "Valid Key",
     "paidKey": "Paid Key",
-    "freeKey": "Free Key", 
+    "freeKey": "Free Key",
     "model": "Model"
   },
-
   "ui": {
     "expandSidebar": "Expand Sidebar",
-    "collapseSidebar": "Collapse Sidebar", 
+    "collapseSidebar": "Collapse Sidebar",
     "chineseName": "简体中文",
     "englishName": "English",
     "loading": "Loading...",
     "retry": "Retry"
   },
-
   "paidDetectionSettings": {
     "description": "When enabled, Cache API will be used to detect paid functionality of Gemini keys, consuming additional quota",
     "popupSettings": "Popup Settings",
@@ -186,5 +200,8 @@
     "resetModalMessage": "Are you sure to reset popup settings? After reset, the paid detection dialog will show again next time you select Gemini.",
     "confirm": "Confirm",
     "cancel": "Cancel"
+  },
+  "results": {
+    "logTooltip": "Tip: Click a test result card to view the log for that key."
   }
 }
