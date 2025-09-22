@@ -4,20 +4,16 @@ import ResultTabs from './ResultTabs';
 import VirtualizedList from './VirtualizedList';
 import Loading from '../../common/Loading';
 import CopyButtons from './CopyButtons';
-import { LogsPreviewPanel } from '../LogsPreview';
+import KeyLogModal from '../LogsPreview/KeyLogModal';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useLanguage } from '../../../hooks/useLanguage';
 
 const Results = () => {
-  const { state } = useAppState();
+  const { state, dispatch } = useAppState();
   const { t } = useLanguage();
 
-  // 从状态获取日志数据
-  const logs = state.logs || [];
-
-  const handleExpandLogs = (logId) => {
-    // TODO: 实现日志详情查看功能
-    console.log('Expand log:', logId);
+  const handleTooltipDismiss = () => {
+    dispatch({ type: 'DISMISS_LOG_TOOLTIP' });
   };
 
   return (
@@ -26,15 +22,20 @@ const Results = () => {
         <>
           <StatsCards />
           
-          {/* 日志预览面板 - 仅在启用日志功能时显示 */}
-          {(state.logsEnabled || logs.length > 0) && (
-            <LogsPreviewPanel 
-              logs={logs}
-              onExpandLogs={handleExpandLogs}
-            />
-          )}
-          
           <div className="function-card results-card">
+            {state.showLogTooltip && (
+              <div className="results-tooltip" role="note">
+                <div className="results-tooltip__text">{t('results.logTooltip')}</div>
+                <button
+                  type="button"
+                  className="results-tooltip__close"
+                  onClick={handleTooltipDismiss}
+                  aria-label={t('close') || 'Close'}
+                >
+                  &times;
+                </button>
+              </div>
+            )}
             <ResultTabs />
             <div className="results-content">
               <VirtualizedList />
@@ -57,6 +58,7 @@ const Results = () => {
       )}
 
       <Loading isVisible={state.isTesting && state.keyResults.length === 0} />
+      <KeyLogModal />
     </>
   );
 };

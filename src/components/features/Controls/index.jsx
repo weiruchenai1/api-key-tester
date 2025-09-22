@@ -3,6 +3,7 @@ import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useApiTester } from '../../../hooks/useApiTester';
 import { deduplicateAndCleanKeys } from '../../../utils/keyProcessor';
+import { getLogCollector } from '../../../utils/logCollector';
 
 const Controls = () => {
   const { t } = useLanguage();
@@ -76,6 +77,10 @@ const Controls = () => {
     }
 
     dispatch({ type: 'CLEAR_ALL' });
+    const collector = getLogCollector && getLogCollector();
+    if (collector && typeof collector.clearLogs === 'function') {
+      collector.clearLogs();
+    }
     alert(t('cleared') || '已清空所有内容。');
   };
 

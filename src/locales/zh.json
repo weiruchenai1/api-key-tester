@@ -10,7 +10,6 @@
   "detected": "检测到",
   "proxyUrl": "代理服务器 URL (可选)",
   "proxyHelp": "留空使用默认代理",
-
   "concurrencyControl": "并发控制",
   "retryControl": "重试控制",
   "retryHelp": "遇到临时错误(如403)时重试次数，有助于提高检测准确性",
@@ -22,7 +21,6 @@
   "lightRetry": "轻度",
   "normalRetry": "正常",
   "heavyRetry": "重度",
-
   "apiKeys": "API 密钥列表 (每行一个)",
   "apiKeysPlaceholder": "请输入API密钥，每行一个：\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n...",
   "import": "导入",
@@ -30,13 +28,11 @@
   "importFile": "导入文件",
   "paste": "粘贴",
   "pasting": "粘贴中",
-
   "detectModels": "获取模型",
   "startTest": "开始测试",
   "cancelTest": "取消测试",
   "dedupeKeys": "去重密钥",
   "clear": "清空",
-
   "testing": "测试中",
   "completed": "测试完成",
   "total": "总计",
@@ -47,7 +43,6 @@
   "retrying": "重试中",
   "pending": "等待中",
   "models": "个模型",
-
   "enablePaidDetection": "启用付费检测",
   "enablePaidKeyDetection": "检测付费key",
   "paidDetection": "付费检测",
@@ -57,7 +52,6 @@
   "copyPaidKeys": "复制付费密钥",
   "paidDetectionEnabled": "已开启付费检测",
   "paidDetectionDisabled": "未开启付费检测",
-
   "all": "全部",
   "validKeys": "有效密钥",
   "invalidKeys": "无效密钥",
@@ -67,7 +61,6 @@
   "copyValid": "复制有效密钥",
   "copyInvalid": "复制无效密钥",
   "copyRateLimited": "复制速率限制密钥",
-
   "statusValid": "有效",
   "statusInvalid": "无效",
   "statusRateLimit": "速率限制",
@@ -75,12 +68,44 @@
   "statusTesting": "测试中",
   "statusRetrying": "重试中",
   "statusPending": "等待中",
-
+  "logs": "日志",
+  "logsHelp": "记录并查看每次 API 调用的详细日志",
+  "enabled": "已启用",
+  "disabled": "未启用",
+  "logViewer": {
+    "title": "日志详情",
+    "noData": "暂无日志数据",
+    "noEvents": "暂无事件记录",
+    "request": "请求",
+    "response": "响应",
+    "duration": "耗时",
+    "attempt": "尝试",
+    "freeKey": "免费",
+    "errorStatus": "错误",
+    "cancelled": "已取消",
+    "summary": {
+      "status": "最终状态",
+      "duration": "总耗时",
+      "attempts": "尝试次数",
+      "context": "上下文"
+    },
+    "stages": {
+      "testStart": "开始测试",
+      "attemptStart": "开始尝试",
+      "attemptResult": "尝试结果",
+      "retryWait": "等待重试",
+      "retryScheduled": "准备重试",
+      "retry": "重试",
+      "attemptException": "尝试异常",
+      "paidDetection": "付费检测",
+      "final": "最终结果",
+      "cancelled": "已取消"
+    }
+  },
   "validKeyInfo": "有效密钥",
   "paidKeyInfo": "付费密钥",
   "freeKeyInfo": "免费密钥",
   "invalidKeyInfo": "API密钥无效",
-
   "enterApiKeys": "请输入API密钥！",
   "enterValidKeys": "请输入有效的API密钥！",
   "enterApiKeysFirst": "请先输入API密钥！",
@@ -98,25 +123,21 @@
   "selectTextFile": "请选择一个.txt文件",
   "fileTooLarge": "文件过大，请选择小于10MB的文件",
   "clipboardError": "无法读取剪贴板内容，请确保已授权访问剪贴板",
-
   "noKeys": "暂无密钥",
   "noValidKeys": "暂无有效密钥",
   "noInvalidKeys": "暂无无效密钥",
   "noRateLimitedKeys": "暂无速率限制密钥",
   "noPaidKeys": "暂无付费密钥",
   "resultsWillShow": "检测结果将显示在这里",
-
   "authFailed": "认证失败",
   "permissionDenied": "权限不足",
   "networkFailed": "网络连接失败",
   "retry": "重试",
   "freeKey": "免费密钥",
   "validKey": "有效密钥",
-
   "usageTitle": "使用说明：",
   "usage1": "• 建议使用自己的反向代理URL，公共代理可能不稳定",
   "usage2": "• 测试过程中密钥仅用于验证，不会被存储",
-
   "ok": "确定",
   "cancel": "取消",
   "confirm": "确认",
@@ -127,19 +148,16 @@
   "warning": "警告",
   "success": "成功",
   "info": "提示",
-
   "control": "控制台",
   "lightMode": "浅色",
   "darkMode": "深色",
   "systemMode": "跟随系统",
-
   "advancedSettings": "高级设置",
   "addProvider": "添加服务商",
   "appTitle": "API Key 测活工具",
-
   "errorMessages": {
     "invalidApiKey": "API密钥无效 (400)",
-    "authFailed401": "认证失败 (401)", 
+    "authFailed401": "认证失败 (401)",
     "permissionDenied403": "权限不足 (403)",
     "rateLimited429": "速率限制 (429)",
     "emptyResponse": "空响应",
@@ -148,7 +166,6 @@
     "parseError": "JSON解析失败",
     "timeoutError": "请求超时"
   },
-
   "paidDetectionDialog": {
     "title": "测试Gemini付费Key",
     "description": "如果要测试Gemini的付费Key，需要消耗一定的Token来检测Key是否有访问付费功能的能力。",
@@ -157,14 +174,12 @@
     "confirmButton": "是，启用付费检测",
     "cancelButton": "否，不检测付费功能"
   },
-
   "keyStatus": {
     "validKey": "有效密钥",
-    "paidKey": "付费密钥", 
+    "paidKey": "付费密钥",
     "freeKey": "免费密钥",
     "model": "模型"
   },
-
   "ui": {
     "expandSidebar": "展开侧边栏",
     "collapseSidebar": "折叠侧边栏",
@@ -173,7 +188,6 @@
     "loading": "加载中...",
     "retry": "重试"
   },
-
   "paidDetectionSettings": {
     "description": "启用后将使用Cache API检测Gemini密钥的付费功能，会消耗额外配额",
     "popupSettings": "弹窗提示设置",
@@ -186,5 +200,8 @@
     "resetModalMessage": "确定要重置弹窗提示设置吗？重置后，下次选择Gemini时将重新显示付费检测询问弹窗。",
     "confirm": "确定",
     "cancel": "取消"
+  },
+  "results": {
+    "logTooltip": "提示：点击测试结果卡片即可查看对应 key 的测试日志。"
   }
 }

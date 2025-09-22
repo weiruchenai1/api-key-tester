@@ -1,5 +1,6 @@
 import React, { createContext, useReducer, useContext, useEffect, useRef, useMemo } from 'react';
 import { debounce } from '../utils/debounce';
+import { getAllLogEntries } from '../utils/logStorage';
 
 // 清理旧的localStorage数据
 const cleanupOldData = () => {
@@ -82,6 +83,7 @@ const getInitialState = () => {
     
     const apiType = localStorage.getItem('apiType') ? JSON.parse(localStorage.getItem('apiType')) : 'openai';
     const currentApiState = getApiTypeState(apiType);
+    const hasSeenLogTooltip = localStorage.getItem('hasSeenLogTooltip') ? JSON.parse(localStorage.getItem('hasSeenLogTooltip')) : false;
     
     return {
       // 当前选中的API类型
@@ -98,6 +100,9 @@ const getInitialState = () => {
       // 全局设置 - 从localStorage获取
       concurrency: localStorage.getItem('concurrency') ? JSON.parse(localStorage.getItem('concurrency')) : 5,
       retryCount: localStorage.getItem('maxRetries') ? JSON.parse(localStorage.getItem('maxRetries')) : 3,
+      logs: [],
+      activeLogKey: null,
+      isLogModalOpen: false,
 
       // Gemini付费检测 - 从localStorage获取
       enablePaidDetection: localStorage.getItem('enablePaidDetection') ? JSON.parse(localStorage.getItem('enablePaidDetection')) : false,
@@ -107,7 +112,9 @@ const getInitialState = () => {
       detectedModels: new Set(),
 
       // 消息
-      message: null
+      message: null,
+      showLogTooltip: false,
+      hasSeenLogTooltip
     };
   } catch (error) {
     console.warn('读取本地存储失败，使用默认配置:', error);
@@ -118,13 +125,18 @@ const getInitialState = () => {
       apiKeysText: '',
       concurrency: 5,
       retryCount: 3,
+      logs: [],
+      activeLogKey: null,
+      isLogModalOpen: false,
       enablePaidDetection: false,
       isTesting: false,
       keyResults: [],
       showResults: false,
       activeTab: 'all',
       detectedModels: new Set(),
-      message: null
+      message: null,
+      showLogTooltip: false,
+      hasSeenLogTooltip: false
     };
   }
 };
@@ -201,7 +213,9 @@ const appReducer = (state, action) => {
           model: state.model,
           isPaid: null // For Gemini paid detection
         })),
-        activeTab: 'all'
+        activeTab: 'all',
+        showLogTooltip: state.hasSeenLogTooltip ? state.showLogTooltip : true,
+        hasSeenLogTooltip: state.hasSeenLogTooltip
       };
 
     case 'UPDATE_KEY_STATUS':
@@ -265,11 +279,70 @@ const appReducer = (state, action) => {
         concurrency: state.concurrency,
         retryCount: state.retryCount,
         enablePaidDetection: state.enablePaidDetection,
+        logs: [],
+        activeLogKey: null,
+        isLogModalOpen: false,
+        showLogTooltip: false,
+        hasSeenLogTooltip: state.hasSeenLogTooltip,
         // 清空测试相关的数据
         apiKeysText: '', // 清空密钥列表
         keyResults: [],
         showResults: false,
         activeTab: 'all'
+      };
+
+    // 日志相关
+    case 'SET_LOGS':
+      return {
+        ...state,
+        logs: Array.isArray(action.payload) ? action.payload : []
+      };
+
+    case 'ADD_LOG': {
+      const newLogs = [
+        ...(state.logs || []),
+        action.payload
+      ];
+      return {
+        ...state,
+        logs: newLogs
+      };
+    }
+    case 'UPDATE_LOG': {
+      const { id, ...rest } = action.payload || {};
+      if (!id) return state;
+      return {
+        ...state,
+        logs: (state.logs || []).map(l => l.id === id ? { ...l, ...rest } : l)
+      };
+    }
+    case 'CLEAR_LOGS':
+      return {
+        ...state,
+        logs: [],
+        activeLogKey: null,
+        isLogModalOpen: false
+      };
+
+    case 'DISMISS_LOG_TOOLTIP':
+      return {
+        ...state,
+        showLogTooltip: false,
+        hasSeenLogTooltip: true
+      };
+
+    case 'OPEN_LOG_MODAL':
+      return {
+        ...state,
+        activeLogKey: action.payload,
+        isLogModalOpen: true
+      };
+
+    case 'CLOSE_LOG_MODAL':
+      return {
+        ...state,
+        activeLogKey: null,
+        isLogModalOpen: false
       };
 
     default:
@@ -285,11 +358,33 @@ const AppStateContext = createContext();
 export const AppStateProvider = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, getInitialState());
   const stateRef = useRef(state);
+  // 日志收集器
+  const logCollectorRef = useRef(null);
+  const hasHydratedLogsRef = useRef(false);
 
   // 保持stateRef同步
   useEffect(() => {
     stateRef.current = state;
   }, [state]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    getAllLogEntries()
+      .then((storedLogs) => {
+        if (!isMounted) return;
+        if (Array.isArray(storedLogs) && storedLogs.length > 0) {
+          dispatch({ type: 'SET_LOGS', payload: storedLogs });
+        }
+      })
+      .catch((error) => {
+        console.warn('加载持久化日志失败:', error);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dispatch]);
 
   // 使用useMemo创建稳定的防抖函数
   const debouncedSaveApiState = useMemo(
@@ -310,10 +405,11 @@ export const AppStateProvider = ({ children }) => {
       localStorage.setItem('concurrency', JSON.stringify(state.concurrency));
       localStorage.setItem('maxRetries', JSON.stringify(state.retryCount));
       localStorage.setItem('enablePaidDetection', JSON.stringify(state.enablePaidDetection));
+      localStorage.setItem('hasSeenLogTooltip', JSON.stringify(state.hasSeenLogTooltip));
     } catch (error) {
       console.warn('保存全局配置到本地存储失败:', error);
     }
-  }, [state.apiType, state.concurrency, state.retryCount, state.enablePaidDetection]);
+  }, [state.apiType, state.concurrency, state.retryCount, state.enablePaidDetection, state.hasSeenLogTooltip]);
 
   // 监听API状态变化并防抖保存（避免频繁保存，如输入时的每个字符变化）
   useEffect(() => {
@@ -340,6 +436,26 @@ export const AppStateProvider = ({ children }) => {
     debouncedSaveApiState
   ]);
 
+  useEffect(() => {
+    const collector = logCollectorRef.current;
+    if (!collector) return;
+
+    if (!state.logs || state.logs.length === 0) {
+      if (typeof collector.clearCache === 'function') {
+        collector.clearCache();
+      }
+      hasHydratedLogsRef.current = false;
+      return;
+    }
+
+    if (hasHydratedLogsRef.current) return;
+
+    if (typeof collector.hydrateLogs === 'function') {
+      collector.hydrateLogs(state.logs);
+      hasHydratedLogsRef.current = true;
+    }
+  }, [state.logs]);
+
   // 组件卸载时立即保存任何待保存的数据
   useEffect(() => {
     return () => {
@@ -351,6 +467,29 @@ export const AppStateProvider = ({ children }) => {
       }
     };
   }, []); // 空依赖数组，只在组件挂载时设置cleanup
+
+  // 初始化日志收集器
+  useEffect(() => {
+    import('../utils/logCollector')
+      .then(({ initializeLogCollector, getLogCollector }) => {
+        if (!logCollectorRef.current) {
+          logCollectorRef.current = initializeLogCollector(dispatch);
+        }
+        const collector = getLogCollector();
+        if (collector) {
+          if (typeof collector.setEnabled === 'function') {
+            collector.setEnabled(true);
+          }
+          if (typeof collector.hydrateLogs === 'function' && (stateRef.current.logs || []).length > 0) {
+            collector.hydrateLogs(stateRef.current.logs || []);
+            hasHydratedLogsRef.current = true;
+          }
+        }
+      })
+      .catch(() => {
+        // 安静失败，不影响主要功能
+      });
+  }, [dispatch]);
 
   const value = {
     state,

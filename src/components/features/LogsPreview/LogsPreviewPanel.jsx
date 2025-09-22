@@ -23,8 +23,7 @@ const LogsPreviewPanel = ({ logs = [], onExpandLogs }) => {
   // 脱敏API密钥
   const maskApiKey = (key) => {
     if (!key || typeof key !== 'string') return 'Unknown';
-    if (key.length <= 8) return key;
-    return key.substring(0, 4) + '...' + key.substring(key.length - 4);
+    return key;
   };
 
   // 过滤和搜索日志

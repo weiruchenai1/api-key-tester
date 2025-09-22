@@ -6,7 +6,7 @@ import { useVirtualization } from '../../../hooks/useVirtualization';
 
 const KeyItem = ({ index, style, data }) => {
   const { t } = useLanguage();
-  const { state } = useAppState();
+  const { state, dispatch } = useAppState();
   const keyData = data[index];
 
   if (!keyData) {
@@ -70,9 +70,26 @@ const KeyItem = ({ index, style, data }) => {
     return null;
   };
 
+  const handleOpenLogs = () => {
+    dispatch({ type: 'OPEN_LOG_MODAL', payload: keyData.key });
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleOpenLogs();
+    }
+  };
+
   return (
     <div style={style} className="key-item-wrapper">
-      <div className="key-item">
+      <div
+        className="key-item"
+        role="button"
+        tabIndex={0}
+        onClick={handleOpenLogs}
+        onKeyDown={handleKeyDown}
+      >
         <div className="key-content">
           <div className="key-text">{keyData.key}</div>
           {keyData.model && (
