@@ -38,8 +38,6 @@ const { extractApiKeys } = require('../../utils/fileHandler');
 // Mock FileReader
 class MockFileReader {
   constructor() {
-    this.result = null;
-    this.error = null;
     this.onload = null;
     this.onerror = null;
   }
@@ -47,13 +45,16 @@ class MockFileReader {
   readAsText(file, encoding) {
     setTimeout(() => {
       if (this.error) {
-        this.onerror && this.onerror();
+        this.onerror && this.onerror({ target: { error: this.error } });
       } else {
         this.onload && this.onload({ target: { result: this.result } });
       }
     }, 0);
   }
 }
+
+MockFileReader.prototype.result = null;
+MockFileReader.prototype.error = null;
 
 global.FileReader = MockFileReader;
 
