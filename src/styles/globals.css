@@ -748,8 +748,8 @@ body {
     align-items: flex-start;
     gap: var(--spacing-sm);
     padding: 10px 12px;
-    margin-bottom: 3px;
-    min-height: 70px;
+    margin-bottom: 6px;
+    min-height: 80px;
   }
 
   .key-content {
@@ -851,8 +851,8 @@ body {
 
   .key-item {
     padding: 8px 10px;
-    margin-bottom: 2px;
-    min-height: 65px;
+    margin-bottom: 5px;
+    min-height: 75px;
   }
 
   .key-text {
@@ -969,6 +969,7 @@ body {
   border-color: #444444;
   color: #ffffff;
 }
+
 /* Results tooltip */
 .results-tooltip {
   display: flex;
@@ -1041,4 +1042,3 @@ body {
     margin: var(--spacing-sm) auto;
   }
 }
-

@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 export const useVirtualization = () => {
-  const getItemHeight = useCallback((keyData) => {
+  const getItemHeight = useCallback((keyData, apiType) => {
     if (!keyData) return 60; // 默认高度
 
     // 基础高度：padding(12*2=24) + wrapper padding(2*2=4) + 基础内容(40) = 68px
@@ -41,6 +41,11 @@ export const useVirtualization = () => {
     // 如果有状态信息（有效密钥信息），增加一行
     if (keyData.status === 'valid' || keyData.status === 'paid') {
       baseHeight += lineHeight;
+    }
+
+    // 如果是硅基流动且是有效密钥，为余额显示增加额外高度
+    if (apiType === 'siliconcloud' && (keyData.status === 'valid' || keyData.status === 'paid')) {
+      baseHeight += lineHeight; // 为余额显示增加一行高度
     }
 
     return Math.max(baseHeight, 68); // 设置最小高度为68px

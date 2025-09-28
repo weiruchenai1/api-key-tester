@@ -1,31 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { getApiBalance } from '../../../services/api/base';
 import { useLanguage } from '../../../hooks/useLanguage';
+import { useAppState } from '../../../contexts/AppStateContext';
 
 const KeyBalanceDisplay = ({ apiKey, apiType, proxyUrl }) => {
   const { t } = useLanguage();
-  const [balanceInfo, setBalanceInfo] = useState(null);
+  const { state, dispatch } = useAppState();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+
+  // 从keyResults中获取当前key的余额信息
+  const keyResult = state.keyResults?.find(result => result.key === apiKey);
+  const balanceInfo = keyResult?.balanceInfo;
+  const balanceError = keyResult?.balanceError;
 
   const fetchBalance = async () => {
     if (!apiKey || !apiType) return;
     
+    // 如果已经有余额信息，不重复查询
+    if (balanceInfo || balanceError) return;
+
     setLoading(true);
-    setError(null);
     
     try {
       const result = await getApiBalance(apiKey, apiType, proxyUrl);
-      if (result.success) {
-        setBalanceInfo(result);
-        setError(null);
-      } else {
-        setError(result.error);
-        setBalanceInfo(null);
-      }
+      
+      // 更新keyResults中的余额信息
+      dispatch({
+        type: 'UPDATE_KEY_STATUS',
+        payload: {
+          key: apiKey,
+          balanceInfo: result.success ? result : null,
+          balanceError: result.success ? null : result.error
+        }
+      });
     } catch (err) {
-      setError(err.message);
-      setBalanceInfo(null);
+      // 更新错误信息
+      dispatch({
+        type: 'UPDATE_KEY_STATUS',
+        payload: {
+          key: apiKey,
+          balanceError: err.message
+        }
+      });
     } finally {
       setLoading(false);
     }
@@ -49,7 +65,7 @@ const KeyBalanceDisplay = ({ apiKey, apiType, proxyUrl }) => {
     return <div className="key-model">{t('balance.title')}: {t('balance.refreshing')}</div>;
   }
   
-  if (error) {
+  if (balanceError) {
     return <div className="key-model">{t('balance.title')}: {t('balance.fetchFailed')}</div>;
   }
   
