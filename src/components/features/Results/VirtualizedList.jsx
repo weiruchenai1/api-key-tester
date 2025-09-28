@@ -165,7 +165,7 @@ const VirtualizedList = () => {
 
   // 创建一个函数来获取每个项目的高度
   const getItemSize = (index) => {
-    return getItemHeight(filteredKeys[index]);
+    return getItemHeight(filteredKeys[index], state.apiType);
   };
 
   // 当数据变化时重置虚拟化缓存
