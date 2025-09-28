@@ -42,18 +42,26 @@ const CopyButtons = () => {
       return;
     }
 
-    navigator.clipboard.writeText(keysToCopy.join('\n')).then(() => {
-      showToast.success((t('keysCopied') || '已复制 {count} 个密钥到剪贴板！').replace('{count}', keysToCopy.length));
-    }).catch(() => {
+    const textToCopy = keysToCopy.join('\n');
+    const successMessage = (t('keysCopied') || '已复制 {count} 个密钥到剪贴板！').replace('{count}', keysToCopy.length);
+    const fallbackCopy = () => {
       const textArea = document.createElement('textarea');
-      textArea.value = keysToCopy.join('\n');
+      textArea.value = textToCopy;
       document.body.appendChild(textArea);
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
+      showToast.success(successMessage);
+    };
 
-      showToast.success((t('keysCopied') || '已复制 {count} 个密钥到剪贴板！').replace('{count}', keysToCopy.length));
-    });
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(textToCopy)
+        .then(() => showToast.success(successMessage))
+        .catch(fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
   };
 
   // 根据当前活跃标签页显示对应的复制按钮

@@ -17,7 +17,7 @@
   --text-primary: #495057;
   --text-secondary: #6c757d;
   --text-tertiary: #adb5bd;
-  --text-muted: #adb5bd;
+  --text-muted: var(--text-tertiary);
 
   /* 边框 */
   --border-color: #dee2e6;
@@ -92,7 +92,7 @@
   --text-primary: #ffffff;
   --text-secondary: #b0b0b0;
   --text-tertiary: #888888;
-  --text-muted: #888888;
+  --text-muted: var(--text-tertiary);
 
   --border-color: #444444;
   --border-focus: #60a5fa;

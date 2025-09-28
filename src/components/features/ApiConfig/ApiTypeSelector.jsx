@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { usePaidDetectionPrompt } from '../../../hooks/usePaidDetectionPrompt';
@@ -9,16 +9,19 @@ const ApiTypeSelector = () => {
   const { state, dispatch } = useAppState();
   const { showPaidDetectionPrompt, hidePrompt, handleConfirm, handleApiTypeChange } = usePaidDetectionPrompt();
 
-  const handleApiTypeSelect = (apiType) => {
+  const handleApiTypeSelect = useCallback((apiType) => {
     dispatch({ type: 'SET_API_TYPE', payload: apiType });
     // 清空检测到的模型
     dispatch({ type: 'CLEAR_DETECTED_MODELS' });
-  };
+  }, [dispatch]);
 
-  const onApiTypeChange = (e) => {
-    const apiType = e.target.value;
-    handleApiTypeChange(apiType, handleApiTypeSelect);
-  };
+  const onApiTypeChange = useCallback(
+    (e) => {
+      const apiType = e.target.value;
+      handleApiTypeChange(apiType, handleApiTypeSelect);
+    },
+    [handleApiTypeChange, handleApiTypeSelect]
+  );
 
   return (
     <div className="space-y-sm">

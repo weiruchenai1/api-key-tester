@@ -1,3 +1,4 @@
+import React from "react";
 import toast from "react-hot-toast";
 
 // 基础提示函数

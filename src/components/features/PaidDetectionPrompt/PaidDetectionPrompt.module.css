@@ -151,14 +151,14 @@
 }
 
 .confirmBtn {
-  background: #3B82F6;
-  color: white;
-  border-color: #3B82F6;
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
 }
 
 .confirmBtn:hover {
-  background: #2563EB;
-  border-color: #2563EB;
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
   transform: translateY(-1px);
 }
 
@@ -227,6 +227,6 @@
 }
 
 :global(.dark-theme) .confirmBtn:hover {
-  background: #3b82f6;
-  border-color: #3b82f6;
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
 }
