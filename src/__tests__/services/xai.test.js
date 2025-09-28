@@ -2,17 +2,13 @@
  * XAI API 服务测试
  */
 
-import { testXAIKey, getXAIModels } from '../../services/api/xai';
-
 // Mock base module
 jest.mock('../../services/api/base', () => ({
-  getApiUrl: jest.fn((service, endpoint, proxyUrl) => {
-    if (proxyUrl) {
-      return `${proxyUrl}/xai${endpoint}`;
-    }
-    return `https://api.x.ai/v1${endpoint}`;
-  })
+  getApiUrl: jest.fn()
 }));
+
+import { testXAIKey, getXAIModels } from '../../services/api/xai';
+import { getApiUrl } from '../../services/api/base';
 
 // Mock fetch
 const originalFetch = global.fetch;
@@ -30,6 +26,14 @@ describe('XAI API Service', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(console, 'error').mockImplementation(() => {});
+    
+    // Setup getApiUrl mock implementation
+    getApiUrl.mockImplementation((service, endpoint, proxyUrl) => {
+      if (proxyUrl) {
+        return `${proxyUrl}${endpoint}`;
+      }
+      return `https://api.x.ai/v1${endpoint}`;
+    });
   });
 
   afterEach(() => {
@@ -71,7 +75,7 @@ describe('XAI API Service', () => {
       await testXAIKey(mockApiKey, mockModel, proxyUrl);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${proxyUrl}/xai/chat/completions`,
+        `${proxyUrl}/chat/completions`,
         expect.any(Object)
       );
     });
@@ -197,7 +201,7 @@ describe('XAI API Service', () => {
       await getXAIModels(mockApiKey, proxyUrl);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        `${proxyUrl}/xai/models`,
+        `${proxyUrl}/models`,
         expect.any(Object)
       );
     });

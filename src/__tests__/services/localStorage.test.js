@@ -308,7 +308,7 @@ describe('App Storage Service', () => {
       const result = appStorage.saveTestHistory(history);
       
       expect(result).toBe(false);
-      expect(console.warn).toHaveBeenCalledWith('保存测试历史失败:', expect.any(Error));
+      expect(console.warn).toHaveBeenCalledWith('localStorage set error:', expect.any(Error));
     });
   });
 

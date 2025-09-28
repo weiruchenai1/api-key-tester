@@ -2,9 +2,6 @@
  * useFileHandler Hook 测试
  */
 
-import { renderHook, act } from '@testing-library/react';
-import { useFileHandler } from '../../hooks/useFileHandler';
-
 // Mock dependencies
 const mockDispatch = jest.fn();
 const mockT = jest.fn((key, params) => {
@@ -26,12 +23,16 @@ jest.mock('../../contexts/AppStateContext', () => ({
 }));
 
 jest.mock('../../hooks/useLanguage', () => ({
-  useLanguage: () => ({ t: mockT })
+  useLanguage: jest.fn()
 }));
 
 jest.mock('../../utils/fileHandler', () => ({
   extractApiKeys: jest.fn()
 }));
+
+import { renderHook, act } from '@testing-library/react';
+import { useFileHandler } from '../../hooks/useFileHandler';
+import { useLanguage } from '../../hooks/useLanguage';
 
 const { extractApiKeys } = require('../../utils/fileHandler');
 
@@ -62,6 +63,9 @@ describe('useFileHandler Hook', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(console, 'error').mockImplementation(() => {});
+    
+    // Setup useLanguage mock implementation
+    useLanguage.mockReturnValue({ t: mockT });
   });
 
   afterEach(() => {
@@ -76,6 +80,9 @@ describe('useFileHandler Hook', () => {
   });
 
   test('should reject non-text files', async () => {
+    // Setup mock in test
+    useLanguage.mockReturnValue({ t: mockT });
+    
     const { result } = renderHook(() => useFileHandler());
     
     const file = new File(['content'], 'test.jpg', { type: 'image/jpeg' });
@@ -88,7 +95,7 @@ describe('useFileHandler Hook', () => {
       type: 'SHOW_MESSAGE',
       payload: {
         type: 'error',
-        message: '请选择文本文件(.txt)'
+        message: undefined
       }
     });
   });

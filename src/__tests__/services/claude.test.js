@@ -4,15 +4,11 @@
 
 // Mock base module - must be before imports
 jest.mock('../../services/api/base', () => ({
-  getApiUrl: jest.fn((service, endpoint, proxyUrl) => {
-    if (proxyUrl) {
-      return `${proxyUrl}/claude${endpoint}`;
-    }
-    return `https://api.anthropic.com/v1${endpoint}`;
-  })
+  getApiUrl: jest.fn()
 }));
 
 import { testClaudeKey, getClaudeModels } from '../../services/api/claude';
+import { getApiUrl } from '../../services/api/base';
 
 // Mock fetch
 const originalFetch = global.fetch;
@@ -30,6 +26,14 @@ describe('Claude API Service', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(console, 'error').mockImplementation(() => {});
+    
+    // Setup getApiUrl mock implementation
+    getApiUrl.mockImplementation((service, endpoint, proxyUrl) => {
+      if (proxyUrl) {
+        return `${proxyUrl}${endpoint}`;
+      }
+      return `https://claude.weiruchenai.me/v1${endpoint}`;
+    });
   });
 
   describe('testClaudeKey', () => {
@@ -52,7 +56,7 @@ describe('Claude API Service', () => {
       });
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.anthropic.com/v1/messages',
+        'https://claude.weiruchenai.me/v1/messages',
         {
           method: 'POST',
           headers: {
@@ -80,7 +84,7 @@ describe('Claude API Service', () => {
       await testClaudeKey(mockApiKey, mockModel, proxyUrl);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://proxy.example.com/claude/messages',
+        'https://proxy.example.com/messages',
         expect.any(Object)
       );
     });
@@ -333,7 +337,7 @@ describe('Claude API Service', () => {
       ]);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://api.anthropic.com/v1/models',
+        'https://claude.weiruchenai.me/v1/models',
         {
           method: 'GET',
           headers: {
@@ -356,7 +360,7 @@ describe('Claude API Service', () => {
       await getClaudeModels(mockApiKey, proxyUrl);
 
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://proxy.example.com/claude/models',
+        'https://proxy.example.com/models',
         expect.any(Object)
       );
     });
