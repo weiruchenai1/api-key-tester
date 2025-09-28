@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
+import { showToast } from '../../../utils/toast';
 
 const CopyButtons = () => {
   const { t } = useLanguage();
@@ -37,12 +38,12 @@ const CopyButtons = () => {
     }
 
     if (keysToCopy.length === 0) {
-      alert(t('noKeysToCopy') || '没有可复制的密钥！');
+      showToast.warning(t('noKeysToCopy') || '没有可复制的密钥！');
       return;
     }
 
     navigator.clipboard.writeText(keysToCopy.join('\n')).then(() => {
-      alert((t('keysCopied') || '已复制 {count} 个密钥到剪贴板！').replace('{count}', keysToCopy.length));
+      showToast.success((t('keysCopied') || '已复制 {count} 个密钥到剪贴板！').replace('{count}', keysToCopy.length));
     }).catch(() => {
       const textArea = document.createElement('textarea');
       textArea.value = keysToCopy.join('\n');
@@ -51,7 +52,7 @@ const CopyButtons = () => {
       document.execCommand('copy');
       document.body.removeChild(textArea);
 
-      alert((t('keysCopied') || '已复制 {count} 个密钥到剪贴板！').replace('{count}', keysToCopy.length));
+      showToast.success((t('keysCopied') || '已复制 {count} 个密钥到剪贴板！').replace('{count}', keysToCopy.length));
     });
   };
 

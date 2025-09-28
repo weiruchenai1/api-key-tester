@@ -167,51 +167,66 @@
 }
 
 /* 暗色主题 */
-[data-theme="dark"] .modal {
-  background: #1F2937;
-  color: #F9FAFB;
+:global(.dark-theme) .modal {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
-[data-theme="dark"] .header {
-  background: #111827;
-  border-bottom-color: #374151;
+:global(.dark-theme) .header {
+  background: var(--bg-input);
+  border-bottom-color: var(--border-color);
 }
 
-[data-theme="dark"] .header h3 {
-  color: #F9FAFB;
+:global(.dark-theme) .header h3 {
+  color: var(--text-primary);
 }
 
-[data-theme="dark"] .closeBtn {
-  color: #9CA3AF;
+:global(.dark-theme) .closeBtn {
+  color: var(--text-secondary);
 }
 
-[data-theme="dark"] .closeBtn:hover {
-  background: #374151;
-  color: #D1D5DB;
+:global(.dark-theme) .closeBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
 }
 
-[data-theme="dark"] .description {
-  color: #D1D5DB;
+:global(.dark-theme) .description {
+  color: var(--text-secondary);
 }
 
-[data-theme="dark"] .warning {
-  background: #7F1D1D;
-  color: #FCA5A5;
-  border-color: #991B1B;
+:global(.dark-theme) .warning {
+  background: rgba(220, 38, 38, 0.15);
+  color: #fca5a5;
+  border-color: rgba(220, 38, 38, 0.3);
 }
 
-[data-theme="dark"] .checkboxText {
-  color: #9CA3AF;
+:global(.dark-theme) .checkboxLabel {
+  color: var(--text-tertiary);
 }
 
-[data-theme="dark"] .cancelBtn {
-  background: #374151;
-  color: #D1D5DB;
-  border-color: #4B5563;
+:global(.dark-theme) .checkboxText {
+  color: var(--text-tertiary);
 }
 
-[data-theme="dark"] .cancelBtn:hover {
-  background: #4B5563;
-  color: #F3F4F6;
-  border-color: #6B7280;
+:global(.dark-theme) .cancelBtn {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+:global(.dark-theme) .cancelBtn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: var(--text-tertiary);
+}
+
+:global(.dark-theme) .confirmBtn {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+:global(.dark-theme) .confirmBtn:hover {
+  background: #3b82f6;
+  border-color: #3b82f6;
 }

@@ -8,6 +8,7 @@ import KeyInput from './components/features/KeyInput';
 import Controls from './components/features/Controls';
 import Results from './components/features/Results';
 import AdvancedSettings from './components/features/AdvancedSettings';
+import ToastProvider from './components/common/ToastProvider';
 import { useLanguage } from './hooks/useLanguage';
 
 const AppContent = () => {
@@ -65,6 +66,7 @@ const AppContent = () => {
 
   return (
     <>
+      <ToastProvider />
       <AppLayout>
         {{
           leftPanel,

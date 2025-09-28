@@ -4,6 +4,7 @@ import { useAppState } from '../../../contexts/AppStateContext';
 import { useApiTester } from '../../../hooks/useApiTester';
 import { deduplicateAndCleanKeys } from '../../../utils/keyProcessor';
 import { getLogCollector } from '../../../utils/logCollector';
+import { showToast } from '../../../utils/toast';
 
 const Controls = () => {
   const { t } = useLanguage();
@@ -17,18 +18,18 @@ const Controls = () => {
     }
 
     if (!state.apiKeysText.trim()) {
-      alert(t('enterApiKeys') || '请输入API密钥！');
+      showToast.error(t('enterApiKeys') || '请输入API密钥！');
       return;
     }
 
     if (!state.model.trim()) {
-      alert(t('selectModel') || '请选择或输入模型名！');
+      showToast.error(t('selectModel') || '请选择或输入模型名！');
       return;
     }
 
     const rawKeys = state.apiKeysText.split('\n').filter(key => key.trim());
     if (rawKeys.length === 0) {
-      alert(t('enterValidKeys') || '请输入有效的API密钥！');
+      showToast.error(t('enterValidKeys') || '请输入有效的API密钥！');
       return;
     }
 
@@ -39,7 +40,7 @@ const Controls = () => {
       const message = (t('duplicatesRemoved') || '发现 {duplicates} 个重复密钥，已自动去除。将测试 {unique} 个唯一密钥。')
         .replace('{duplicates}', duplicates.length)
         .replace('{unique}', uniqueKeys.length);
-      alert(message);
+      showToast.info(message);
     }
 
     await startTesting(uniqueKeys);
@@ -47,12 +48,12 @@ const Controls = () => {
 
   const handleDedupeKeys = () => {
     if (state.isTesting) {
-      alert(t('cannotDedupeWhileTesting') || '测试正在进行中，无法去重！');
+      showToast.warning(t('cannotDedupeWhileTesting') || '测试正在进行中，无法去重！');
       return;
     }
 
     if (!state.apiKeysText.trim()) {
-      alert(t('enterApiKeysFirst') || '请先输入API密钥！');
+      showToast.error(t('enterApiKeysFirst') || '请先输入API密钥！');
       return;
     }
 
@@ -64,15 +65,15 @@ const Controls = () => {
       const message = (t('dedupeSuccess') || '已去除 {removed} 个重复密钥，保留 {kept} 个唯一密钥。')
         .replace('{removed}', duplicates.length)
         .replace('{kept}', uniqueKeys.length);
-      alert(message);
+      showToast.success(message);
     } else {
-      alert(t('noDuplicatesFound') || '未发现重复密钥。');
+      showToast.info(t('noDuplicatesFound') || '未发现重复密钥。');
     }
   };
 
   const handleClear = () => {
     if (state.isTesting) {
-      alert(t('cannotClearWhileTesting') || '测试正在进行中，无法清空！');
+      showToast.warning(t('cannotClearWhileTesting') || '测试正在进行中，无法清空！');
       return;
     }
 
@@ -81,7 +82,7 @@ const Controls = () => {
     if (collector && typeof collector.clearLogs === 'function') {
       collector.clearLogs();
     }
-    alert(t('cleared') || '已清空所有内容。');
+    showToast.success(t('cleared') || '已清空所有内容。');
   };
 
   return (

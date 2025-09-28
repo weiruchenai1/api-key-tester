@@ -16,6 +16,7 @@
   /* 文字颜色 */
   --text-primary: #495057;
   --text-secondary: #6c757d;
+  --text-tertiary: #adb5bd;
   --text-muted: #adb5bd;
 
   /* 边框 */
@@ -82,9 +83,15 @@
   --bg-card: #2a2a2a;
   --bg-input: #1a1a1a;
   --bg-hover: #3a3a3a;
+  --bg-tertiary: #3a3a3a;
+
+  /* 修复背景色别名 */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: #2a2a2a;
 
   --text-primary: #ffffff;
   --text-secondary: #b0b0b0;
+  --text-tertiary: #888888;
   --text-muted: #888888;
 
   --border-color: #444444;

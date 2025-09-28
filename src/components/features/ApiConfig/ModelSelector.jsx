@@ -3,7 +3,9 @@ import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useApiTester } from '../../../hooks/useApiTester';
 import { MODEL_OPTIONS } from '../../../constants/api';
+import { PAID_DETECTION_KEYS } from '../../../constants/localStorage';
 import PaidDetectionPrompt from '../PaidDetectionPrompt';
+import { showToast } from '../../../utils/toast';
 
 const ModelSelector = () => {
   const { t } = useLanguage();
@@ -39,9 +41,9 @@ const ModelSelector = () => {
   const checkPaidDetectionPrompt = (selectedModel) => {
     if (state.apiType !== 'gemini') return false;
 
-    const promptDisabled = localStorage.getItem('geminiPaidDetectionPromptDisabled') === 'true';
+    const promptDisabled = localStorage.getItem(PAID_DETECTION_KEYS.GEMINI_PROMPT_DISABLED) === 'true';
     if (promptDisabled) {
-      const defaultSetting = localStorage.getItem('geminiPaidDetectionDefault') === 'true';
+      const defaultSetting = localStorage.getItem(PAID_DETECTION_KEYS.GEMINI_DEFAULT_SETTING) === 'true';
       dispatch({ type: 'SET_PAID_DETECTION', payload: defaultSetting });
       return false;
     }
@@ -71,13 +73,13 @@ const ModelSelector = () => {
 
   const handleDetectModels = async () => {
     if (!state.apiKeysText.trim()) {
-      alert(t('enterApiKeysFirst') || '请先输入API密钥！');
+      showToast.error(t('enterApiKeysFirst') || '请先输入API密钥！');
       return;
     }
 
     const apiKeys = state.apiKeysText.split('\n').filter(key => key.trim());
     if (apiKeys.length === 0) {
-      alert(t('enterValidKeys') || '请输入有效的API密钥！');
+      showToast.error(t('enterValidKeys') || '请输入有效的API密钥！');
       return;
     }
 

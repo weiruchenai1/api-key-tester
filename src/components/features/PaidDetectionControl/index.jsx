@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
+import { PAID_DETECTION_KEYS } from '../../../constants/localStorage';
 import Modal from '../../common/Modal';
 
 const PaidDetectionControl = () => {
@@ -16,9 +17,9 @@ const PaidDetectionControl = () => {
     localStorage.setItem('enablePaidDetection', JSON.stringify(newValue));
 
     // 如果用户之前设置了不再提示，更新默认设置
-    const promptDisabled = localStorage.getItem('geminiPaidDetectionPromptDisabled') === 'true';
+    const promptDisabled = localStorage.getItem(PAID_DETECTION_KEYS.GEMINI_PROMPT_DISABLED) === 'true';
     if (promptDisabled) {
-      localStorage.setItem('geminiPaidDetectionDefault', newValue.toString());
+      localStorage.setItem(PAID_DETECTION_KEYS.GEMINI_DEFAULT_SETTING, newValue.toString());
     }
   };
 
@@ -28,8 +29,8 @@ const PaidDetectionControl = () => {
   };
 
   const confirmResetPrompt = () => {
-    localStorage.removeItem('geminiPaidDetectionPromptDisabled');
-    localStorage.removeItem('geminiPaidDetectionDefault');
+    localStorage.removeItem(PAID_DETECTION_KEYS.GEMINI_PROMPT_DISABLED);
+    localStorage.removeItem(PAID_DETECTION_KEYS.GEMINI_DEFAULT_SETTING);
     setShowResetModal(false);
   };
 
