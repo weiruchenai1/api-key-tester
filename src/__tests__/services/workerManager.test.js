@@ -30,6 +30,7 @@ global.Worker = MockWorker;
 
 describe('WorkerManager', () => {
   beforeEach(() => {
+    global.Worker = MockWorker;
     // Reset WorkerManager state
     WorkerManager.worker = null;
     WorkerManager.isReady = false;
@@ -173,8 +174,9 @@ describe('WorkerManager', () => {
         });
       }, 10);
       
-      await WorkerManager.sendMessage('TEST');
+      const promise = WorkerManager.sendMessage('TEST');
       jest.advanceTimersByTime(10);
+      await promise;
       
       expect(clearTimeoutSpy).toHaveBeenCalled();
       expect(WorkerManager.pendingTimeouts.size).toBe(0);

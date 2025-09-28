@@ -66,7 +66,8 @@ describe('useLocalStorage Hook', () => {
   });
 
   test('should initialize with stored value when exists', () => {
-    mockLocalStorage.store['testKey'] = JSON.stringify('storedValue');
+    // Set value before creating the hook
+    mockLocalStorage.setItem('testKey', JSON.stringify('storedValue'));
 
     const { result } = renderHook(() => useLocalStorage('testKey', 'defaultValue'));
 
@@ -75,6 +76,7 @@ describe('useLocalStorage Hook', () => {
   });
 
   test('should handle JSON parse errors gracefully', () => {
+    // Set invalid JSON directly to store to bypass the mock's JSON.stringify
     mockLocalStorage.store['testKey'] = 'invalid json {';
 
     const { result } = renderHook(() => useLocalStorage('testKey', 'defaultValue'));
@@ -127,7 +129,7 @@ describe('useLocalStorage Hook', () => {
   });
 
   test('should handle localStorage setItem errors', () => {
-    mockLocalStorage.setItem.mockImplementation(() => {
+    mockLocalStorage.setItem.mockImplementationOnce(() => {
       throw new Error('Storage quota exceeded');
     });
 
@@ -262,7 +264,7 @@ describe('useUserConfig Hook', () => {
   });
 
   test('should handle localStorage errors when clearing config', () => {
-    mockLocalStorage.removeItem.mockImplementation((key) => {
+    mockLocalStorage.removeItem.mockImplementationOnce((key) => {
       if (key === 'apiType') {
         throw new Error('Remove failed');
       }

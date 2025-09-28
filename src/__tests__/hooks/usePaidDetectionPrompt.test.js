@@ -35,6 +35,9 @@ describe('usePaidDetectionPrompt Hook', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockLocalStorage.store = {};
+    mockLocalStorage.getItem.mockImplementation(
+      (key) => mockLocalStorage.store[key] || null
+    );
   });
 
   test('should initialize with default values', () => {

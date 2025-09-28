@@ -7,7 +7,7 @@ import { useWebWorker } from '../../hooks/useWebWorker';
 
 // Mock dependencies
 const mockDispatch = jest.fn();
-const mockLanguage = 'en';
+let mockLanguage = 'en';
 
 jest.mock('../../contexts/AppStateContext', () => ({
   useAppState: () => ({
@@ -28,30 +28,9 @@ jest.mock('../../utils/logCollector', () => ({
   getLogCollector: jest.fn(() => mockLogCollector)
 }));
 
-// Mock Web Worker
-class MockWorker {
-  constructor(path) {
-    this.path = path;
-    this.onmessage = null;
-    this.onerror = null;
-    this.onmessageerror = null;
-  }
-
-  postMessage(data) {
-    // Simulate worker responses
-    setTimeout(() => {
-      if (data.type === 'PING' && this.onmessage) {
-        this.onmessage({ data: { type: 'PONG' } });
-      }
-    }, 10);
-  }
-
-  terminate() {
-    // Mock terminate
-  }
-}
-
-global.Worker = MockWorker;
+// Store original Worker for restoration
+const OriginalWorker = global.Worker;
+let WorkerCtor; // assigned in beforeEach
 
 // Mock window.location
 Object.defineProperty(window, 'location', {
@@ -73,12 +52,33 @@ describe('useWebWorker Hook', () => {
     console.log = jest.fn();
     console.error = jest.fn();
     console.warn = jest.fn();
+    // Reset log collector state for each test
+    mockLogCollector.enabled = true;
+    mockLogCollector.recordEvent = jest.fn();
+
+    // Fresh Worker constructor per test (callable with new and spy-able)
+    WorkerCtor = jest.fn(function MockWorker(path) {
+      this.path = path;
+      this.onmessage = null;
+      this.onerror = null;
+      this.onmessageerror = null;
+      this.postMessage = (data) => {
+        setTimeout(() => {
+          if (data?.type === 'PING' && this.onmessage) {
+            this.onmessage({ data: { type: 'PONG' } });
+          }
+        }, 10);
+      };
+      this.terminate = jest.fn();
+    });
+    global.Worker = WorkerCtor;
   });
 
   afterEach(() => {
     console.log = originalConsoleLog;
     console.error = originalConsoleError;
     console.warn = originalConsoleWarn;
+    global.Worker = OriginalWorker;
   });
 
   test('should initialize with default values', () => {
@@ -95,7 +95,7 @@ describe('useWebWorker Hook', () => {
 
     renderHook(() => useWebWorker());
 
-    expect(global.Worker).toHaveBeenCalledWith('/worker.js');
+    expect(WorkerCtor).toHaveBeenCalledWith('/worker.js');
     
     process.env.NODE_ENV = originalEnv;
   });
@@ -109,7 +109,7 @@ describe('useWebWorker Hook', () => {
 
     renderHook(() => useWebWorker());
 
-    expect(global.Worker).toHaveBeenCalledWith('/my-app/worker.js');
+    expect(WorkerCtor).toHaveBeenCalledWith('/my-app/worker.js');
     
     process.env.NODE_ENV = originalEnv;
     process.env.PUBLIC_URL = originalPublicUrl;
@@ -124,7 +124,7 @@ describe('useWebWorker Hook', () => {
 
     renderHook(() => useWebWorker());
 
-    expect(global.Worker).toHaveBeenCalledWith('./worker.js');
+    expect(WorkerCtor).toHaveBeenCalledWith('./worker.js');
     
     process.env.NODE_ENV = originalEnv;
     process.env.PUBLIC_URL = originalPublicUrl;
@@ -149,7 +149,7 @@ describe('useWebWorker Hook', () => {
     });
 
     // Simulate KEY_STATUS_UPDATE message
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
     const payload = { key: 'sk-test123', status: 'valid' };
 
     act(() => {
@@ -169,7 +169,7 @@ describe('useWebWorker Hook', () => {
       await new Promise(resolve => setTimeout(resolve, 20));
     });
 
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
     const payload = { key: 'sk-test123', event: 'test_start' };
 
     act(() => {
@@ -187,7 +187,7 @@ describe('useWebWorker Hook', () => {
       await new Promise(resolve => setTimeout(resolve, 20));
     });
 
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
     const payload = { key: 'sk-test123', event: 'test_start' };
 
     act(() => {
@@ -204,7 +204,7 @@ describe('useWebWorker Hook', () => {
       await new Promise(resolve => setTimeout(resolve, 20));
     });
 
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
 
     act(() => {
       mockWorker.onmessage({ data: { type: 'TESTING_COMPLETE' } });
@@ -220,7 +220,7 @@ describe('useWebWorker Hook', () => {
       await new Promise(resolve => setTimeout(resolve, 20));
     });
 
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
 
     act(() => {
       mockWorker.onmessage({ data: { type: 'UNKNOWN_TYPE' } });
@@ -230,9 +230,10 @@ describe('useWebWorker Hook', () => {
   });
 
   test('should handle worker creation errors', () => {
-    global.Worker = jest.fn(() => {
+    WorkerCtor = jest.fn(() => {
       throw new Error('Worker creation failed');
     });
+    global.Worker = WorkerCtor;
 
     const { result } = renderHook(() => useWebWorker());
 
@@ -243,7 +244,7 @@ describe('useWebWorker Hook', () => {
   test('should handle worker error events', async () => {
     const { result } = renderHook(() => useWebWorker());
 
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
     const error = new Error('Worker error');
 
     act(() => {
@@ -257,7 +258,7 @@ describe('useWebWorker Hook', () => {
   test('should handle worker message errors', async () => {
     const { result } = renderHook(() => useWebWorker());
 
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
     const error = new Error('Message error');
 
     act(() => {
@@ -275,10 +276,11 @@ describe('useWebWorker Hook', () => {
       await new Promise(resolve => setTimeout(resolve, 20));
     });
 
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
     mockWorker.postMessage = jest.fn();
 
-    // Worker should be ready now, test language update
+    // Worker should be ready now, change language and test update
+    mockLanguage = 'zh';
     act(() => {
       // Simulate language change by re-rendering
       result.rerender();
@@ -298,7 +300,7 @@ describe('useWebWorker Hook', () => {
     });
 
     const config = { keys: ['sk-test123'], services: ['openai'] };
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
     
     // Mock postMessage to simulate TESTING_COMPLETE
     mockWorker.postMessage = jest.fn((data) => {
@@ -333,22 +335,16 @@ describe('useWebWorker Hook', () => {
       await new Promise(resolve => setTimeout(resolve, 20));
     });
 
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
     mockWorker.postMessage = jest.fn(); // Don't send TESTING_COMPLETE
 
-    // Mock shorter timeout for testing
-    jest.spyOn(global, 'setTimeout').mockImplementation((fn, delay) => {
-      if (delay === 300000) { // 5 minutes
-        return global.setTimeout(fn, 10); // Make it 10ms for test
-      }
-      return global.setTimeout(fn, delay);
-    });
-
+    jest.useFakeTimers();
+    const promise = result.current.startWorkerTesting({});
     await act(async () => {
-      await expect(result.current.startWorkerTesting({})).rejects.toThrow('Worker testing timeout');
+      jest.advanceTimersByTime(300000);
     });
-
-    jest.restoreAllMocks();
+    await expect(promise).rejects.toThrow('Worker testing timeout');
+    jest.useRealTimers();
   });
 
   test('should cancel worker testing', async () => {
@@ -358,7 +354,7 @@ describe('useWebWorker Hook', () => {
       await new Promise(resolve => setTimeout(resolve, 20));
     });
 
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
     mockWorker.postMessage = jest.fn();
 
     act(() => {
@@ -383,7 +379,7 @@ describe('useWebWorker Hook', () => {
   test('should terminate worker on cleanup', () => {
     const { unmount } = renderHook(() => useWebWorker());
 
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
     mockWorker.terminate = jest.fn();
 
     unmount();
@@ -402,7 +398,7 @@ describe('useWebWorker Hook', () => {
       await new Promise(resolve => setTimeout(resolve, 20));
     });
 
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
     const payload = { key: 'sk-test123', event: 'test_start' };
 
     act(() => {
@@ -419,7 +415,7 @@ describe('useWebWorker Hook', () => {
       await new Promise(resolve => setTimeout(resolve, 20));
     });
 
-    const mockWorker = global.Worker.mock.instances[0];
+    const mockWorker = WorkerCtor.mock.instances[0];
 
     // Test empty message
     act(() => {

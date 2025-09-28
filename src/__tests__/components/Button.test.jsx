@@ -5,7 +5,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Button from '../../../components/common/Button';
+import Button from '../../components/common/Button';
 
 describe('Button Component', () => {
   test('should render with default props', () => {
@@ -56,7 +56,8 @@ describe('Button Component', () => {
     
     rerender(<Button size="medium">Test</Button>);
     button = screen.getByRole('button');
-    expect(button).not.toHaveClass('btn-sm', 'btn-lg');
+    expect(button).not.toHaveClass('btn-sm');
+    expect(button).not.toHaveClass('btn-lg');
     
     rerender(<Button size="large">Test</Button>);
     button = screen.getByRole('button');

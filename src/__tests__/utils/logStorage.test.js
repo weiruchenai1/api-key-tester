@@ -351,14 +351,17 @@ describe('LogStorage', () => {
 
       await saveLogEntry(logEntry);
       
-      // Mock index error
-      const originalConsoleWarn = console.warn;
-      console.warn = jest.fn();
-      
-      const result = await getLogEntryByKey('test-key');
-      
-      console.warn = originalConsoleWarn;
-      expect(result).toBeTruthy();
+      // Force index lookup to fail
+      const originalIndex = MockIDBObjectStore.prototype.index;
+      MockIDBObjectStore.prototype.index = function () {
+        throw new Error('Index failed');
+      };
+      try {
+        const result = await getLogEntryByKey('test-key');
+        expect(result).toBeTruthy();
+      } finally {
+        MockIDBObjectStore.prototype.index = originalIndex;
+      }
     });
 
     test('should handle retrieval errors gracefully', async () => {

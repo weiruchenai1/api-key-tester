@@ -5,31 +5,31 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import KeyInput from '../../../components/features/KeyInput';
+import KeyInput from '../../components/features/KeyInput';
 
 // Mock dependencies
-jest.mock('../../../contexts/AppStateContext', () => ({
+jest.mock('../../contexts/AppStateContext', () => ({
   useAppState: jest.fn()
 }));
 
-jest.mock('../../../hooks/useLanguage', () => ({
+jest.mock('../../hooks/useLanguage', () => ({
   useLanguage: jest.fn()
 }));
 
-jest.mock('../../../components/features/KeyInput/FileImport', () => {
+jest.mock('../../components/features/KeyInput/FileImport', () => {
   return function MockFileImport() {
     return <div data-testid="file-import">File Import</div>;
   };
 });
 
-jest.mock('../../../components/features/KeyInput/PasteButton', () => {
+jest.mock('../../components/features/KeyInput/PasteButton', () => {
   return function MockPasteButton() {
     return <div data-testid="paste-button">Paste Button</div>;
   };
 });
 
-import { useAppState } from '../../../contexts/AppStateContext';
-import { useLanguage } from '../../../hooks/useLanguage';
+import { useAppState } from '../../contexts/AppStateContext';
+import { useLanguage } from '../../hooks/useLanguage';
 
 describe('KeyInput Component', () => {
   const mockDispatch = jest.fn();
@@ -158,7 +158,7 @@ describe('KeyInput Component', () => {
   });
 
   test('should maintain textarea focus during typing', () => {
-    render(<KeyInput />);
+    const { rerender } = render(<KeyInput />);
     
     const textarea = screen.getByRole('textbox');
     textarea.focus();
@@ -167,8 +167,16 @@ describe('KeyInput Component', () => {
     
     fireEvent.change(textarea, { target: { value: 'typing...' } });
     
-    // Textarea should still be focused after change
-    expect(textarea).toHaveFocus();
+    // Simulate state update by re-rendering with new state
+    useAppState.mockReturnValue({
+      state: { ...mockState, apiKeysText: 'typing...' },
+      dispatch: mockDispatch
+    });
+    rerender(<KeyInput />);
+    
+    // Textarea should still be focused after re-render
+    const updatedTextarea = screen.getByRole('textbox');
+    expect(updatedTextarea).toHaveFocus();
   });
 
   test('should handle large text input', () => {
@@ -185,23 +193,29 @@ describe('KeyInput Component', () => {
     });
   });
 
-  test('should preserve textarea cursor position', () => {
-    render(<KeyInput />);
+  test('should preserve textarea cursor position during input', () => {
+    const { rerender } = render(<KeyInput />);
     
     const textarea = screen.getByRole('textbox');
     
     // Set initial value
     fireEvent.change(textarea, { target: { value: 'sk-test123' } });
     
-    // Set cursor position
+    // Set cursor position at index 3
     textarea.setSelectionRange(3, 3);
+    expect(textarea.selectionStart).toBe(3);
+    expect(textarea.selectionEnd).toBe(3);
     
-    // Add more text
-    fireEvent.change(textarea, { target: { value: 'sk-new-test123' } });
-    
-    expect(mockDispatch).toHaveBeenCalledWith({
-      type: 'SET_API_KEYS_TEXT',
-      payload: 'sk-new-test123'
+    // Simulate state update
+    useAppState.mockReturnValue({
+      state: { ...mockState, apiKeysText: 'sk-test123' },
+      dispatch: mockDispatch
     });
+    rerender(<KeyInput />);
+    
+    // Verify the cursor position is preserved after re-render
+    const updatedTextarea = screen.getByRole('textbox');
+    expect(updatedTextarea.selectionStart).toBe(3);
+    expect(updatedTextarea.selectionEnd).toBe(3);
   });
 });

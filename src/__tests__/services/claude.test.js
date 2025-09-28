@@ -2,9 +2,7 @@
  * Claude API 服务测试
  */
 
-import { testClaudeKey, getClaudeModels } from '../../services/api/claude';
-
-// Mock base module
+// Mock base module - must be before imports
 jest.mock('../../services/api/base', () => ({
   getApiUrl: jest.fn((service, endpoint, proxyUrl) => {
     if (proxyUrl) {
@@ -14,8 +12,19 @@ jest.mock('../../services/api/base', () => ({
   })
 }));
 
+import { testClaudeKey, getClaudeModels } from '../../services/api/claude';
+
 // Mock fetch
-global.fetch = jest.fn();
+const originalFetch = global.fetch;
+const mockFetch = jest.fn();
+
+beforeAll(() => {
+  global.fetch = mockFetch;
+});
+
+afterAll(() => {
+  global.fetch = originalFetch;
+});
 
 describe('Claude API Service', () => {
   beforeEach(() => {
@@ -23,16 +32,12 @@ describe('Claude API Service', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-  });
-
   describe('testClaudeKey', () => {
     const mockApiKey = 'sk-ant-test123456789';
     const mockModel = 'claude-3-sonnet-20240229';
 
     test('should return valid for successful response', async () => {
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         text: jest.fn().mockResolvedValue('{"content":[{"text":"Hello"}]}')
@@ -46,7 +51,7 @@ describe('Claude API Service', () => {
         isRateLimit: false
       });
 
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(mockFetch).toHaveBeenCalledWith(
         'https://api.anthropic.com/v1/messages',
         {
           method: 'POST',
@@ -65,7 +70,7 @@ describe('Claude API Service', () => {
     });
 
     test('should use proxy URL when provided', async () => {
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         text: jest.fn().mockResolvedValue('{}')
@@ -74,14 +79,14 @@ describe('Claude API Service', () => {
       const proxyUrl = 'https://proxy.example.com';
       await testClaudeKey(mockApiKey, mockModel, proxyUrl);
 
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(mockFetch).toHaveBeenCalledWith(
         'https://proxy.example.com/claude/messages',
         expect.any(Object)
       );
     });
 
     test('should return invalid for 401 unauthorized', async () => {
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
         text: jest.fn().mockResolvedValue('Unauthorized')
@@ -97,7 +102,7 @@ describe('Claude API Service', () => {
     });
 
     test('should return invalid for 403 forbidden', async () => {
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 403,
         text: jest.fn().mockResolvedValue('Forbidden')
@@ -113,7 +118,7 @@ describe('Claude API Service', () => {
     });
 
     test('should return rate limit error for 429', async () => {
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 429,
         text: jest.fn().mockResolvedValue('Rate Limited')
@@ -136,7 +141,7 @@ describe('Claude API Service', () => {
         }
       };
 
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
         text: jest.fn().mockResolvedValue(JSON.stringify(errorResponse))
@@ -159,7 +164,7 @@ describe('Claude API Service', () => {
         }
       };
 
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
         text: jest.fn().mockResolvedValue(JSON.stringify(errorResponse))
@@ -182,7 +187,7 @@ describe('Claude API Service', () => {
         }
       };
 
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
         text: jest.fn().mockResolvedValue(JSON.stringify(errorResponse))
@@ -205,7 +210,7 @@ describe('Claude API Service', () => {
         }
       };
 
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
         text: jest.fn().mockResolvedValue(JSON.stringify(errorResponse))
@@ -227,7 +232,7 @@ describe('Claude API Service', () => {
         }
       };
 
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
         text: jest.fn().mockResolvedValue(JSON.stringify(errorResponse))
@@ -243,7 +248,7 @@ describe('Claude API Service', () => {
     });
 
     test('should handle 400 with invalid JSON', async () => {
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
         text: jest.fn().mockResolvedValue('Invalid JSON {')
@@ -259,7 +264,7 @@ describe('Claude API Service', () => {
     });
 
     test('should handle other HTTP error codes', async () => {
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
         text: jest.fn().mockResolvedValue('Internal Server Error')
@@ -276,7 +281,7 @@ describe('Claude API Service', () => {
 
     test('should handle network errors', async () => {
       const networkError = new TypeError('Failed to fetch');
-      global.fetch.mockRejectedValue(networkError);
+      mockFetch.mockRejectedValue(networkError);
 
       const result = await testClaudeKey(mockApiKey, mockModel);
 
@@ -289,7 +294,7 @@ describe('Claude API Service', () => {
 
     test('should handle other errors', async () => {
       const error = new Error('Custom error');
-      global.fetch.mockRejectedValue(error);
+      mockFetch.mockRejectedValue(error);
 
       const result = await testClaudeKey(mockApiKey, mockModel);
 
@@ -313,7 +318,7 @@ describe('Claude API Service', () => {
         ]
       };
 
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         json: jest.fn().mockResolvedValue(mockModelsResponse)
@@ -327,7 +332,7 @@ describe('Claude API Service', () => {
         'claude-3-sonnet-20240229'
       ]);
 
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(mockFetch).toHaveBeenCalledWith(
         'https://api.anthropic.com/v1/models',
         {
           method: 'GET',
@@ -341,7 +346,7 @@ describe('Claude API Service', () => {
     });
 
     test('should use proxy URL when provided', async () => {
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         json: jest.fn().mockResolvedValue({ data: [] })
@@ -350,14 +355,14 @@ describe('Claude API Service', () => {
       const proxyUrl = 'https://proxy.example.com';
       await getClaudeModels(mockApiKey, proxyUrl);
 
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(mockFetch).toHaveBeenCalledWith(
         'https://proxy.example.com/claude/models',
         expect.any(Object)
       );
     });
 
     test('should return empty array for non-ok response', async () => {
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
         json: jest.fn().mockResolvedValue({ error: 'Unauthorized' })
@@ -373,7 +378,7 @@ describe('Claude API Service', () => {
         data: null
       };
 
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         json: jest.fn().mockResolvedValue(mockResponse)
@@ -389,7 +394,7 @@ describe('Claude API Service', () => {
         models: [{ id: 'model1' }] // Wrong structure
       };
 
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         json: jest.fn().mockResolvedValue(mockResponse)
@@ -402,7 +407,7 @@ describe('Claude API Service', () => {
 
     test('should handle fetch errors gracefully', async () => {
       const error = new Error('Network error');
-      global.fetch.mockRejectedValue(error);
+      mockFetch.mockRejectedValue(error);
 
       const result = await getClaudeModels(mockApiKey);
 
@@ -411,7 +416,7 @@ describe('Claude API Service', () => {
     });
 
     test('should handle JSON parsing errors', async () => {
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         json: jest.fn().mockRejectedValue(new Error('Invalid JSON'))
@@ -432,7 +437,7 @@ describe('Claude API Service', () => {
         ]
       };
 
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         json: jest.fn().mockResolvedValue(mockModelsResponse)
@@ -448,7 +453,7 @@ describe('Claude API Service', () => {
         data: []
       };
 
-      global.fetch.mockResolvedValue({
+      mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
         json: jest.fn().mockResolvedValue(mockModelsResponse)
@@ -466,7 +471,7 @@ describe('Claude API Service', () => {
       const model = 'claude-3-sonnet-20240229';
 
       // First get models
-      global.fetch.mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
         json: jest.fn().mockResolvedValue({
@@ -481,7 +486,7 @@ describe('Claude API Service', () => {
       expect(models).toContain(model);
 
       // Then test the key
-      global.fetch.mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
         text: jest.fn().mockResolvedValue('{"content":[{"text":"Hello"}]}')
@@ -495,7 +500,7 @@ describe('Claude API Service', () => {
       const apiKey = 'invalid-key';
 
       // Models request fails with 401
-      global.fetch.mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
         json: jest.fn().mockResolvedValue({ error: 'Unauthorized' })
@@ -505,7 +510,7 @@ describe('Claude API Service', () => {
       expect(models).toEqual([]);
 
       // Key test also fails with 401
-      global.fetch.mockResolvedValueOnce({
+      mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
         text: jest.fn().mockResolvedValue('Unauthorized')

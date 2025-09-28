@@ -314,10 +314,15 @@ describe('FileHandler Utilities', () => {
   describe('downloadFile', () => {
     beforeEach(() => {
       // Mock URL methods
+      const { URL } = global;
+      if (!URL) global.URL = {};
+      global.__origCreateObjectURL = global.URL.createObjectURL;
+      global.__origRevokeObjectURL = global.URL.revokeObjectURL;
       global.URL.createObjectURL = jest.fn(() => 'blob:mock-url');
       global.URL.revokeObjectURL = jest.fn();
       
       // Mock DOM methods
+      global.__origDocument = global.document;
       global.document = {
         createElement: jest.fn(() => ({
           href: '',
@@ -329,6 +334,16 @@ describe('FileHandler Utilities', () => {
           removeChild: jest.fn()
         }
       };
+    });
+
+    afterEach(() => {
+      // restore globals
+      global.URL.createObjectURL = global.__origCreateObjectURL;
+      global.URL.revokeObjectURL = global.__origRevokeObjectURL;
+      global.document = global.__origDocument;
+      delete global.__origCreateObjectURL;
+      delete global.__origRevokeObjectURL;
+      delete global.__origDocument;
     });
 
     test('should create download link and trigger download', () => {

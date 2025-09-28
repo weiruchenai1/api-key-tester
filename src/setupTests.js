@@ -36,6 +36,41 @@ global.Worker = MockWorker;
 // Mock fetch for API testing
 global.fetch = jest.fn();
 
+// Mock Blob.prototype.text() for Web API compatibility
+if (!global.Blob.prototype.text) {
+  global.Blob.prototype.text = jest.fn(function() {
+    return Promise.resolve(new TextDecoder().decode(this));
+  });
+}
+
+// Enhanced mock Blob for testing
+const originalBlob = global.Blob;
+global.Blob = class MockBlob extends originalBlob {
+  constructor(parts, options) {
+    super(parts, options);
+    this._parts = parts;
+  }
+  
+  text() {
+    // Convert parts array to string
+    const content = this._parts.join('');
+    return Promise.resolve(content);
+  }
+  
+  arrayBuffer() {
+    const content = this._parts.join('');
+    const encoder = new TextEncoder();
+    return Promise.resolve(encoder.encode(content).buffer);
+  }
+};
+
+// Mock URL.createObjectURL and URL.revokeObjectURL
+global.URL.createObjectURL = jest.fn(() => 'blob:mock-url');
+global.URL.revokeObjectURL = jest.fn();
+
+// Don't mock DOM methods globally - they interfere with React Testing Library
+// Instead, individual tests that need DOM mocking should set up their own mocks
+
 // Mock window.matchMedia
 global.matchMedia = global.matchMedia || function (query) {
   return {

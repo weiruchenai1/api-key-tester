@@ -15,8 +15,16 @@ jest.mock('../../services/api/base', () => ({
 }));
 
 // Mock fetch
+const originalFetch = global.fetch;
 const mockFetch = jest.fn();
-global.fetch = mockFetch;
+
+beforeAll(() => {
+  global.fetch = mockFetch;
+});
+
+afterAll(() => {
+  global.fetch = originalFetch;
+});
 
 describe('XAI API Service', () => {
   beforeEach(() => {

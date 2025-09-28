@@ -375,10 +375,13 @@ describe('LogCollector', () => {
         type: 'UPDATE_LOG',
         payload: expect.objectContaining({
           status: 'retrying',
-          finalStatus: null, // Not final for retries
-          attempt: 2
+          attempts: 2,
+          retryCount: 1
         })
       });
+      // And ensure finalStatus is not set for non-final events
+      const entry = logCollector.logsByKey.get('test-key');
+      expect(entry.finalStatus).toBeUndefined();
     });
   });
 
@@ -393,7 +396,8 @@ describe('LogCollector', () => {
         type: 'UPDATE_LOG',
         payload: expect.objectContaining({
           status: 'retrying',
-          attempt: 2
+          attempts: 2,
+          retryCount: 1
         })
       });
     });

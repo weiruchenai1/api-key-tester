@@ -15,8 +15,16 @@ jest.mock('../../services/api/base', () => ({
 }));
 
 // Mock fetch
+const originalFetch = global.fetch;
 const mockFetch = jest.fn();
-global.fetch = mockFetch;
+
+beforeAll(() => {
+  global.fetch = mockFetch;
+});
+
+afterAll(() => {
+  global.fetch = originalFetch;
+});
 
 describe('OpenRouter API Service', () => {
   beforeEach(() => {
@@ -29,7 +37,7 @@ describe('OpenRouter API Service', () => {
   });
 
   describe('testOpenRouterKey', () => {
-    const mockApiKey = 'sk-or-test123456789';
+    const mockApiKey = 'OPENROUTER_API_KEY_EXAMPLE';
     const mockModel = 'anthropic/claude-3.5-sonnet';
 
     test('should return valid for successful response', async () => {
@@ -163,7 +171,7 @@ describe('OpenRouter API Service', () => {
   });
 
   describe('getOpenRouterModels', () => {
-    const mockApiKey = 'sk-or-test123456789';
+    const mockApiKey = 'OPENROUTER_API_KEY_EXAMPLE';
 
     test('should return model list for successful response', async () => {
       mockFetch.mockResolvedValue({

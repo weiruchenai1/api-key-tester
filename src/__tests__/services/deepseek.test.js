@@ -29,7 +29,7 @@ describe('DeepSeek API Service', () => {
   });
 
   describe('testDeepSeekKey', () => {
-    const mockApiKey = 'sk-deepseek-test123456789';
+    const mockApiKey = 'DEEPSEEK_API_KEY_EXAMPLE';
     const mockModel = 'deepseek-chat';
 
     test('should return valid for successful response', async () => {
@@ -198,7 +198,7 @@ describe('DeepSeek API Service', () => {
   });
 
   describe('getDeepSeekModels', () => {
-    const mockApiKey = 'sk-deepseek-test123456789';
+    const mockApiKey = 'DEEPSEEK_API_KEY_EXAMPLE';
 
     test('should return models list for successful response', async () => {
       const mockModelsResponse = {
@@ -334,7 +334,7 @@ describe('DeepSeek API Service', () => {
 
   describe('Integration Tests', () => {
     test('should handle complete DeepSeek API workflow', async () => {
-      const apiKey = 'sk-deepseek-test123456789';
+      const apiKey = 'DEEPSEEK_API_KEY_EXAMPLE';
 
       // First get models
       global.fetch.mockResolvedValueOnce({
@@ -392,7 +392,7 @@ describe('DeepSeek API Service', () => {
     });
 
     test('should handle rate limiting scenarios', async () => {
-      const apiKey = 'sk-deepseek-test123456789';
+      const apiKey = 'DEEPSEEK_API_KEY_EXAMPLE';
 
       // Test rate limiting in key test
       mockFetch.mockResolvedValue({

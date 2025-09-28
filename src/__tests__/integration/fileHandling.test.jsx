@@ -13,6 +13,14 @@ jest.mock('../../utils/toast', () => ({
   }
 }));
 
+// Store original globals for restoration
+const REALS = {
+  document: global.document,
+  FileReader: global.FileReader,
+  URL_createObjectURL: global.URL?.createObjectURL,
+  URL_revokeObjectURL: global.URL?.revokeObjectURL,
+};
+
 // Mock file reader
 class MockFileReader {
   constructor() {
@@ -35,53 +43,51 @@ class MockFileReader {
 
 global.FileReader = MockFileReader;
 
-// File handling utilities
-const fileHandlers = {
-  validateFile: (file) => {
-    if (!file) return { valid: false, error: 'No file selected' };
-    
-    if (file.type !== 'text/plain' && !file.name.endsWith('.txt')) {
-      return { valid: false, error: '请选择文本文件(.txt)' };
-    }
-    
-    if (file.size > 10 * 1024 * 1024) {
-      return { valid: false, error: '文件大小不能超过10MB' };
-    }
-    
-    return { valid: true };
-  },
+// Simple utility functions for testing (extracted from existing codebase logic)
+const validateFile = (file) => {
+  if (!file) return { valid: false, error: 'No file selected' };
+  
+  if (file.type !== 'text/plain' && !file.name.endsWith('.txt')) {
+    return { valid: false, error: '请选择文本文件(.txt)' };
+  }
+  
+  if (file.size > 10 * 1024 * 1024) {
+    return { valid: false, error: '文件大小不能超过10MB' };
+  }
+  
+  return { valid: true };
+};
 
-  readFileAsync: (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (e) => resolve(e.target.result);
-      reader.onerror = (e) => reject(e.target.error);
-      reader.readAsText(file);
-    });
-  },
+const readFileAsync = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result);
+    reader.onerror = (e) => reject(e.target.error);
+    reader.readAsText(file);
+  });
+};
 
-  exportData: (data, filename = 'export.txt') => {
-    if (!data || data.length === 0) {
-      showToast.warning('没有数据可导出');
-      return false;
-    }
+const exportData = (data, filename = 'export.txt') => {
+  if (!data || data.length === 0) {
+    showToast.warning('没有数据可导出');
+    return false;
+  }
 
-    try {
-      const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      showToast.success('导出成功');
-      return true;
-    } catch (error) {
-      showToast.error('导出失败: ' + error.message);
-      return false;
-    }
+  try {
+    const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showToast.success('导出成功');
+    return true;
+  } catch (error) {
+    showToast.error('导出失败: ' + error.message);
+    return false;
   }
 };
 
@@ -110,19 +116,26 @@ describe('File Handling Utilities', () => {
 
   afterEach(() => {
     jest.useRealTimers();
+    // Restore globals
+    global.document = REALS.document;
+    global.FileReader = REALS.FileReader;
+    if (global.URL) {
+      global.URL.createObjectURL = REALS.URL_createObjectURL;
+      global.URL.revokeObjectURL = REALS.URL_revokeObjectURL;
+    }
   });
 
   describe('File Validation', () => {
     test('should validate text files successfully', () => {
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
-      const result = fileHandlers.validateFile(file);
+      const result = validateFile(file);
       
       expect(result.valid).toBe(true);
     });
 
     test('should reject non-text files', () => {
       const file = new File(['binary'], 'test.exe', { type: 'application/exe' });
-      const result = fileHandlers.validateFile(file);
+      const result = validateFile(file);
       
       expect(result.valid).toBe(false);
       expect(result.error).toBe('请选择文本文件(.txt)');
@@ -132,20 +145,20 @@ describe('File Handling Utilities', () => {
       const file = new File(['x'.repeat(100)], 'large.txt', { type: 'text/plain' });
       Object.defineProperty(file, 'size', { value: 11 * 1024 * 1024 });
       
-      const result = fileHandlers.validateFile(file);
+      const result = validateFile(file);
       
       expect(result.valid).toBe(false);
       expect(result.error).toBe('文件大小不能超过10MB');
     });
 
     test('should reject null/undefined files', () => {
-      expect(fileHandlers.validateFile(null).valid).toBe(false);
-      expect(fileHandlers.validateFile(undefined).valid).toBe(false);
+      expect(validateFile(null).valid).toBe(false);
+      expect(validateFile(undefined).valid).toBe(false);
     });
 
     test('should accept .txt files by extension', () => {
       const file = new File(['content'], 'test.txt', { type: '' });
-      const result = fileHandlers.validateFile(file);
+      const result = validateFile(file);
       
       expect(result.valid).toBe(true);
     });
@@ -163,7 +176,7 @@ describe('File Handling Utilities', () => {
       
       global.FileReader = jest.fn(() => mockReader);
       
-      const promise = fileHandlers.readFileAsync(file);
+      const promise = readFileAsync(file);
       jest.advanceTimersByTime(10);
       
       const result = await promise;
@@ -181,7 +194,7 @@ describe('File Handling Utilities', () => {
       
       global.FileReader = jest.fn(() => mockReader);
       
-      const promise = fileHandlers.readFileAsync(file);
+      const promise = readFileAsync(file);
       jest.advanceTimersByTime(10);
       
       await expect(promise).rejects.toBe(error);
@@ -191,7 +204,7 @@ describe('File Handling Utilities', () => {
   describe('File Export', () => {
     test('should export data successfully', () => {
       const data = 'sk-test123\nsk-test456';
-      const result = fileHandlers.exportData(data, 'keys.txt');
+      const result = exportData(data, 'keys.txt');
       
       expect(result).toBe(true);
       expect(global.URL.createObjectURL).toHaveBeenCalled();
@@ -200,7 +213,7 @@ describe('File Handling Utilities', () => {
     });
 
     test('should handle empty data', () => {
-      const result = fileHandlers.exportData('');
+      const result = exportData('');
       
       expect(result).toBe(false);
       expect(showToast.warning).toHaveBeenCalledWith('没有数据可导出');
@@ -208,7 +221,7 @@ describe('File Handling Utilities', () => {
     });
 
     test('should handle null data', () => {
-      const result = fileHandlers.exportData(null);
+      const result = exportData(null);
       
       expect(result).toBe(false);
       expect(showToast.warning).toHaveBeenCalledWith('没有数据可导出');
@@ -219,14 +232,14 @@ describe('File Handling Utilities', () => {
         throw new Error('Blob creation failed');
       });
       
-      const result = fileHandlers.exportData('test data');
+      const result = exportData('test data');
       
       expect(result).toBe(false);
       expect(showToast.error).toHaveBeenCalledWith('导出失败: Blob creation failed');
     });
 
     test('should use default filename', () => {
-      const result = fileHandlers.exportData('test data');
+      const result = exportData('test data');
       
       expect(result).toBe(true);
       expect(showToast.success).toHaveBeenCalledWith('导出成功');
@@ -239,7 +252,7 @@ describe('File Handling Utilities', () => {
       const file = new File([originalData], 'input.txt', { type: 'text/plain' });
       
       // Step 1: Validate
-      const validation = fileHandlers.validateFile(file);
+      const validation = validateFile(file);
       expect(validation.valid).toBe(true);
       
       // Step 2: Read
@@ -248,7 +261,7 @@ describe('File Handling Utilities', () => {
       mockReader.error = null;
       global.FileReader = jest.fn(() => mockReader);
       
-      const promise = fileHandlers.readFileAsync(file);
+      const promise = readFileAsync(file);
       jest.advanceTimersByTime(10);
       const content = await promise;
       
@@ -258,7 +271,7 @@ describe('File Handling Utilities', () => {
       const processedData = content.split('\n').map(line => line.trim()).join('\n');
       
       // Step 4: Export
-      const result = fileHandlers.exportData(processedData, 'output.txt');
+      const result = exportData(processedData, 'output.txt');
       expect(result).toBe(true);
       expect(showToast.success).toHaveBeenCalledWith('导出成功');
     });

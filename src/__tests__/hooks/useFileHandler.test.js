@@ -197,27 +197,36 @@ describe('useFileHandler Hook', () => {
   });
 
   test('should append to existing API keys', async () => {
-    // Mock state with existing keys
-    jest.doMock('../../contexts/AppStateContext', () => ({
-      useAppState: () => ({
-        state: { apiKeysText: 'existing-key' },
-        dispatch: mockDispatch
-      })
-    }));
-
-    const { result } = renderHook(() => useFileHandler());
+    jest.resetModules();
     
-    const file = new File(['sk-new123'], 'keys.txt', { type: 'text/plain' });
-    extractApiKeys.mockReturnValue(['sk-new123']);
-    MockFileReader.prototype.result = 'sk-new123';
+    // Isolate modules to allow fresh mock
+    await jest.isolateModules(async () => {
+      // Mock state with existing keys
+      jest.doMock('../../contexts/AppStateContext', () => ({
+        useAppState: () => ({
+          state: { apiKeysText: 'existing-key' },
+          dispatch: mockDispatch
+        })
+      }));
+      
+      const { useFileHandler: isolatedUseFileHandler } = require('../../hooks/useFileHandler');
+      const { renderHook } = require('@testing-library/react');
+      const { act } = require('@testing-library/react');
+      
+      const { result } = renderHook(() => isolatedUseFileHandler());
+      
+      const file = new File(['sk-new123'], 'keys.txt', { type: 'text/plain' });
+      extractApiKeys.mockReturnValue(['sk-new123']);
+      MockFileReader.prototype.result = 'sk-new123';
 
-    await act(async () => {
-      await result.current.importFile(file);
-    });
+      await act(async () => {
+        await result.current.importFile(file);
+      });
 
-    expect(mockDispatch).toHaveBeenCalledWith({
-      type: 'SET_API_KEYS_TEXT',
-      payload: 'existing-key\nsk-new123'
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'SET_API_KEYS_TEXT',
+        payload: 'existing-key\nsk-new123'
+      });
     });
   });
 
@@ -314,15 +323,20 @@ describe('useFileHandler Hook', () => {
     extractApiKeys.mockReturnValue(['sk-test123', 'sk-test456']);
 
     // Mock FileReader with custom behavior
+    const originalFileReader = global.FileReader;
     const mockReader = new MockFileReader();
     mockReader.result = fileContent;
     global.FileReader = jest.fn(() => mockReader);
 
-    await act(async () => {
-      await result.current.importFile(file);
-    });
+    try {
+      await act(async () => {
+        await result.current.importFile(file);
+      });
 
-    expect(extractApiKeys).toHaveBeenCalledWith(fileContent);
+      expect(extractApiKeys).toHaveBeenCalledWith(fileContent);
+    } finally {
+      global.FileReader = originalFileReader;
+    }
   });
 
   test('should handle different file name cases', async () => {

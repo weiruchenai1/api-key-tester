@@ -15,8 +15,16 @@ jest.mock('../../services/api/base', () => ({
 }));
 
 // Mock fetch
+const originalFetch = global.fetch;
 const mockFetch = jest.fn();
-global.fetch = mockFetch;
+
+beforeAll(() => {
+  global.fetch = mockFetch;
+});
+
+afterAll(() => {
+  global.fetch = originalFetch;
+});
 
 describe('SiliconCloud API Service', () => {
   beforeEach(() => {
@@ -29,7 +37,7 @@ describe('SiliconCloud API Service', () => {
   });
 
   describe('testSiliconCloudKey', () => {
-    const mockApiKey = 'sk-silicon-test123456789';
+    const mockApiKey = 'SILICONCLOUD_API_KEY_EXAMPLE';
     const mockModel = 'Qwen/Qwen2-72B-Instruct';
 
     test('should return valid for successful response', async () => {
@@ -147,7 +155,7 @@ describe('SiliconCloud API Service', () => {
   });
 
   describe('getSiliconCloudModels', () => {
-    const mockApiKey = 'sk-silicon-test123456789';
+    const mockApiKey = 'SILICONCLOUD_API_KEY_EXAMPLE';
 
     test('should return model list for successful response', async () => {
       mockFetch.mockResolvedValue({
@@ -185,7 +193,7 @@ describe('SiliconCloud API Service', () => {
   });
 
   describe('getSiliconCloudBalance', () => {
-    const mockApiKey = 'sk-silicon-test123456789';
+    const mockApiKey = 'SILICONCLOUD_API_KEY_EXAMPLE';
 
     test('should return balance info for successful response', async () => {
       mockFetch.mockResolvedValue({
