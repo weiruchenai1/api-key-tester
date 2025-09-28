@@ -3,6 +3,7 @@
  */
 
 import { storage, appStorage } from '../../services/storage/localStorage';
+import { USER_CONFIG_KEYS, TEST_RESULT_KEYS } from '../../constants/localStorage';
 
 describe('Storage Service', () => {
   let mockLocalStorage;
@@ -199,11 +200,11 @@ describe('App Storage Service', () => {
     test('should save theme successfully', () => {
       const result = appStorage.saveTheme('dark');
       expect(result).toBe(true);
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('theme', JSON.stringify('dark'));
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(USER_CONFIG_KEYS.THEME, JSON.stringify('dark'));
     });
 
     test('should get saved theme', () => {
-      mockLocalStorage.store['theme'] = JSON.stringify('dark');
+      mockLocalStorage.store[USER_CONFIG_KEYS.THEME] = JSON.stringify('dark');
       
       const result = appStorage.getTheme();
       expect(result).toBe('dark');
@@ -219,11 +220,11 @@ describe('App Storage Service', () => {
     test('should save language successfully', () => {
       const result = appStorage.saveLanguage('en');
       expect(result).toBe(true);
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('language', JSON.stringify('en'));
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(USER_CONFIG_KEYS.LANGUAGE, JSON.stringify('en'));
     });
 
     test('should get saved language', () => {
-      mockLocalStorage.store['language'] = JSON.stringify('en');
+      mockLocalStorage.store[USER_CONFIG_KEYS.LANGUAGE] = JSON.stringify('en');
       
       const result = appStorage.getLanguage();
       expect(result).toBe('en');
@@ -241,12 +242,12 @@ describe('App Storage Service', () => {
       const result = appStorage.saveConfig(config);
       
       expect(result).toBe(true);
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('config', JSON.stringify(config));
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('akt:user:config', JSON.stringify(config));
     });
 
     test('should get saved config', () => {
       const config = { apiTimeout: 5000, maxRetries: 3 };
-      mockLocalStorage.store['config'] = JSON.stringify(config);
+      mockLocalStorage.store['akt:user:config'] = JSON.stringify(config);
       
       const result = appStorage.getConfig();
       expect(result).toEqual(config);
@@ -267,7 +268,7 @@ describe('App Storage Service', () => {
       
       const result = appStorage.saveTestHistory(history);
       expect(result).toBe(true);
-      expect(mockLocalStorage.setItem).toHaveBeenCalledWith('testHistory', JSON.stringify(history));
+      expect(mockLocalStorage.setItem).toHaveBeenCalledWith(TEST_RESULT_KEYS.TEST_HISTORY, JSON.stringify(history));
     });
 
     test('should limit history to 100 records', () => {
@@ -279,7 +280,7 @@ describe('App Storage Service', () => {
       
       appStorage.saveTestHistory(history);
       
-      const savedData = JSON.parse(mockLocalStorage.store['testHistory']);
+      const savedData = JSON.parse(mockLocalStorage.store[TEST_RESULT_KEYS.TEST_HISTORY]);
       expect(savedData.length).toBe(100);
       expect(savedData[0]).toEqual(history[50]); // First item should be index 50 (keep last 100)
     });
@@ -288,7 +289,7 @@ describe('App Storage Service', () => {
       const history = [
         { key: 'sk-test1', status: 'valid', timestamp: Date.now() }
       ];
-      mockLocalStorage.store['testHistory'] = JSON.stringify(history);
+      mockLocalStorage.store[TEST_RESULT_KEYS.TEST_HISTORY] = JSON.stringify(history);
       
       const result = appStorage.getTestHistory();
       expect(result).toEqual(history);
