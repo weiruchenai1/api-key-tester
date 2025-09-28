@@ -3,6 +3,7 @@ import { VariableSizeList as List } from 'react-window';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useVirtualization } from '../../../hooks/useVirtualization';
+import KeyBalanceDisplay from '../BalanceDisplay/KeyBalanceDisplay';
 
 const KeyItem = ({ index, style, data }) => {
   const { t } = useLanguage();
@@ -110,6 +111,14 @@ const KeyItem = ({ index, style, data }) => {
             <div className="key-valid-info">
               {getKeyStatusInfo()}
             </div>
+          )}
+          {/* 余额显示 - 只在有效的siliconcloud key时显示 */}
+          {(keyData.status === 'valid' || keyData.status === 'paid') && state.apiType === 'siliconcloud' && (
+            <KeyBalanceDisplay 
+              apiKey={keyData.key}
+              apiType={state.apiType}
+              proxyUrl={state.proxyUrl}
+            />
           )}
         </div>
         <div className={`key-status ${getStatusClass(keyData.status)}`}>

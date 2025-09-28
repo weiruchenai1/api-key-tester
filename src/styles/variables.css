@@ -49,14 +49,26 @@
 
   /* 颜色别名 */
   --primary-color: var(--color-primary);
+  --primary-hover: #0056b3;
   --success-color: var(--color-success);
   --error-color: var(--color-danger);
   --warning-color: var(--color-warning);
   --info-color: var(--color-info);
 
   /* 背景色别名 */
-  --bg-primary: var(--color-primary);
+  --bg-primary: var(--bg-input);
+  --bg-secondary: var(--bg-card);
   --bg-tertiary: #f1f3f4;
+
+  /* 错误样式 */
+  --error-bg: #f8d7da;
+  --error-border: #f5c6cb;
+
+  /* 边框样式 */
+  --border-light: rgba(0, 0, 0, 0.1);
+
+  /* 字体 */
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* 过渡动画 */
   --transition-fast: 0.15s ease;
@@ -79,4 +91,12 @@
   --border-focus: #60a5fa;
 
   --color-primary: #60a5fa;
+
+  /* 深色主题的特殊变量 */
+  --dark-bg-primary: #1a1a1a;
+  --dark-bg-secondary: #2a2a2a;
+  --dark-text-primary: #ffffff;
+  --dark-text-secondary: #b0b0b0;
+  --dark-border-color: #444444;
+  --dark-border-light: rgba(255, 255, 255, 0.1);
 }

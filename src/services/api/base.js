@@ -2,7 +2,7 @@ import { testOpenAIKey, getOpenAIModels } from './openai';
 import { testClaudeKey, getClaudeModels } from './claude';
 import { testGeminiKey, getGeminiModels } from './gemini';
 import { testDeepSeekKey, getDeepSeekModels } from './deepseek';
-import { testSiliconCloudKey, getSiliconCloudModels } from './siliconcloud';
+import { testSiliconCloudKey, getSiliconCloudModels, getSiliconCloudBalance } from './siliconcloud';
 import { testXAIKey, getXAIModels } from './xai';
 import { testOpenRouterKey, getOpenRouterModels } from './openrouter';
 
@@ -76,5 +76,38 @@ export const getAvailableModels = async (apiKey, apiType, proxyUrl) => {
   } catch (error) {
     console.error('获取可用模型失败:', error);
     return [];
+  }
+};
+
+export const getApiBalance = async (apiKey, apiType, proxyUrl) => {
+  try {
+    switch (apiType) {
+      case 'siliconcloud':
+        return await getSiliconCloudBalance(apiKey, proxyUrl);
+      case 'openai':
+      case 'claude':
+      case 'gemini':
+      case 'deepseek':
+      case 'xai':
+      case 'openrouter':
+        return {
+          success: false,
+          error: '该API类型暂不支持余额查询',
+          balance: null
+        };
+      default:
+        return {
+          success: false,
+          error: '不支持的API类型',
+          balance: null
+        };
+    }
+  } catch (error) {
+    console.error('获取API余额失败:', error);
+    return {
+      success: false,
+      error: error.message,
+      balance: null
+    };
   }
 };
