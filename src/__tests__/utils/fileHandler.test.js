@@ -190,8 +190,9 @@ describe('FileHandler Utilities', () => {
     });
 
     test('should reject files larger than 10MB', () => {
-      const file = new File(['x'.repeat(100)], 'large.txt', { type: 'text/plain' });
-      Object.defineProperty(file, 'size', { value: 11 * 1024 * 1024 });
+      const file = new File([new Uint8Array(11 * 1024 * 1024)], 'large.txt', {
+        type: 'text/plain'
+      });
       
       const result = validateFileType(file);
       
@@ -208,8 +209,9 @@ describe('FileHandler Utilities', () => {
     });
 
     test('should accept files up to 10MB', () => {
-      const file = new File(['x'.repeat(100)], 'test.txt', { type: 'text/plain' });
-      Object.defineProperty(file, 'size', { value: 10 * 1024 * 1024 });
+      const file = new File([new Uint8Array(10 * 1024 * 1024)], 'test.txt', {
+        type: 'text/plain'
+      });
       
       const result = validateFileType(file);
       expect(result.valid).toBe(true);

@@ -46,9 +46,10 @@ if (!global.Blob.prototype.text) {
 // Enhanced mock Blob for testing
 const originalBlob = global.Blob;
 global.Blob = class MockBlob extends originalBlob {
-  constructor(parts, options) {
+  constructor(parts = [], options) {
     super(parts, options);
-    this._parts = parts;
+    const normalizedParts = parts == null ? [] : Array.from(parts);
+    this._parts = normalizedParts;
   }
   
   text() {

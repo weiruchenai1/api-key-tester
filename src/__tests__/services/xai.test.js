@@ -70,7 +70,10 @@ describe('XAI API Service', () => {
       const proxyUrl = 'https://proxy.example.com';
       await testXAIKey(mockApiKey, mockModel, proxyUrl);
 
-      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(mockFetch).toHaveBeenCalledWith(
+        `${proxyUrl}/xai/chat/completions`,
+        expect.any(Object)
+      );
     });
 
     test('should return rate limit error for 429 status', async () => {
@@ -193,7 +196,10 @@ describe('XAI API Service', () => {
       const proxyUrl = 'https://proxy.example.com';
       await getXAIModels(mockApiKey, proxyUrl);
 
-      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(mockFetch).toHaveBeenCalledWith(
+        `${proxyUrl}/xai/models`,
+        expect.any(Object)
+      );
     });
 
     test('should return empty array for non-ok response', async () => {

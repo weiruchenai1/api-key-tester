@@ -209,14 +209,14 @@ describe('useFileHandler Hook', () => {
         })
       }));
       
+      const { extractApiKeys: isolatedExtractApiKeys } = require('../../utils/fileHandler');
       const { useFileHandler: isolatedUseFileHandler } = require('../../hooks/useFileHandler');
-      const { renderHook } = require('@testing-library/react');
-      const { act } = require('@testing-library/react');
+      const { renderHook, act } = require('@testing-library/react');
       
       const { result } = renderHook(() => isolatedUseFileHandler());
       
       const file = new File(['sk-new123'], 'keys.txt', { type: 'text/plain' });
-      extractApiKeys.mockReturnValue(['sk-new123']);
+      isolatedExtractApiKeys.mockReturnValue(['sk-new123']);
       MockFileReader.prototype.result = 'sk-new123';
 
       await act(async () => {
