@@ -6,7 +6,7 @@ import { vi } from 'vitest';
 import { testDeepSeekKey, getDeepSeekModels } from '../../services/api/deepseek';
 
 // Mock base module
-vi.mock('../../services/api/base', () => ({
+vi.mock('../../services/api/base.js', () => ({
   getApiUrl: vi.fn((service, endpoint, proxyUrl) => {
     if (proxyUrl) {
       return `${proxyUrl}/deepseek${endpoint}`;
@@ -17,7 +17,15 @@ vi.mock('../../services/api/base', () => ({
 
 // Mock fetch
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
+const originalFetch = global.fetch;
+
+beforeAll(() => {
+  global.fetch = mockFetch;
+});
+
+afterAll(() => {
+  global.fetch = originalFetch;
+});
 
 describe('DeepSeek API Service', () => {
   beforeEach(() => {

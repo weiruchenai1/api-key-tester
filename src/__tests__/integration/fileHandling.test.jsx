@@ -6,7 +6,7 @@ import { vi } from 'vitest';
 import { showToast } from '../../utils/toast.jsx';
 
 // Mock toast
-vi.mock('../../utils/toast', () => ({
+vi.mock('../../utils/toast.jsx', () => ({
   showToast: {
     success: vi.fn(),
     error: vi.fn(),

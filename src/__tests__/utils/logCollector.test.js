@@ -16,7 +16,8 @@ vi.mock('../../utils/logStorage', () => ({
   clearLogEntries: vi.fn(() => Promise.resolve())
 }));
 
-const { saveLogEntry, clearLogEntries } = require('../../utils/logStorage');
+// Import mocked members (ESM)
+import { saveLogEntry, clearLogEntries } from '../../utils/logStorage';
 
 describe('LogCollector', () => {
   let dispatch;

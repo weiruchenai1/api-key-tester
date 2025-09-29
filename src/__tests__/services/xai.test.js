@@ -4,12 +4,12 @@ import { vi } from 'vitest';
  */
 
 // Mock base module
-vi.mock('../../services/api/base', () => ({
+vi.mock('../../services/api/base.js', () => ({
   getApiUrl: vi.fn()
 }));
 
 import { testXAIKey, getXAIModels } from '../../services/api/xai';
-import { getApiUrl } from '../../services/api/base';
+import { getApiUrl } from '../../services/api/base.js';
 
 // Mock fetch
 const originalFetch = global.fetch;
@@ -42,7 +42,7 @@ describe('XAI API Service', () => {
   });
 
   describe('testXAIKey', () => {
-    const mockApiKey = 'xai-test123456789';
+    const mockApiKey = 'XAI_API_KEY_EXAMPLE';
     const mockModel = 'grok-beta';
 
     test('should return valid for successful response', async () => {
@@ -168,7 +168,7 @@ describe('XAI API Service', () => {
   });
 
   describe('getXAIModels', () => {
-    const mockApiKey = 'xai-test123456789';
+    const mockApiKey = 'XAI_API_KEY_EXAMPLE';
 
     test('should return models list for successful response', async () => {
       const mockModelsResponse = {

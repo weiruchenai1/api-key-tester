@@ -39,8 +39,10 @@ global.fetch = vi.fn();
 
 // Mock Blob.prototype.text() for Web API compatibility
 if (!global.Blob.prototype.text) {
-  global.Blob.prototype.text = vi.fn(function() {
-    return Promise.resolve(new TextDecoder().decode(this));
+  global.Blob.prototype.text = vi.fn(function () {
+    return this.arrayBuffer().then((buf) =>
+      new TextDecoder().decode(new Uint8Array(buf))
+    );
   });
 }
 
