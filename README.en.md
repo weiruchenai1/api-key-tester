@@ -10,7 +10,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/weiruchenai1/api-key-tester?style=flat&color=green)](https://github.com/weiruchenai1/api-key-tester/network/members)
 
 [![License](https://img.shields.io/github/license/weiruchenai1/api-key-tester?style=flat&color=blue)](https://github.com/weiruchenai1/api-key-tester/blob/main/LICENSE)
-[![Node Version](https://img.shields.io/badge/node-%3E=18.0.0-brightgreen?style=flat&logo=node.js)](https://nodejs.org/)
+[![Node Version](https://img.shields.io/badge/node-%3E=16.0.0-brightgreen?style=flat&logo=node.js)](https://nodejs.org/)
 [![Top Language](https://img.shields.io/github/languages/top/weiruchenai1/api-key-tester?style=flat&logo=javascript&color=yellow)](https://github.com/weiruchenai1/api-key-tester)
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=flat&logo=github)](https://weiruchenai1.github.io/api-key-tester)

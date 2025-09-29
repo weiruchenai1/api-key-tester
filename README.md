@@ -263,8 +263,8 @@ sudo nginx -s reload  # 重新加载配置
 
 ### 环境要求
 
-- Node.js >= 18.0.0
-- npm >= 9.0.0
+- Node.js >= 16.0.0
+- npm >= 8.0.0
 
 ### 安装依赖
 
@@ -341,7 +341,7 @@ services:
 5. 配置构建设置：
    - **构建命令**: `npm run build`
    - **构建输出目录**: `dist`
-   - **Node.js 版本**: `18` 或 `20`
+   - **Node.js 版本**: `16` 或更高
 6. 点击 `Save and Deploy`
 
 ### 4. Vercel 部署
