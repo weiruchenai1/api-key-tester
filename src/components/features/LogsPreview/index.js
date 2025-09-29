@@ -1,3 +1,3 @@
-import LogsPreviewPanel from './LogsPreviewPanel.jsx';
+import LogsPreviewPanel from './LogsPreviewPanel';
 
 export { LogsPreviewPanel };

@@ -26,14 +26,6 @@ export const useWebWorker = () => {
           workerPath = '/worker.js';
         }
         
-        console.log('Environment info:', {
-          NODE_ENV: process.env.NODE_ENV,
-          PUBLIC_URL: process.env.PUBLIC_URL,
-          isProduction,
-          workerPath,
-          currentOrigin: window.location.origin,
-          currentPathname: window.location.pathname
-        });
         workerRef.current = new Worker(workerPath);
 
         workerRef.current.onmessage = (e) => {
@@ -41,7 +33,6 @@ export const useWebWorker = () => {
 
           switch (type) {
             case 'PONG':
-              console.log('Worker connected successfully');
               setIsWorkerReady(true);
               break;
             case 'KEY_STATUS_UPDATE':
@@ -67,7 +58,6 @@ export const useWebWorker = () => {
 
         workerRef.current.onerror = (error) => {
           console.error('Worker error:', error);
-          console.error('Worker path attempted:', workerPath);
           setIsWorkerReady(false);
         };
 
@@ -87,11 +77,6 @@ export const useWebWorker = () => {
 
       } catch (error) {
         console.error('Failed to create worker:', error);
-        console.error('Current environment:', {
-          NODE_ENV: process.env.NODE_ENV,
-          PUBLIC_URL: process.env.PUBLIC_URL,
-          location: window.location
-        });
         setIsWorkerReady(false);
       }
     };

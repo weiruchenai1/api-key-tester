@@ -4,7 +4,7 @@ import { useWebWorker } from './useWebWorker';
 import { getAvailableModels as getAvailableModelsFromApi } from '../services/api/base';
 import { getLogCollector } from '../utils/logCollector';
 import { clearLogEntries } from '../utils/logStorage';
-import { showToast } from '../utils/toast';
+import { showToast } from '../utils/toast.jsx';
 
 export const useApiTester = () => {
   const { state, dispatch } = useAppState();

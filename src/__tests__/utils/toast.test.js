@@ -3,7 +3,7 @@
  */
 
 import toast from 'react-hot-toast';
-import { showToast, showConfirm, alert, confirm } from '../../utils/toast';
+import { showToast, showConfirm, alert, confirm } from '../../utils/toast.jsx';
 import { render, fireEvent } from '@testing-library/react';
 
 // Mock react-hot-toast

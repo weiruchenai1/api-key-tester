@@ -3,7 +3,7 @@ import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { usePaidDetectionPrompt } from '../../../hooks/usePaidDetectionPrompt';
 import PaidDetectionPrompt from '../../features/PaidDetectionPrompt';
-import { showToast } from '../../../utils/toast';
+import { showToast } from '../../../utils/toast.jsx';
 import styles from './Sidebar.module.css';
 
 const ApiProvider = ({ type, icon, name, isActive, onClick, isCollapsed, isDisabled }) => {

@@ -4,7 +4,7 @@ import { useAppState } from '../../../contexts/AppStateContext';
 import { useApiTester } from '../../../hooks/useApiTester';
 import { deduplicateAndCleanKeys } from '../../../utils/keyProcessor';
 import { getLogCollector } from '../../../utils/logCollector';
-import { showToast } from '../../../utils/toast';
+import { showToast } from '../../../utils/toast.jsx';
 
 const Controls = () => {
   const { t } = useLanguage();

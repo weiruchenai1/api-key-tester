@@ -2,7 +2,7 @@
  * 文件处理功能测试 (非UI组件测试)
  */
 
-import { showToast } from '../../utils/toast';
+import { showToast } from '../../utils/toast.jsx';
 
 // Mock toast
 jest.mock('../../utils/toast', () => ({

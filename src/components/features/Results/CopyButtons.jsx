@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
-import { showToast } from '../../../utils/toast';
+import { showToast } from '../../../utils/toast.jsx';
 
 const CopyButtons = () => {
   const { t } = useLanguage();

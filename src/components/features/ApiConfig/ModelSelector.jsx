@@ -5,7 +5,7 @@ import { useApiTester } from '../../../hooks/useApiTester';
 import { MODEL_OPTIONS } from '../../../constants/api';
 import { PAID_DETECTION_KEYS } from '../../../constants/localStorage';
 import PaidDetectionPrompt from '../PaidDetectionPrompt';
-import { showToast } from '../../../utils/toast';
+import { showToast } from '../../../utils/toast.jsx';
 
 const ModelSelector = () => {
   const { t } = useLanguage();
