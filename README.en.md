@@ -10,7 +10,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/weiruchenai1/api-key-tester?style=flat&color=green)](https://github.com/weiruchenai1/api-key-tester/network/members)
 
 [![License](https://img.shields.io/github/license/weiruchenai1/api-key-tester?style=flat&color=blue)](https://github.com/weiruchenai1/api-key-tester/blob/main/LICENSE)
-[![Node Version](https://img.shields.io/badge/node-%3E=16.0.0-brightgreen?style=flat&logo=node.js)](https://nodejs.org/)
+[![Node Version](https://img.shields.io/badge/node-%3E=18.0.0-brightgreen?style=flat&logo=node.js)](https://nodejs.org/)
 [![Top Language](https://img.shields.io/github/languages/top/weiruchenai1/api-key-tester?style=flat&logo=javascript&color=yellow)](https://github.com/weiruchenai1/api-key-tester)
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=flat&logo=github)](https://weiruchenai1.github.io/api-key-tester)
@@ -25,7 +25,7 @@
 ## ✨ Features
 
 - 🚀 Batch test multiple API keys
-- 🎯 Support for OpenAI, Claude, and Gemini platforms
+- 🎯 Support for OpenAI, Claude, Gemini and other platforms
 - 🔄 Smart retry mechanism for improved detection accuracy
 - 🌐 Bilingual interface (Chinese/English)
 - 🌙 Light/Dark theme toggle
@@ -263,7 +263,7 @@ After successful testing, use the following proxy URLs in the API Key tester:
 
 ### Requirements
 
-- Node.js >= 16.0.0
+- Node.js >= 18.0.0
 - npm >= 8.0.0
 
 ### Install Dependencies
@@ -275,7 +275,7 @@ npm install
 ### Start Development Server
 
 ```bash
-npm start
+npm run dev
 ```
 
 The application will start at http://localhost:3000
@@ -286,7 +286,7 @@ The application will start at http://localhost:3000
 npm run build
 ```
 
-Build artifacts will be generated in the `build/` directory
+Build artifacts will be generated in the `dist/` directory
 
 ## 🚀 Deployment Options
 
