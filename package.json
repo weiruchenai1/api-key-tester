@@ -15,12 +15,11 @@
     "virtualization"
   ],
   "dependencies": {
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
     "react-hot-toast": "2.6.0",
     "react-scripts": "5.0.1",
-    "react-window": "1.8.11",
-    "web-vitals": "2.1.4"
+    "react-window": "1.8.11"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -52,11 +51,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "6.8.0",
     "@testing-library/react": "16.3.0",
-    "@testing-library/user-event": "14.6.1",
-    "@types/react": "^18.0.15",
-    "@types/react-dom": "^18.0.6",
-    "@types/react-window": "^1.8.5",
-    "nyc": "^17.1.0"
+    "eslint-config-react-app": "^7.0.1"
   },
   "jest": {
     "collectCoverageFrom": [
