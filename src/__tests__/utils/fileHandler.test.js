@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * 文件处理工具测试
  */
@@ -220,11 +221,11 @@ describe('FileHandler Utilities', () => {
 
   describe('readFileAsText', () => {
     beforeEach(() => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
     });
 
     afterEach(() => {
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     test('should read valid file successfully', async () => {
@@ -235,7 +236,7 @@ describe('FileHandler Utilities', () => {
       MockFileReader.prototype.error = null;
       
       const promise = readFileAsText(file);
-      jest.advanceTimersByTime(10);
+      vi.advanceTimersByTime(10);
       
       const result = await promise;
       expect(result).toBe(content);
@@ -265,7 +266,7 @@ describe('FileHandler Utilities', () => {
       MockFileReader.prototype.result = null;
       
       const promise = readFileAsText(file);
-      jest.advanceTimersByTime(10);
+      vi.advanceTimersByTime(10);
       
       await expect(promise).rejects.toThrow('文件读取失败');
     });
@@ -320,20 +321,20 @@ describe('FileHandler Utilities', () => {
       if (!URL) global.URL = {};
       global.__origCreateObjectURL = global.URL.createObjectURL;
       global.__origRevokeObjectURL = global.URL.revokeObjectURL;
-      global.URL.createObjectURL = jest.fn(() => 'blob:mock-url');
-      global.URL.revokeObjectURL = jest.fn();
+      global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
+      global.URL.revokeObjectURL = vi.fn();
       
       // Mock DOM methods
       global.__origDocument = global.document;
       global.document = {
-        createElement: jest.fn(() => ({
+        createElement: vi.fn(() => ({
           href: '',
           download: '',
-          click: jest.fn()
+          click: vi.fn()
         })),
         body: {
-          appendChild: jest.fn(),
-          removeChild: jest.fn()
+          appendChild: vi.fn(),
+          removeChild: vi.fn()
         }
       };
     });
@@ -365,7 +366,7 @@ describe('FileHandler Utilities', () => {
       const mockLink = {
         href: '',
         download: '',
-        click: jest.fn()
+        click: vi.fn()
       };
       
       global.document.createElement.mockReturnValue(mockLink);
@@ -381,7 +382,7 @@ describe('FileHandler Utilities', () => {
 
   describe('Integration Tests', () => {
     test('should handle complete file processing workflow', async () => {
-      jest.useFakeTimers();
+      vi.useFakeTimers();
       
       // Step 1: Create file with API keys
       const content = `
@@ -401,7 +402,7 @@ describe('FileHandler Utilities', () => {
       MockFileReader.prototype.error = null;
       
       const promise = readFileAsText(file);
-      jest.advanceTimersByTime(10);
+      vi.advanceTimersByTime(10);
       const fileContent = await promise;
       
       // Step 4: Extract API keys
@@ -425,7 +426,7 @@ describe('FileHandler Utilities', () => {
       const blob = exportResultsAsJson(keyResults, summary);
       expect(blob).toBeInstanceOf(Blob);
       
-      jest.useRealTimers();
+      vi.useRealTimers();
     });
 
     test('should handle files with no valid API keys', () => {

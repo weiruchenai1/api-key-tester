@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * 文件处理功能测试 (非UI组件测试)
  */
@@ -5,11 +6,11 @@
 import { showToast } from '../../utils/toast.jsx';
 
 // Mock toast
-jest.mock('../../utils/toast', () => ({
+vi.mock('../../utils/toast', () => ({
   showToast: {
-    success: jest.fn(),
-    error: jest.fn(),
-    warning: jest.fn()
+    success: vi.fn(),
+    error: vi.fn(),
+    warning: vi.fn()
   }
 }));
 
@@ -93,29 +94,29 @@ const exportData = (data, filename = 'export.txt') => {
 
 describe('File Handling Utilities', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
     
     // Mock URL methods
-    global.URL.createObjectURL = jest.fn(() => 'blob:mock-url');
-    global.URL.revokeObjectURL = jest.fn();
+    global.URL.createObjectURL = vi.fn(() => 'blob:mock-url');
+    global.URL.revokeObjectURL = vi.fn();
     
     // Mock DOM methods
     global.document = {
-      createElement: jest.fn(() => ({
+      createElement: vi.fn(() => ({
         href: '',
         download: '',
-        click: jest.fn()
+        click: vi.fn()
       })),
       body: {
-        appendChild: jest.fn(),
-        removeChild: jest.fn()
+        appendChild: vi.fn(),
+        removeChild: vi.fn()
       }
     };
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
     // Restore globals
     global.document = REALS.document;
     global.FileReader = REALS.FileReader;
@@ -174,10 +175,10 @@ describe('File Handling Utilities', () => {
       mockReader.result = content;
       mockReader.error = null;
       
-      global.FileReader = jest.fn(() => mockReader);
+      global.FileReader = vi.fn(() => mockReader);
       
       const promise = readFileAsync(file);
-      jest.advanceTimersByTime(10);
+      vi.advanceTimersByTime(10);
       
       const result = await promise;
       expect(result).toBe(content);
@@ -192,10 +193,10 @@ describe('File Handling Utilities', () => {
       mockReader.error = error;
       mockReader.result = null;
       
-      global.FileReader = jest.fn(() => mockReader);
+      global.FileReader = vi.fn(() => mockReader);
       
       const promise = readFileAsync(file);
-      jest.advanceTimersByTime(10);
+      vi.advanceTimersByTime(10);
       
       await expect(promise).rejects.toBe(error);
     });
@@ -228,7 +229,7 @@ describe('File Handling Utilities', () => {
     });
 
     test('should handle export errors', () => {
-      global.URL.createObjectURL = jest.fn(() => {
+      global.URL.createObjectURL = vi.fn(() => {
         throw new Error('Blob creation failed');
       });
       
@@ -259,10 +260,10 @@ describe('File Handling Utilities', () => {
       const mockReader = new MockFileReader();
       mockReader.result = originalData;
       mockReader.error = null;
-      global.FileReader = jest.fn(() => mockReader);
+      global.FileReader = vi.fn(() => mockReader);
       
       const promise = readFileAsync(file);
-      jest.advanceTimersByTime(10);
+      vi.advanceTimersByTime(10);
       const content = await promise;
       
       expect(content).toBe(originalData);

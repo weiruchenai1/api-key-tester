@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * OpenAI API服务测试
  */
@@ -6,16 +7,16 @@ import { testOpenAIKey, getOpenAIModels } from '../../services/api/openai';
 import { getApiUrl } from '../../services/api/base';
 
 // Mock the base module
-jest.mock('../../services/api/base', () => ({
-  getApiUrl: jest.fn()
+vi.mock('../../services/api/base', () => ({
+  getApiUrl: vi.fn()
 }));
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('OpenAI API Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     getApiUrl.mockReturnValue('https://api.openai.com/v1');
   });
 
@@ -23,7 +24,7 @@ describe('OpenAI API Service', () => {
     test('should return valid for successful response', async () => {
       const mockResponse = {
         ok: true,
-        text: jest.fn().mockResolvedValue(JSON.stringify({
+        text: vi.fn().mockResolvedValue(JSON.stringify({
           choices: [{ message: { content: 'Hello' } }]
         }))
       };
@@ -107,7 +108,7 @@ describe('OpenAI API Service', () => {
     test('should handle empty response', async () => {
       const mockResponse = {
         ok: true,
-        text: jest.fn().mockResolvedValue('')
+        text: vi.fn().mockResolvedValue('')
       };
       
       fetch.mockResolvedValue(mockResponse);
@@ -124,7 +125,7 @@ describe('OpenAI API Service', () => {
     test('should handle JSON parse error', async () => {
       const mockResponse = {
         ok: true,
-        text: jest.fn().mockResolvedValue('invalid json')
+        text: vi.fn().mockResolvedValue('invalid json')
       };
       
       fetch.mockResolvedValue(mockResponse);
@@ -141,7 +142,7 @@ describe('OpenAI API Service', () => {
     test('should handle rate limit error in response body', async () => {
       const mockResponse = {
         ok: true,
-        text: jest.fn().mockResolvedValue(JSON.stringify({
+        text: vi.fn().mockResolvedValue(JSON.stringify({
           error: {
             message: 'Rate limit exceeded'
           }
@@ -162,7 +163,7 @@ describe('OpenAI API Service', () => {
     test('should handle invalid response format', async () => {
       const mockResponse = {
         ok: true,
-        text: jest.fn().mockResolvedValue(JSON.stringify({
+        text: vi.fn().mockResolvedValue(JSON.stringify({
           invalidField: 'value'
         }))
       };
@@ -207,7 +208,7 @@ describe('OpenAI API Service', () => {
     test('should return filtered model list', async () => {
       const mockResponse = {
         ok: true,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           data: [
             { id: 'gpt-3.5-turbo' },
             { id: 'gpt-4' },
@@ -252,7 +253,7 @@ describe('OpenAI API Service', () => {
     test('should return empty array for invalid response format', async () => {
       const mockResponse = {
         ok: true,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           invalidField: 'value'
         })
       };
@@ -275,7 +276,7 @@ describe('OpenAI API Service', () => {
     test('should filter out non-chat models correctly', async () => {
       const mockResponse = {
         ok: true,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           data: [
             { id: 'gpt-3.5-turbo' },
             { id: 'text-embedding-3-small' },

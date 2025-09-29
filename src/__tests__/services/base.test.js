@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * API服务基础功能测试
  */
@@ -5,45 +6,45 @@
 import { getApiUrl, testApiKey, getAvailableModels, getApiBalance } from '../../services/api/base';
 
 // Mock all API service modules
-jest.mock('../../services/api/openai', () => ({
-  testOpenAIKey: jest.fn(),
-  getOpenAIModels: jest.fn()
+vi.mock('../../services/api/openai', () => ({
+  testOpenAIKey: vi.fn(),
+  getOpenAIModels: vi.fn()
 }));
 
-jest.mock('../../services/api/claude', () => ({
-  testClaudeKey: jest.fn(),
-  getClaudeModels: jest.fn()
+vi.mock('../../services/api/claude', () => ({
+  testClaudeKey: vi.fn(),
+  getClaudeModels: vi.fn()
 }));
 
-jest.mock('../../services/api/gemini', () => ({
-  testGeminiKey: jest.fn(),
-  getGeminiModels: jest.fn()
+vi.mock('../../services/api/gemini', () => ({
+  testGeminiKey: vi.fn(),
+  getGeminiModels: vi.fn()
 }));
 
-jest.mock('../../services/api/deepseek', () => ({
-  testDeepSeekKey: jest.fn(),
-  getDeepSeekModels: jest.fn()
+vi.mock('../../services/api/deepseek', () => ({
+  testDeepSeekKey: vi.fn(),
+  getDeepSeekModels: vi.fn()
 }));
 
-jest.mock('../../services/api/siliconcloud', () => ({
-  testSiliconCloudKey: jest.fn(),
-  getSiliconCloudModels: jest.fn(),
-  getSiliconCloudBalance: jest.fn()
+vi.mock('../../services/api/siliconcloud', () => ({
+  testSiliconCloudKey: vi.fn(),
+  getSiliconCloudModels: vi.fn(),
+  getSiliconCloudBalance: vi.fn()
 }));
 
-jest.mock('../../services/api/xai', () => ({
-  testXAIKey: jest.fn(),
-  getXAIModels: jest.fn()
+vi.mock('../../services/api/xai', () => ({
+  testXAIKey: vi.fn(),
+  getXAIModels: vi.fn()
 }));
 
-jest.mock('../../services/api/openrouter', () => ({
-  testOpenRouterKey: jest.fn(),
-  getOpenRouterModels: jest.fn()
+vi.mock('../../services/api/openrouter', () => ({
+  testOpenRouterKey: vi.fn(),
+  getOpenRouterModels: vi.fn()
 }));
 
 describe('API Base Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getApiUrl', () => {
@@ -130,7 +131,7 @@ describe('API Base Service', () => {
       const { getOpenAIModels } = require('../../services/api/openai');
       getOpenAIModels.mockRejectedValue(new Error('Network error'));
       
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
       
       const result = await getAvailableModels('test-key', 'openai');
       expect(result).toEqual([]);
@@ -176,7 +177,7 @@ describe('API Base Service', () => {
       const { getSiliconCloudBalance } = require('../../services/api/siliconcloud');
       getSiliconCloudBalance.mockRejectedValue(new Error('Network error'));
       
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
       
       const result = await getApiBalance('test-key', 'siliconcloud');
       expect(result).toEqual({

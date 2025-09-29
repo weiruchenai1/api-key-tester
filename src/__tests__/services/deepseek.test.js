@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * DeepSeek API 服务测试
  */
@@ -5,8 +6,8 @@
 import { testDeepSeekKey, getDeepSeekModels } from '../../services/api/deepseek';
 
 // Mock base module
-jest.mock('../../services/api/base', () => ({
-  getApiUrl: jest.fn((service, endpoint, proxyUrl) => {
+vi.mock('../../services/api/base', () => ({
+  getApiUrl: vi.fn((service, endpoint, proxyUrl) => {
     if (proxyUrl) {
       return `${proxyUrl}/deepseek${endpoint}`;
     }
@@ -15,17 +16,17 @@ jest.mock('../../services/api/base', () => ({
 }));
 
 // Mock fetch
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
 describe('DeepSeek API Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('testDeepSeekKey', () => {
@@ -36,7 +37,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           choices: [{ message: { content: 'Hello!' } }]
         })
       });
@@ -56,7 +57,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({})
+        json: vi.fn().mockResolvedValue({})
       });
 
       const proxyUrl = 'https://proxy.example.com';
@@ -69,7 +70,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 429,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           error: { message: 'Rate limit exceeded' }
         })
       });
@@ -93,7 +94,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue(errorResponse)
+        json: vi.fn().mockResolvedValue(errorResponse)
       });
 
       const result = await testDeepSeekKey(mockApiKey, mockModel);
@@ -109,7 +110,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
-        json: jest.fn().mockResolvedValue({})
+        json: vi.fn().mockResolvedValue({})
       });
 
       const result = await testDeepSeekKey(mockApiKey, mockModel);
@@ -125,7 +126,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
-        json: jest.fn().mockRejectedValue(new Error('Invalid JSON'))
+        json: vi.fn().mockRejectedValue(new Error('Invalid JSON'))
       });
 
       const result = await testDeepSeekKey(mockApiKey, mockModel);
@@ -162,7 +163,7 @@ describe('DeepSeek API Service', () => {
         mockFetch.mockResolvedValue({
           ok: false,
           status: testCase.status,
-          json: jest.fn().mockResolvedValue({})
+          json: vi.fn().mockResolvedValue({})
         });
 
         const result = await testDeepSeekKey(mockApiKey, mockModel);
@@ -179,7 +180,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           error: {
             type: 'invalid_request_error',
             message: 'The model is not supported'
@@ -212,7 +213,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue(mockModelsResponse)
+        json: vi.fn().mockResolvedValue(mockModelsResponse)
       });
 
       const result = await getDeepSeekModels(mockApiKey);
@@ -230,7 +231,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({ data: [] })
+        json: vi.fn().mockResolvedValue({ data: [] })
       });
 
       const proxyUrl = 'https://proxy.example.com';
@@ -243,7 +244,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({ error: 'Unauthorized' })
+        json: vi.fn().mockResolvedValue({ error: 'Unauthorized' })
       });
 
       const result = await getDeepSeekModels(mockApiKey);
@@ -256,7 +257,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({ data: null })
+        json: vi.fn().mockResolvedValue({ data: null })
       });
 
       const result = await getDeepSeekModels(mockApiKey);
@@ -268,7 +269,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({})
+        json: vi.fn().mockResolvedValue({})
       });
 
       const result = await getDeepSeekModels(mockApiKey);
@@ -290,7 +291,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockRejectedValue(new Error('Invalid JSON'))
+        json: vi.fn().mockRejectedValue(new Error('Invalid JSON'))
       });
 
       const result = await getDeepSeekModels(mockApiKey);
@@ -303,7 +304,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({ data: [] })
+        json: vi.fn().mockResolvedValue({ data: [] })
       });
 
       const result = await getDeepSeekModels(mockApiKey);
@@ -323,7 +324,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue(mockModelsResponse)
+        json: vi.fn().mockResolvedValue(mockModelsResponse)
       });
 
       const result = await getDeepSeekModels(mockApiKey);
@@ -340,7 +341,7 @@ describe('DeepSeek API Service', () => {
       global.fetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           data: [
             { id: 'deepseek-chat' },
             { id: 'deepseek-coder' }
@@ -355,7 +356,7 @@ describe('DeepSeek API Service', () => {
       global.fetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           choices: [{ message: { content: 'Hello!' } }]
         })
       });
@@ -371,7 +372,7 @@ describe('DeepSeek API Service', () => {
       global.fetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({ error: 'Unauthorized' })
+        json: vi.fn().mockResolvedValue({ error: 'Unauthorized' })
       });
 
       const models = await getDeepSeekModels(invalidApiKey);
@@ -381,7 +382,7 @@ describe('DeepSeek API Service', () => {
       global.fetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           error: { message: 'Invalid API key' }
         })
       });
@@ -398,7 +399,7 @@ describe('DeepSeek API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 429,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           error: { message: 'Rate limit exceeded' }
         })
       });

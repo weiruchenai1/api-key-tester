@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Integration test for paid key detection functionality
  * Tests the complete flow from API calls to UI display
@@ -6,7 +7,7 @@
 import { testGeminiKey, testGeminiPaidKey } from '../services/api/gemini';
 
 // Mock fetch for testing
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('Paid Key Detection Integration Test', () => {
   beforeEach(() => {

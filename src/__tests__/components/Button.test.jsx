@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Button组件测试
  */
@@ -65,7 +66,7 @@ describe('Button Component', () => {
   });
 
   test('should handle click events', () => {
-    const mockOnClick = jest.fn();
+    const mockOnClick = vi.fn();
     render(<Button onClick={mockOnClick}>Clickable</Button>);
     
     const button = screen.getByRole('button');
@@ -75,7 +76,7 @@ describe('Button Component', () => {
   });
 
   test('should be disabled when disabled prop is true', () => {
-    const mockOnClick = jest.fn();
+    const mockOnClick = vi.fn();
     render(
       <Button disabled onClick={mockOnClick}>
         Disabled Button
@@ -100,7 +101,7 @@ describe('Button Component', () => {
   });
 
   test('should be disabled during loading', () => {
-    const mockOnClick = jest.fn();
+    const mockOnClick = vi.fn();
     render(
       <Button loading onClick={mockOnClick}>
         Loading Button

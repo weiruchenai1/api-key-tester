@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * useWebWorker Hook 测试
  */
@@ -6,26 +7,26 @@ import { renderHook, act } from '@testing-library/react';
 import { useWebWorker } from '../../hooks/useWebWorker';
 
 // Mock dependencies
-const mockDispatch = jest.fn();
+const mockDispatch = vi.fn();
 let mockLanguage = 'en';
 
-jest.mock('../../contexts/AppStateContext', () => ({
+vi.mock('../../contexts/AppStateContext', () => ({
   useAppState: () => ({
     dispatch: mockDispatch
   })
 }));
 
-jest.mock('../../hooks/useLanguage', () => ({
+vi.mock('../../hooks/useLanguage', () => ({
   useLanguage: () => ({ language: mockLanguage })
 }));
 
 const mockLogCollector = {
   enabled: true,
-  recordEvent: jest.fn()
+  recordEvent: vi.fn()
 };
 
-jest.mock('../../utils/logCollector', () => ({
-  getLogCollector: jest.fn(() => mockLogCollector)
+vi.mock('../../utils/logCollector', () => ({
+  getLogCollector: vi.fn(() => mockLogCollector)
 }));
 
 // Store original Worker for restoration
@@ -48,16 +49,16 @@ const originalConsoleWarn = console.warn;
 
 describe('useWebWorker Hook', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    console.log = jest.fn();
-    console.error = jest.fn();
-    console.warn = jest.fn();
+    vi.clearAllMocks();
+    console.log = vi.fn();
+    console.error = vi.fn();
+    console.warn = vi.fn();
     // Reset log collector state for each test
     mockLogCollector.enabled = true;
-    mockLogCollector.recordEvent = jest.fn();
+    mockLogCollector.recordEvent = vi.fn();
 
     // Fresh Worker constructor per test (callable with new and spy-able)
-    WorkerCtor = jest.fn(function MockWorker(path) {
+    WorkerCtor = vi.fn(function MockWorker(path) {
       this.path = path;
       this.onmessage = null;
       this.onerror = null;
@@ -69,7 +70,7 @@ describe('useWebWorker Hook', () => {
           }
         }, 10);
       };
-      this.terminate = jest.fn();
+      this.terminate = vi.fn();
     });
     global.Worker = WorkerCtor;
   });
@@ -230,7 +231,7 @@ describe('useWebWorker Hook', () => {
   });
 
   test('should handle worker creation errors', () => {
-    WorkerCtor = jest.fn(() => {
+    WorkerCtor = vi.fn(() => {
       throw new Error('Worker creation failed');
     });
     global.Worker = WorkerCtor;
@@ -277,7 +278,7 @@ describe('useWebWorker Hook', () => {
     });
 
     const mockWorker = WorkerCtor.mock.instances[0];
-    mockWorker.postMessage = jest.fn();
+    mockWorker.postMessage = vi.fn();
 
     // Worker should be ready now, change language and test update
     mockLanguage = 'zh';
@@ -303,7 +304,7 @@ describe('useWebWorker Hook', () => {
     const mockWorker = WorkerCtor.mock.instances[0];
     
     // Mock postMessage to simulate TESTING_COMPLETE
-    mockWorker.postMessage = jest.fn((data) => {
+    mockWorker.postMessage = vi.fn((data) => {
       if (data.type === 'START_TESTING') {
         setTimeout(() => {
           mockWorker.onmessage({ data: { type: 'TESTING_COMPLETE' } });
@@ -336,15 +337,15 @@ describe('useWebWorker Hook', () => {
     });
 
     const mockWorker = WorkerCtor.mock.instances[0];
-    mockWorker.postMessage = jest.fn(); // Don't send TESTING_COMPLETE
+    mockWorker.postMessage = vi.fn(); // Don't send TESTING_COMPLETE
 
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const promise = result.current.startWorkerTesting({});
     await act(async () => {
-      jest.advanceTimersByTime(300000);
+      vi.advanceTimersByTime(300000);
     });
     await expect(promise).rejects.toThrow('Worker testing timeout');
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test('should cancel worker testing', async () => {
@@ -355,7 +356,7 @@ describe('useWebWorker Hook', () => {
     });
 
     const mockWorker = WorkerCtor.mock.instances[0];
-    mockWorker.postMessage = jest.fn();
+    mockWorker.postMessage = vi.fn();
 
     act(() => {
       result.current.cancelWorkerTesting();
@@ -380,7 +381,7 @@ describe('useWebWorker Hook', () => {
     const { unmount } = renderHook(() => useWebWorker());
 
     const mockWorker = WorkerCtor.mock.instances[0];
-    mockWorker.terminate = jest.fn();
+    mockWorker.terminate = vi.fn();
 
     unmount();
 
@@ -388,7 +389,7 @@ describe('useWebWorker Hook', () => {
   });
 
   test('should handle log collection errors gracefully', async () => {
-    mockLogCollector.recordEvent = jest.fn(() => {
+    mockLogCollector.recordEvent = vi.fn(() => {
       throw new Error('Log error');
     });
 

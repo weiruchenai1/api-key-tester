@@ -1,4 +1,4 @@
-import { getApiUrl } from './base';
+import { getApiUrl } from './base.js';
 
 export const testDeepSeekKey = async (apiKey, model, proxyUrl) => {
   try {

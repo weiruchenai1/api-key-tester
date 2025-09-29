@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Jest test suite for key processing utilities.
  * Framework: Jest (configured via package.json)
@@ -263,7 +264,7 @@ describe('Key Processing Utilities', () => {
     });
 
     test('warns about unknown status', () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation();
+      const consoleSpy = vi.spyOn(console, 'warn').mockImplementation();
       
       const keyResults = [{ status: 'unknown-status' }];
       keyProcessor.countKeysByStatus(keyResults);

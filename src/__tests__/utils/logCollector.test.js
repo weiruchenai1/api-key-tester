@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * 日志收集工具测试
  */
@@ -10,9 +11,9 @@ import {
 } from '../../utils/logCollector';
 
 // Mock logStorage
-jest.mock('../../utils/logStorage', () => ({
-  saveLogEntry: jest.fn(() => Promise.resolve()),
-  clearLogEntries: jest.fn(() => Promise.resolve())
+vi.mock('../../utils/logStorage', () => ({
+  saveLogEntry: vi.fn(() => Promise.resolve()),
+  clearLogEntries: vi.fn(() => Promise.resolve())
 }));
 
 const { saveLogEntry, clearLogEntries } = require('../../utils/logStorage');
@@ -22,17 +23,17 @@ describe('LogCollector', () => {
   let logCollector;
 
   beforeEach(() => {
-    dispatch = jest.fn();
+    dispatch = vi.fn();
     logCollector = new LogCollector(dispatch);
     logCollector.setEnabled(true);
     
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
-    jest.spyOn(Date, 'now').mockReturnValue(1234567890);
-    jest.spyOn(Math, 'random').mockReturnValue(0.123456);
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(Date, 'now').mockReturnValue(1234567890);
+    vi.spyOn(Math, 'random').mockReturnValue(0.123456);
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
     saveLogEntry.mockClear();
     clearLogEntries.mockClear();
   });

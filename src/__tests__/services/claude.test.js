@@ -1,10 +1,11 @@
+import { vi } from 'vitest';
 /**
  * Claude API 服务测试
  */
 
 // Mock base module - must be before imports
-jest.mock('../../services/api/base', () => ({
-  getApiUrl: jest.fn()
+vi.mock('../../services/api/base', () => ({
+  getApiUrl: vi.fn()
 }));
 
 import { testClaudeKey, getClaudeModels } from '../../services/api/claude';
@@ -12,7 +13,7 @@ import { getApiUrl } from '../../services/api/base';
 
 // Mock fetch
 const originalFetch = global.fetch;
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 
 beforeAll(() => {
   global.fetch = mockFetch;
@@ -24,8 +25,8 @@ afterAll(() => {
 
 describe('Claude API Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     
     // Setup getApiUrl mock implementation
     getApiUrl.mockImplementation((service, endpoint, proxyUrl) => {
@@ -44,7 +45,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        text: jest.fn().mockResolvedValue('{"content":[{"text":"Hello"}]}')
+        text: vi.fn().mockResolvedValue('{"content":[{"text":"Hello"}]}')
       });
 
       const result = await testClaudeKey(mockApiKey, mockModel);
@@ -77,7 +78,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        text: jest.fn().mockResolvedValue('{}')
+        text: vi.fn().mockResolvedValue('{}')
       });
 
       const proxyUrl = 'https://proxy.example.com';
@@ -93,7 +94,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
-        text: jest.fn().mockResolvedValue('Unauthorized')
+        text: vi.fn().mockResolvedValue('Unauthorized')
       });
 
       const result = await testClaudeKey(mockApiKey, mockModel);
@@ -109,7 +110,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 403,
-        text: jest.fn().mockResolvedValue('Forbidden')
+        text: vi.fn().mockResolvedValue('Forbidden')
       });
 
       const result = await testClaudeKey(mockApiKey, mockModel);
@@ -125,7 +126,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 429,
-        text: jest.fn().mockResolvedValue('Rate Limited')
+        text: vi.fn().mockResolvedValue('Rate Limited')
       });
 
       const result = await testClaudeKey(mockApiKey, mockModel);
@@ -148,7 +149,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
-        text: jest.fn().mockResolvedValue(JSON.stringify(errorResponse))
+        text: vi.fn().mockResolvedValue(JSON.stringify(errorResponse))
       });
 
       const result = await testClaudeKey(mockApiKey, mockModel);
@@ -171,7 +172,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
-        text: jest.fn().mockResolvedValue(JSON.stringify(errorResponse))
+        text: vi.fn().mockResolvedValue(JSON.stringify(errorResponse))
       });
 
       const result = await testClaudeKey(mockApiKey, mockModel);
@@ -194,7 +195,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
-        text: jest.fn().mockResolvedValue(JSON.stringify(errorResponse))
+        text: vi.fn().mockResolvedValue(JSON.stringify(errorResponse))
       });
 
       const result = await testClaudeKey(mockApiKey, mockModel);
@@ -217,7 +218,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
-        text: jest.fn().mockResolvedValue(JSON.stringify(errorResponse))
+        text: vi.fn().mockResolvedValue(JSON.stringify(errorResponse))
       });
 
       const result = await testClaudeKey(mockApiKey, mockModel);
@@ -239,7 +240,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
-        text: jest.fn().mockResolvedValue(JSON.stringify(errorResponse))
+        text: vi.fn().mockResolvedValue(JSON.stringify(errorResponse))
       });
 
       const result = await testClaudeKey(mockApiKey, mockModel);
@@ -255,7 +256,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
-        text: jest.fn().mockResolvedValue('Invalid JSON {')
+        text: vi.fn().mockResolvedValue('Invalid JSON {')
       });
 
       const result = await testClaudeKey(mockApiKey, mockModel);
@@ -271,7 +272,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
-        text: jest.fn().mockResolvedValue('Internal Server Error')
+        text: vi.fn().mockResolvedValue('Internal Server Error')
       });
 
       const result = await testClaudeKey(mockApiKey, mockModel);
@@ -325,7 +326,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue(mockModelsResponse)
+        json: vi.fn().mockResolvedValue(mockModelsResponse)
       });
 
       const result = await getClaudeModels(mockApiKey);
@@ -353,7 +354,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({ data: [] })
+        json: vi.fn().mockResolvedValue({ data: [] })
       });
 
       const proxyUrl = 'https://proxy.example.com';
@@ -369,7 +370,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({ error: 'Unauthorized' })
+        json: vi.fn().mockResolvedValue({ error: 'Unauthorized' })
       });
 
       const result = await getClaudeModels(mockApiKey);
@@ -385,7 +386,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue(mockResponse)
+        json: vi.fn().mockResolvedValue(mockResponse)
       });
 
       const result = await getClaudeModels(mockApiKey);
@@ -401,7 +402,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue(mockResponse)
+        json: vi.fn().mockResolvedValue(mockResponse)
       });
 
       const result = await getClaudeModels(mockApiKey);
@@ -423,7 +424,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockRejectedValue(new Error('Invalid JSON'))
+        json: vi.fn().mockRejectedValue(new Error('Invalid JSON'))
       });
 
       const result = await getClaudeModels(mockApiKey);
@@ -444,7 +445,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue(mockModelsResponse)
+        json: vi.fn().mockResolvedValue(mockModelsResponse)
       });
 
       const result = await getClaudeModels(mockApiKey);
@@ -460,7 +461,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue(mockModelsResponse)
+        json: vi.fn().mockResolvedValue(mockModelsResponse)
       });
 
       const result = await getClaudeModels(mockApiKey);
@@ -478,7 +479,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           data: [
             { id: 'claude-3-sonnet-20240229' },
             { id: 'claude-3-haiku-20240307' }
@@ -493,7 +494,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        text: jest.fn().mockResolvedValue('{"content":[{"text":"Hello"}]}')
+        text: vi.fn().mockResolvedValue('{"content":[{"text":"Hello"}]}')
       });
 
       const testResult = await testClaudeKey(apiKey, model);
@@ -507,7 +508,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({ error: 'Unauthorized' })
+        json: vi.fn().mockResolvedValue({ error: 'Unauthorized' })
       });
 
       const models = await getClaudeModels(apiKey);
@@ -517,7 +518,7 @@ describe('Claude API Service', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 401,
-        text: jest.fn().mockResolvedValue('Unauthorized')
+        text: vi.fn().mockResolvedValue('Unauthorized')
       });
 
       const testResult = await testClaudeKey(apiKey, 'claude-3-sonnet-20240229');

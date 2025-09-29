@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * usePaidDetectionPrompt Hook 测试
  */
@@ -7,8 +8,8 @@ import { usePaidDetectionPrompt } from '../../hooks/usePaidDetectionPrompt';
 import { PAID_DETECTION_KEYS } from '../../constants/localStorage';
 
 // Mock AppStateContext
-const mockDispatch = jest.fn();
-jest.mock('../../contexts/AppStateContext', () => ({
+const mockDispatch = vi.fn();
+vi.mock('../../contexts/AppStateContext', () => ({
   useAppState: () => ({
     dispatch: mockDispatch
   })
@@ -17,11 +18,11 @@ jest.mock('../../contexts/AppStateContext', () => ({
 // Mock localStorage
 const mockLocalStorage = {
   store: {},
-  getItem: jest.fn((key) => mockLocalStorage.store[key] || null),
-  setItem: jest.fn((key, value) => {
+  getItem: vi.fn((key) => mockLocalStorage.store[key] || null),
+  setItem: vi.fn((key, value) => {
     mockLocalStorage.store[key] = value;
   }),
-  removeItem: jest.fn((key) => {
+  removeItem: vi.fn((key) => {
     delete mockLocalStorage.store[key];
   })
 };
@@ -33,7 +34,7 @@ Object.defineProperty(global, 'localStorage', {
 
 describe('usePaidDetectionPrompt Hook', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockLocalStorage.store = {};
     mockLocalStorage.getItem.mockImplementation(
       (key) => mockLocalStorage.store[key] || null
@@ -163,7 +164,7 @@ describe('usePaidDetectionPrompt Hook', () => {
 
   describe('handleApiTypeChange', () => {
     test('should call onApiTypeChange callback when provided', () => {
-      const mockCallback = jest.fn();
+      const mockCallback = vi.fn();
       const { result } = renderHook(() => usePaidDetectionPrompt());
 
       act(() => {
@@ -184,7 +185,7 @@ describe('usePaidDetectionPrompt Hook', () => {
     });
 
     test('should show prompt for gemini API type', () => {
-      const mockCallback = jest.fn();
+      const mockCallback = vi.fn();
       const { result } = renderHook(() => usePaidDetectionPrompt());
 
       act(() => {
@@ -196,7 +197,7 @@ describe('usePaidDetectionPrompt Hook', () => {
     });
 
     test('should not show prompt for non-gemini API types', () => {
-      const mockCallback = jest.fn();
+      const mockCallback = vi.fn();
       const { result } = renderHook(() => usePaidDetectionPrompt());
 
       act(() => {
@@ -208,7 +209,7 @@ describe('usePaidDetectionPrompt Hook', () => {
 
     test('should not show prompt when gemini prompt is disabled', () => {
       mockLocalStorage.store[PAID_DETECTION_KEYS.GEMINI_PROMPT_DISABLED] = 'true';
-      const mockCallback = jest.fn();
+      const mockCallback = vi.fn();
       const { result } = renderHook(() => usePaidDetectionPrompt());
 
       act(() => {

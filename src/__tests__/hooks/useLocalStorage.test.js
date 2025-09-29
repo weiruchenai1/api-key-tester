@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * useLocalStorage Hook 测试
  */
@@ -8,14 +9,14 @@ import { useLocalStorage, useUserConfig } from '../../hooks/useLocalStorage';
 // Mock window.localStorage
 const mockLocalStorage = {
   store: {},
-  getItem: jest.fn((key) => mockLocalStorage.store[key] || null),
-  setItem: jest.fn((key, value) => {
+  getItem: vi.fn((key) => mockLocalStorage.store[key] || null),
+  setItem: vi.fn((key, value) => {
     mockLocalStorage.store[key] = value;
   }),
-  removeItem: jest.fn((key) => {
+  removeItem: vi.fn((key) => {
     delete mockLocalStorage.store[key];
   }),
-  clear: jest.fn(() => {
+  clear: vi.fn(() => {
     mockLocalStorage.store = {};
   })
 };
@@ -28,33 +29,33 @@ Object.defineProperty(window, 'localStorage', {
 // Mock window.location.reload
 Object.defineProperty(window, 'location', {
   value: {
-    reload: jest.fn()
+    reload: vi.fn()
   },
   writable: true
 });
 
 // Mock URL and document for blob handling
 global.URL = {
-  createObjectURL: jest.fn(() => 'blob:url'),
-  revokeObjectURL: jest.fn()
+  createObjectURL: vi.fn(() => 'blob:url'),
+  revokeObjectURL: vi.fn()
 };
 
 // Mock FileReader
-global.FileReader = jest.fn(() => ({
-  readAsText: jest.fn(),
+global.FileReader = vi.fn(() => ({
+  readAsText: vi.fn(),
   onload: null,
   onerror: null
 }));
 
 describe('useLocalStorage Hook', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockLocalStorage.store = {};
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   test('should initialize with initial value when no stored value', () => {
@@ -163,23 +164,23 @@ describe('useLocalStorage Hook', () => {
 
 describe('useUserConfig Hook', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockLocalStorage.store = {};
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
     
     // Mock document methods
     const mockLink = {
-      click: jest.fn(),
+      click: vi.fn(),
       href: '',
       download: ''
     };
-    jest.spyOn(document, 'createElement').mockReturnValue(mockLink);
-    jest.spyOn(document.body, 'appendChild').mockImplementation(() => {});
-    jest.spyOn(document.body, 'removeChild').mockImplementation(() => {});
+    vi.spyOn(document, 'createElement').mockReturnValue(mockLink);
+    vi.spyOn(document.body, 'appendChild').mockImplementation(() => {});
+    vi.spyOn(document.body, 'removeChild').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   test('should initialize with default values', () => {
@@ -314,7 +315,7 @@ describe('useUserConfig Hook', () => {
     };
 
     const mockFileReader = {
-      readAsText: jest.fn(),
+      readAsText: vi.fn(),
       onload: null,
       onerror: null
     };
@@ -343,7 +344,7 @@ describe('useUserConfig Hook', () => {
     const invalidConfig = { noVersion: true };
 
     const mockFileReader = {
-      readAsText: jest.fn(),
+      readAsText: vi.fn(),
       onload: null,
       onerror: null
     };
@@ -365,7 +366,7 @@ describe('useUserConfig Hook', () => {
     const mockFile = new File(['{}'], 'config.json');
 
     const mockFileReader = {
-      readAsText: jest.fn(),
+      readAsText: vi.fn(),
       onload: null,
       onerror: null
     };
@@ -387,7 +388,7 @@ describe('useUserConfig Hook', () => {
     const mockFile = new File(['{}'], 'config.json');
 
     const mockFileReader = {
-      readAsText: jest.fn(),
+      readAsText: vi.fn(),
       onload: null,
       onerror: null
     };

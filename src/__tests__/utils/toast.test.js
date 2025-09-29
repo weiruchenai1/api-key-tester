@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Toast 工具函数测试
  */
@@ -7,8 +8,8 @@ import { showToast, showConfirm, alert, confirm } from '../../utils/toast.jsx';
 import { render, fireEvent } from '@testing-library/react';
 
 // Mock react-hot-toast
-jest.mock('react-hot-toast', () => {
-  const mockToast = jest.fn((component, options) => {
+vi.mock('react-hot-toast', () => {
+  const mockToast = vi.fn((component, options) => {
     // Mock the toast function to call the component if it's a function
     if (typeof component === 'function') {
       const mockToastObject = { id: 'mock-toast-id' };
@@ -18,10 +19,10 @@ jest.mock('react-hot-toast', () => {
   });
 
   // Add methods to the mock function
-  mockToast.success = jest.fn();
-  mockToast.error = jest.fn();
-  mockToast.loading = jest.fn(() => 'mock-loading-id');
-  mockToast.dismiss = jest.fn();
+  mockToast.success = vi.fn();
+  mockToast.error = vi.fn();
+  mockToast.loading = vi.fn(() => 'mock-loading-id');
+  mockToast.dismiss = vi.fn();
 
   return {
     __esModule: true,
@@ -31,7 +32,7 @@ jest.mock('react-hot-toast', () => {
 
 describe('Toast Utils', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('showToast', () => {
@@ -224,7 +225,7 @@ describe('Toast Utils', () => {
 
   describe('alert function', () => {
     test('should call showToast.info', () => {
-      const spy = jest.spyOn(showToast, 'info');
+      const spy = vi.spyOn(showToast, 'info');
       alert('Alert message');
       expect(spy).toHaveBeenCalledWith('Alert message');
       spy.mockRestore();

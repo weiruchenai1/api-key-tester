@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * SiliconCloud API 服务测试
  */
@@ -5,8 +6,8 @@
 import { testSiliconCloudKey, getSiliconCloudModels, getSiliconCloudBalance } from '../../services/api/siliconcloud';
 
 // Mock base module
-jest.mock('../../services/api/base', () => ({
-  getApiUrl: jest.fn((service, endpoint, proxyUrl) => {
+vi.mock('../../services/api/base', () => ({
+  getApiUrl: vi.fn((service, endpoint, proxyUrl) => {
     if (proxyUrl) {
       return `${proxyUrl}/siliconcloud${endpoint}`;
     }
@@ -16,7 +17,7 @@ jest.mock('../../services/api/base', () => ({
 
 // Mock fetch
 const originalFetch = global.fetch;
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 
 beforeAll(() => {
   global.fetch = mockFetch;
@@ -28,12 +29,12 @@ afterAll(() => {
 
 describe('SiliconCloud API Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('testSiliconCloudKey', () => {
@@ -44,7 +45,7 @@ describe('SiliconCloud API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           choices: [{ message: { content: 'Hello!' } }]
         })
       });
@@ -64,7 +65,7 @@ describe('SiliconCloud API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({})
+        json: vi.fn().mockResolvedValue({})
       });
 
       const proxyUrl = 'https://proxy.example.com';
@@ -77,7 +78,7 @@ describe('SiliconCloud API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 429,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           error: { message: 'Rate limit exceeded' }
         })
       });
@@ -95,7 +96,7 @@ describe('SiliconCloud API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           error: { message: 'Invalid API key' }
         })
       });
@@ -125,7 +126,7 @@ describe('SiliconCloud API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockRejectedValue(new Error('Invalid JSON'))
+        json: vi.fn().mockRejectedValue(new Error('Invalid JSON'))
       });
 
       const result = await testSiliconCloudKey(mockApiKey, mockModel);
@@ -141,7 +142,7 @@ describe('SiliconCloud API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({})
+        json: vi.fn().mockResolvedValue({})
       });
 
       const result = await testSiliconCloudKey(mockApiKey, mockModel);
@@ -161,7 +162,7 @@ describe('SiliconCloud API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           data: [
             { id: 'Qwen/Qwen2-72B-Instruct', object: 'model' },
             { id: 'deepseek-ai/DeepSeek-V2-Chat', object: 'model' }
@@ -181,7 +182,7 @@ describe('SiliconCloud API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           error: { message: 'Unauthorized' }
         })
       });
@@ -199,7 +200,7 @@ describe('SiliconCloud API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           data: {
             balance: 1000,
             currency: 'CNY'
@@ -227,7 +228,7 @@ describe('SiliconCloud API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           data: { balance: 1000, currency: 'CNY' }
         })
       });
@@ -242,7 +243,7 @@ describe('SiliconCloud API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           error: { message: 'Unauthorized' }
         })
       });

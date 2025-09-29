@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Gemini API服务测试
  */
@@ -6,16 +7,16 @@ import { testGeminiKey, getGeminiModels } from '../../services/api/gemini';
 import { getApiUrl } from '../../services/api/base';
 
 // Mock the base module
-jest.mock('../../services/api/base', () => ({
-  getApiUrl: jest.fn()
+vi.mock('../../services/api/base', () => ({
+  getApiUrl: vi.fn()
 }));
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('Gemini API Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     getApiUrl.mockReturnValue('https://gemini.weiruchenai.me/v1beta');
   });
 
@@ -34,7 +35,7 @@ describe('Gemini API Service', () => {
       const mockResponse = {
         ok: true,
         status: 200,
-        text: jest.fn().mockResolvedValue(JSON.stringify(mockResponseData))
+        text: vi.fn().mockResolvedValue(JSON.stringify(mockResponseData))
       };
       
       fetch.mockResolvedValue(mockResponse);
@@ -110,7 +111,7 @@ describe('Gemini API Service', () => {
       const mockResponse = {
         ok: true,
         status: 200,
-        text: jest.fn().mockResolvedValue(JSON.stringify(mockResponseData))
+        text: vi.fn().mockResolvedValue(JSON.stringify(mockResponseData))
       };
       
       fetch.mockResolvedValue(mockResponse);
@@ -132,7 +133,7 @@ describe('Gemini API Service', () => {
       const mockResponse = {
         ok: true,
         status: 200,
-        text: jest.fn().mockResolvedValue(JSON.stringify(mockResponseData))
+        text: vi.fn().mockResolvedValue(JSON.stringify(mockResponseData))
       };
       
       fetch.mockResolvedValue(mockResponse);
@@ -162,7 +163,7 @@ describe('Gemini API Service', () => {
       const mockResponse = {
         ok: true,
         status: 200,
-        text: jest.fn().mockResolvedValue('invalid json')
+        text: vi.fn().mockResolvedValue('invalid json')
       };
       
       fetch.mockResolvedValue(mockResponse);
@@ -181,7 +182,7 @@ describe('Gemini API Service', () => {
     test('should return model list from models endpoint', async () => {
       const mockResponse = {
         ok: true,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           models: [
             { 
               name: 'models/gemini-pro',
@@ -241,7 +242,7 @@ describe('Gemini API Service', () => {
     test('should filter gemini models correctly', async () => {
       const mockResponse = {
         ok: true,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           models: [
             { 
               name: 'models/gemini-1.5-flash',
@@ -290,7 +291,7 @@ describe('Gemini API Service', () => {
     test('should handle invalid response format', async () => {
       const mockResponse = {
         ok: true,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           invalidField: 'value'
         })
       };

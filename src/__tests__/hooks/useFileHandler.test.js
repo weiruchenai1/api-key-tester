@@ -1,10 +1,11 @@
+import { vi } from 'vitest';
 /**
  * useFileHandler Hook 测试
  */
 
 // Mock dependencies
-const mockDispatch = jest.fn();
-const mockT = jest.fn((key, params) => {
+const mockDispatch = vi.fn();
+const mockT = vi.fn((key, params) => {
   const translations = {
     selectTextFile: '请选择文本文件(.txt)',
     fileTooLarge: '文件大小不能超过10MB',
@@ -15,19 +16,19 @@ const mockT = jest.fn((key, params) => {
   return translations[key] || key;
 });
 
-jest.mock('../../contexts/AppStateContext', () => ({
+vi.mock('../../contexts/AppStateContext', () => ({
   useAppState: () => ({
     state: { apiKeysText: '' },
     dispatch: mockDispatch
   })
 }));
 
-jest.mock('../../hooks/useLanguage', () => ({
-  useLanguage: jest.fn()
+vi.mock('../../hooks/useLanguage', () => ({
+  useLanguage: vi.fn()
 }));
 
-jest.mock('../../utils/fileHandler', () => ({
-  extractApiKeys: jest.fn()
+vi.mock('../../utils/fileHandler', () => ({
+  extractApiKeys: vi.fn()
 }));
 
 import { renderHook, act } from '@testing-library/react';
@@ -61,15 +62,15 @@ global.FileReader = MockFileReader;
 
 describe('useFileHandler Hook', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     
     // Setup useLanguage mock implementation
     useLanguage.mockReturnValue({ t: mockT });
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   test('should initialize with default values', () => {
@@ -205,12 +206,12 @@ describe('useFileHandler Hook', () => {
   });
 
   test('should append to existing API keys', async () => {
-    jest.resetModules();
+    vi.resetModules();
     
     // Isolate modules to allow fresh mock
-    await jest.isolateModules(async () => {
+    await vi.isolateModules(async () => {
       // Mock state with existing keys
-      jest.doMock('../../contexts/AppStateContext', () => ({
+      vi.doMock('../../contexts/AppStateContext', () => ({
         useAppState: () => ({
           state: { apiKeysText: 'existing-key' },
           dispatch: mockDispatch
@@ -334,7 +335,7 @@ describe('useFileHandler Hook', () => {
     const originalFileReader = global.FileReader;
     const mockReader = new MockFileReader();
     mockReader.result = fileContent;
-    global.FileReader = jest.fn(() => mockReader);
+    global.FileReader = vi.fn(() => mockReader);
 
     try {
       await act(async () => {

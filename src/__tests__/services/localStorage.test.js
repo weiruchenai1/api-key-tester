@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * localStorage 服务测试
  */
@@ -12,14 +13,14 @@ describe('Storage Service', () => {
     // Mock localStorage
     mockLocalStorage = {
       store: {},
-      getItem: jest.fn((key) => mockLocalStorage.store[key] || null),
-      setItem: jest.fn((key, value) => {
+      getItem: vi.fn((key) => mockLocalStorage.store[key] || null),
+      setItem: vi.fn((key, value) => {
         mockLocalStorage.store[key] = value;
       }),
-      removeItem: jest.fn((key) => {
+      removeItem: vi.fn((key) => {
         delete mockLocalStorage.store[key];
       }),
-      clear: jest.fn(() => {
+      clear: vi.fn(() => {
         mockLocalStorage.store = {};
       })
     };
@@ -31,11 +32,11 @@ describe('Storage Service', () => {
     });
     
     // Mock console methods
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('storage.get', () => {
@@ -176,24 +177,24 @@ describe('App Storage Service', () => {
   beforeEach(() => {
     mockLocalStorage = {
       store: {},
-      getItem: jest.fn((key) => mockLocalStorage.store[key] || null),
-      setItem: jest.fn((key, value) => {
+      getItem: vi.fn((key) => mockLocalStorage.store[key] || null),
+      setItem: vi.fn((key, value) => {
         mockLocalStorage.store[key] = value;
       }),
-      removeItem: jest.fn((key) => {
+      removeItem: vi.fn((key) => {
         delete mockLocalStorage.store[key];
       }),
-      clear: jest.fn(() => {
+      clear: vi.fn(() => {
         mockLocalStorage.store = {};
       })
     };
 
     global.localStorage = mockLocalStorage;
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('Theme Management', () => {

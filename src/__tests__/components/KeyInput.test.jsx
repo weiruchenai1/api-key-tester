@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * KeyInput组件测试
  */
@@ -8,21 +9,21 @@ import '@testing-library/jest-dom';
 import KeyInput from '../../components/features/KeyInput';
 
 // Mock dependencies
-jest.mock('../../contexts/AppStateContext', () => ({
-  useAppState: jest.fn()
+vi.mock('../../contexts/AppStateContext', () => ({
+  useAppState: vi.fn()
 }));
 
-jest.mock('../../hooks/useLanguage', () => ({
-  useLanguage: jest.fn()
+vi.mock('../../hooks/useLanguage', () => ({
+  useLanguage: vi.fn()
 }));
 
-jest.mock('../../components/features/KeyInput/FileImport', () => {
+vi.mock('../../components/features/KeyInput/FileImport', () => {
   return function MockFileImport() {
     return <div data-testid="file-import">File Import</div>;
   };
 });
 
-jest.mock('../../components/features/KeyInput/PasteButton', () => {
+vi.mock('../../components/features/KeyInput/PasteButton', () => {
   return function MockPasteButton() {
     return <div data-testid="paste-button">Paste Button</div>;
   };
@@ -32,12 +33,12 @@ import { useAppState } from '../../contexts/AppStateContext';
 import { useLanguage } from '../../hooks/useLanguage';
 
 describe('KeyInput Component', () => {
-  const mockDispatch = jest.fn();
+  const mockDispatch = vi.fn();
   const mockState = {
     apiKeysText: '',
     isTesting: false
   };
-  const mockT = jest.fn((key) => {
+  const mockT = vi.fn((key) => {
     const translations = {
       apiKeys: 'API Keys',
       apiKeysPlaceholder: 'Enter your API keys here...'
@@ -46,7 +47,7 @@ describe('KeyInput Component', () => {
   });
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     useAppState.mockReturnValue({
       state: mockState,
       dispatch: mockDispatch
@@ -124,7 +125,7 @@ describe('KeyInput Component', () => {
   });
 
   test('should handle empty translation gracefully', () => {
-    const mockTEmpty = jest.fn((key) => key); // Return key as-is
+    const mockTEmpty = vi.fn((key) => key); // Return key as-is
     useLanguage.mockReturnValue({ t: mockTEmpty });
     
     render(<KeyInput />);

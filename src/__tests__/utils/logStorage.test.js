@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * LogStorage 工具测试
  */
@@ -15,7 +16,7 @@ import {
 class MockIDBDatabase {
   constructor() {
     this.objectStoreNames = {
-      contains: jest.fn(() => false)
+      contains: vi.fn(() => false)
     };
     this.version = 1;
     this.isOpen = true;
@@ -84,7 +85,7 @@ class MockIDBObjectStore {
     this.data = new Map();
     this.indices = new Map();
     this.indexNames = {
-      contains: jest.fn((name) => this.indices.has(name))
+      contains: vi.fn((name) => this.indices.has(name))
     };
   }
   
@@ -212,19 +213,19 @@ describe('LogStorage', () => {
     
     global.window = {
       indexedDB: mockIndexedDB,
-      alert: jest.fn(),
+      alert: vi.fn(),
       console: {
-        warn: jest.fn()
+        warn: vi.fn()
       }
     };
     
     global.indexedDB = mockIndexedDB;
     
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
     global.window = originalWindow;
     global.indexedDB = originalIndexedDB;
     closeLogDatabase(); // Clean up connections
@@ -255,7 +256,7 @@ describe('LogStorage', () => {
 
     test('should handle save errors gracefully', async () => {
       // Mock database error
-      mockIndexedDB.open = jest.fn().mockImplementation(() => {
+      mockIndexedDB.open = vi.fn().mockImplementation(() => {
         const request = new MockIDBRequest('error', null);
         return request;
       });
@@ -303,7 +304,7 @@ describe('LogStorage', () => {
     });
 
     test('should handle retrieval errors gracefully', async () => {
-      mockIndexedDB.open = jest.fn().mockImplementation(() => {
+      mockIndexedDB.open = vi.fn().mockImplementation(() => {
         const request = new MockIDBRequest('error', null);
         return request;
       });
@@ -365,7 +366,7 @@ describe('LogStorage', () => {
     });
 
     test('should handle retrieval errors gracefully', async () => {
-      mockIndexedDB.open = jest.fn().mockImplementation(() => {
+      mockIndexedDB.open = vi.fn().mockImplementation(() => {
         const request = new MockIDBRequest('error', null);
         return request;
       });
@@ -389,7 +390,7 @@ describe('LogStorage', () => {
     });
 
     test('should handle clear errors gracefully', async () => {
-      mockIndexedDB.open = jest.fn().mockImplementation(() => {
+      mockIndexedDB.open = vi.fn().mockImplementation(() => {
         const request = new MockIDBRequest('error', null);
         return request;
       });
@@ -424,7 +425,7 @@ describe('LogStorage', () => {
     });
 
     test('should handle delete errors gracefully', async () => {
-      mockIndexedDB.open = jest.fn().mockImplementation(() => {
+      mockIndexedDB.open = vi.fn().mockImplementation(() => {
         const request = new MockIDBRequest('error', null);
         return request;
       });
@@ -444,7 +445,7 @@ describe('LogStorage', () => {
 
     test('should handle close errors gracefully', () => {
       // Mock error in close
-      mockIndexedDB.open = jest.fn().mockImplementation(() => {
+      mockIndexedDB.open = vi.fn().mockImplementation(() => {
         const request = new MockIDBRequest('success', {
           close: () => {
             throw new Error('Close error');
@@ -462,7 +463,7 @@ describe('LogStorage', () => {
   describe('IndexedDB Unavailable Scenarios', () => {
     test('should warn when IndexedDB is unavailable in browser', async () => {
       global.window = {
-        alert: jest.fn()
+        alert: vi.fn()
       };
       global.indexedDB = undefined;
 
@@ -491,7 +492,7 @@ describe('LogStorage', () => {
 
     test('should only warn once about IndexedDB unavailability', async () => {
       global.window = {
-        alert: jest.fn()
+        alert: vi.fn()
       };
       global.indexedDB = undefined;
 

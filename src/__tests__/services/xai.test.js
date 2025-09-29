@@ -1,10 +1,11 @@
+import { vi } from 'vitest';
 /**
  * XAI API 服务测试
  */
 
 // Mock base module
-jest.mock('../../services/api/base', () => ({
-  getApiUrl: jest.fn()
+vi.mock('../../services/api/base', () => ({
+  getApiUrl: vi.fn()
 }));
 
 import { testXAIKey, getXAIModels } from '../../services/api/xai';
@@ -12,7 +13,7 @@ import { getApiUrl } from '../../services/api/base';
 
 // Mock fetch
 const originalFetch = global.fetch;
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 
 beforeAll(() => {
   global.fetch = mockFetch;
@@ -24,8 +25,8 @@ afterAll(() => {
 
 describe('XAI API Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
     
     // Setup getApiUrl mock implementation
     getApiUrl.mockImplementation((service, endpoint, proxyUrl) => {
@@ -37,7 +38,7 @@ describe('XAI API Service', () => {
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('testXAIKey', () => {
@@ -48,7 +49,7 @@ describe('XAI API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           choices: [{ message: { content: 'Hello!' } }]
         })
       });
@@ -68,7 +69,7 @@ describe('XAI API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({})
+        json: vi.fn().mockResolvedValue({})
       });
 
       const proxyUrl = 'https://proxy.example.com';
@@ -84,7 +85,7 @@ describe('XAI API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 429,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           error: { message: 'Rate limit exceeded' }
         })
       });
@@ -108,7 +109,7 @@ describe('XAI API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue(errorResponse)
+        json: vi.fn().mockResolvedValue(errorResponse)
       });
 
       const result = await testXAIKey(mockApiKey, mockModel);
@@ -124,7 +125,7 @@ describe('XAI API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
-        json: jest.fn().mockResolvedValue({})
+        json: vi.fn().mockResolvedValue({})
       });
 
       const result = await testXAIKey(mockApiKey, mockModel);
@@ -140,7 +141,7 @@ describe('XAI API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
-        json: jest.fn().mockRejectedValue(new Error('Invalid JSON'))
+        json: vi.fn().mockRejectedValue(new Error('Invalid JSON'))
       });
 
       const result = await testXAIKey(mockApiKey, mockModel);
@@ -180,7 +181,7 @@ describe('XAI API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue(mockModelsResponse)
+        json: vi.fn().mockResolvedValue(mockModelsResponse)
       });
 
       const result = await getXAIModels(mockApiKey);
@@ -194,7 +195,7 @@ describe('XAI API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({ data: [] })
+        json: vi.fn().mockResolvedValue({ data: [] })
       });
 
       const proxyUrl = 'https://proxy.example.com';
@@ -210,7 +211,7 @@ describe('XAI API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({ error: 'Unauthorized' })
+        json: vi.fn().mockResolvedValue({ error: 'Unauthorized' })
       });
 
       const result = await getXAIModels(mockApiKey);
@@ -223,7 +224,7 @@ describe('XAI API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({ data: null })
+        json: vi.fn().mockResolvedValue({ data: null })
       });
 
       const result = await getXAIModels(mockApiKey);

@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * OpenRouter API 服务测试
  */
@@ -5,8 +6,8 @@
 import { testOpenRouterKey, getOpenRouterModels } from '../../services/api/openrouter';
 
 // Mock base module
-jest.mock('../../services/api/base', () => ({
-  getApiUrl: jest.fn((service, endpoint, proxyUrl) => {
+vi.mock('../../services/api/base', () => ({
+  getApiUrl: vi.fn((service, endpoint, proxyUrl) => {
     if (proxyUrl) {
       return `${proxyUrl}/openrouter${endpoint}`;
     }
@@ -16,7 +17,7 @@ jest.mock('../../services/api/base', () => ({
 
 // Mock fetch
 const originalFetch = global.fetch;
-const mockFetch = jest.fn();
+const mockFetch = vi.fn();
 
 beforeAll(() => {
   global.fetch = mockFetch;
@@ -28,12 +29,12 @@ afterAll(() => {
 
 describe('OpenRouter API Service', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(console, 'error').mockImplementation(() => {});
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   describe('testOpenRouterKey', () => {
@@ -44,7 +45,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           choices: [{ message: { content: 'Hello!' } }]
         })
       });
@@ -64,7 +65,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({})
+        json: vi.fn().mockResolvedValue({})
       });
 
       const proxyUrl = 'https://proxy.example.com';
@@ -77,7 +78,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 429,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           error: { message: 'Rate limit exceeded' }
         })
       });
@@ -95,7 +96,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           error: { message: 'Invalid API key' }
         })
       });
@@ -125,7 +126,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockRejectedValue(new Error('Invalid JSON'))
+        json: vi.fn().mockRejectedValue(new Error('Invalid JSON'))
       });
 
       const result = await testOpenRouterKey(mockApiKey, mockModel);
@@ -141,7 +142,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
-        json: jest.fn().mockResolvedValue({})
+        json: vi.fn().mockResolvedValue({})
       });
 
       const result = await testOpenRouterKey(mockApiKey, mockModel);
@@ -157,7 +158,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 400,
-        json: jest.fn().mockRejectedValue(new Error('JSON parse error'))
+        json: vi.fn().mockRejectedValue(new Error('JSON parse error'))
       });
 
       const result = await testOpenRouterKey(mockApiKey, mockModel);
@@ -177,7 +178,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           data: [
             { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet' },
             { id: 'openai/gpt-4o', name: 'GPT-4o' },
@@ -199,7 +200,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({ data: [] })
+        json: vi.fn().mockResolvedValue({ data: [] })
       });
 
       const proxyUrl = 'https://proxy.example.com';
@@ -212,7 +213,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
-        json: jest.fn().mockResolvedValue({ error: 'Unauthorized' })
+        json: vi.fn().mockResolvedValue({ error: 'Unauthorized' })
       });
 
       const result = await getOpenRouterModels(mockApiKey);
@@ -224,7 +225,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({ data: null })
+        json: vi.fn().mockResolvedValue({ data: null })
       });
 
       const result = await getOpenRouterModels(mockApiKey);
@@ -236,7 +237,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({})
+        json: vi.fn().mockResolvedValue({})
       });
 
       const result = await getOpenRouterModels(mockApiKey);
@@ -248,7 +249,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           data: [
             { id: 'valid-model-1', name: 'Valid Model 1' },
             { id: '', name: 'Empty ID' },
@@ -281,7 +282,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockRejectedValue(new Error('Invalid JSON'))
+        json: vi.fn().mockRejectedValue(new Error('Invalid JSON'))
       });
 
       const result = await getOpenRouterModels(mockApiKey);
@@ -294,7 +295,7 @@ describe('OpenRouter API Service', () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: jest.fn().mockResolvedValue({
+        json: vi.fn().mockResolvedValue({
           data: 'not an array'
         })
       });
