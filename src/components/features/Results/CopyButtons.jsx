@@ -47,8 +47,15 @@ const CopyButtons = () => {
     const fallbackCopy = () => {
       const textArea = document.createElement('textarea');
       textArea.value = textToCopy;
+      textArea.setAttribute('readonly', '');
+      Object.assign(textArea.style, {
+        position: 'fixed',
+        top: '-9999px',
+        left: '-9999px',
+      });
       document.body.appendChild(textArea);
       textArea.select();
+      textArea.setSelectionRange(0, textToCopy.length);
       let copied = false;
       try {
         copied = document.execCommand('copy');

@@ -78,9 +78,19 @@ describe('Performance instrumentation suite', () => {
       expect(stats).toHaveProperty('rss');
       expect(stats).toHaveProperty('heapTotal');
       expect(stats).toHaveProperty('heapUsed');
-      Object.values(stats).forEach((value) => {
+      
+      // Strictly positive for the core metrics
+      expect(typeof stats.rss).toBe('number');
+      expect(stats.rss).toBeGreaterThan(0);
+      expect(typeof stats.heapTotal).toBe('number');
+      expect(stats.heapTotal).toBeGreaterThan(0);
+      expect(typeof stats.heapUsed).toBe('number');
+      expect(stats.heapUsed).toBeGreaterThan(0);
+      
+      // All fields must still be numbers ≥ 0 to catch anomalies
+      Object.entries(stats).forEach(([, value]) => {
         expect(typeof value).toBe('number');
-        expect(value).toBeGreaterThan(0);
+        expect(value).toBeGreaterThanOrEqual(0);
       });
     });
 

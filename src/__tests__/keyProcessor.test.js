@@ -1,8 +1,8 @@
 import { vi } from 'vitest';
 /**
- * Jest test suite for key processing utilities.
- * Framework: Jest (configured via package.json)
- * 
+ * Vitest suite for key processing utilities.
+ * Framework: Vitest (configured via vite.config/vitest.config)
+ *
  * Tests the actual API available in keyProcessor.js
  */
 

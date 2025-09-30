@@ -10,7 +10,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/weiruchenai1/api-key-tester?style=flat&color=green)](https://github.com/weiruchenai1/api-key-tester/network/members)
 
 [![License](https://img.shields.io/github/license/weiruchenai1/api-key-tester?style=flat&color=blue)](https://github.com/weiruchenai1/api-key-tester/blob/main/LICENSE)
-[![Node Version](https://img.shields.io/badge/node-%3E=18.0.0-brightgreen?style=flat&logo=node.js)](https://nodejs.org/)
+[![Node Version](https://img.shields.io/badge/node-%3E=20.19.0-brightgreen?style=flat&logo=node.js)](https://nodejs.org/)
 [![Top Language](https://img.shields.io/github/languages/top/weiruchenai1/api-key-tester?style=flat&logo=javascript&color=yellow)](https://github.com/weiruchenai1/api-key-tester)
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-blue?style=flat&logo=github)](https://weiruchenai1.github.io/api-key-tester)
@@ -253,9 +253,9 @@ sudo nginx -s reload  # Reload configuration
 
 **Proxy URLs:**
 After successful testing, use the following proxy URLs in the API Key tester:
-- OpenAI: `https://openai.your-domain.com`
-- Claude: `https://claude.your-domain.com`  
-- Gemini: `https://gemini.your-domain.com`
+- OpenAI: `https://openai.your-domain.com/v1`
+- Claude: `https://claude.your-domain.com/v1`  
+- Gemini: `https://gemini.your-domain.com/v1`
 
 </details>
 
@@ -263,7 +263,7 @@ After successful testing, use the following proxy URLs in the API Key tester:
 
 ### Requirements
 
-- Node.js >= 18.0.0
+- Node.js >= 20.19.0
 - npm >= 8.0.0
 
 ### Install Dependencies
@@ -341,7 +341,7 @@ services:
 5. Configure build settings:
    - **Build command**: `npm run build`
    - **Build output directory**: `build`
-   - **Node.js version**: `18` or higher
+   - **Node.js version**: `20` or higher
 6. Click `Save and Deploy`
 
 ### 4. Vercel Deployment

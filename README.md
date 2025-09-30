@@ -10,7 +10,7 @@
 [![GitHub forks](https://img.shields.io/github/forks/weiruchenai1/api-key-tester?style=flat&color=green)](https://github.com/weiruchenai1/api-key-tester/network/members)
 
 [![License](https://img.shields.io/github/license/weiruchenai1/api-key-tester?style=flat&color=blue)](https://github.com/weiruchenai1/api-key-tester/blob/main/LICENSE)
-[![Node Version](https://img.shields.io/badge/node-%3E=18.0.0-brightgreen?style=flat&logo=node.js)](https://nodejs.org/)
+[![Node Version](https://img.shields.io/badge/node-%3E=20.19.0-brightgreen?style=flat&logo=node.js)](https://nodejs.org/)
 [![Top Language](https://img.shields.io/github/languages/top/weiruchenai1/api-key-tester?style=flat&logo=javascript&color=yellow)](https://github.com/weiruchenai1/api-key-tester)
 
 [![在线使用](https://img.shields.io/badge/在线使用-GitHub%20Pages-blue?style=flat&logo=github)](https://weiruchenai1.github.io/api-key-tester)
@@ -253,9 +253,9 @@ sudo nginx -s reload  # 重新加载配置
 
 **代理地址：**
 测试成功后，在API Key测试工具中使用以下代理地址：
-- OpenAI: `https://openai.your-domain.com`
-- Claude: `https://claude.your-domain.com`  
-- Gemini: `https://gemini.your-domain.com`
+- OpenAI: `https://openai.your-domain.com/v1`
+- Claude: `https://claude.your-domain.com/v1`  
+- Gemini: `https://gemini.your-domain.com/v1`
 
 </details>
 
@@ -263,7 +263,7 @@ sudo nginx -s reload  # 重新加载配置
 
 ### 环境要求
 
-- Node.js >= 18.0.0
+- Node.js >= 20.19.0
 - npm >= 8.0.0
 
 ### 安装依赖
@@ -341,7 +341,7 @@ services:
 5. 配置构建设置：
    - **构建命令**: `npm run build`
    - **构建输出目录**: `dist`
-   - **Node.js 版本**: `18` 或更高
+   - **Node.js 版本**: `20` 或更高
 6. 点击 `Save and Deploy`
 
 ### 4. Vercel 部署
