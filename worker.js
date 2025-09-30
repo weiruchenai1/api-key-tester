@@ -1,3 +1,1043 @@
-let T=!1,v=!1,E="zh";const R=new Map,O=4e3,A=(s,a=O)=>{if(s==null)return s;const i=typeof s=="string"?s:JSON.stringify(s);return i.length<=a?i:i.slice(0,a)+`
-...(+`+(i.length-a)+" chars)"},k=s=>{if(!s)return null;try{if(typeof s.forEach=="function"){const a={};return s.forEach((i,n)=>{a[n]=i}),a}return{...s}}catch(a){return{error:"serialize_headers_failed",message:a.message}}},y=({url:s,method:a,headers:i,body:n})=>({url:s,method:a,headers:k(i),body:A(n)}),g=async s=>{if(!s)return null;const a=s.clone?s.clone():s;let i=null;try{i=await a.text()}catch(u){i="<<无法读取响应正文: "+u.message+">>"}let n=null;try{n=i?JSON.parse(i):null}catch{n=null}return{status:s.status,statusText:s.statusText,headers:k(s.headers),body:A(i),parsed:n}},m=(s,a,i)=>{s&&self.postMessage({type:"LOG_EVENT",payload:{key:s,apiType:a.apiType,model:a.model,metadata:{proxyUrl:a.proxyUrl,enablePaidDetection:a.enablePaidDetection,concurrency:a.concurrency},event:i}})},w={zh:{invalidKey:"API密钥无效",authFailed:"认证失败",permissionDenied:"权限不足",rateLimited:"速率限制",emptyResponse:"空响应",jsonParseError:"JSON解析失败",responseFormatError:"响应格式错误",networkError:"网络连接失败",requestFailed:"请求失败",testException:"测试异常",authError:"认证错误",apiError:"API错误",quotaExceeded:"配额超出"},en:{invalidKey:"Invalid API Key",authFailed:"Auth Failed",permissionDenied:"Permission Denied",rateLimited:"Rate Limited",emptyResponse:"Empty Response",jsonParseError:"JSON Parse Error",responseFormatError:"Response Format Error",networkError:"Network Connection Failed",requestFailed:"Request Failed",testException:"Test Exception",authError:"Authentication Error",apiError:"API Error",quotaExceeded:"Quota Exceeded"}};function f(s,a=null){const n=(w[E]||w.zh)[s]||s;return a?`${n} (${a})`:n}self.onmessage=function(s){const{type:a,payload:i}=s.data;switch(a){case"START_TESTING":b(i);break;case"CANCEL_TESTING":v=!0;break;case"SET_LANGUAGE":E=i.language;break;case"PING":self.postMessage({type:"PONG"});break;default:console.warn("Unknown message type:",a)}};async function b({apiKeys:s,apiType:a,model:i,proxyUrl:n,concurrency:u,maxRetries:l,enablePaidDetection:t}){if(!T){T=!0,v=!1;try{await _(s,{apiType:a,model:i,proxyUrl:n,concurrency:u,maxRetries:l,enablePaidDetection:t})}finally{T=!1,v=!1,self.postMessage({type:"TESTING_COMPLETE"})}}}async function _(s,a){const{concurrency:i}=a,n=[...s],u=new Array(i).fill(null);let l=0;for(let t=0;t<i&&t<n.length;t++)u[t]=P(n[l],a,t),l++;for(;u.some(t=>t!==null)&&!v;){const t=await x(u);l<n.length?(u[t]=P(n[l],a,t),l++):u[t]=null}}async function x(s){const a=s.map((i,n)=>i?i.then(()=>n):null).filter(i=>i!==null);if(a.length===0)throw new Error("没有活跃的测试任务");return await Promise.race(a)}async function P(s,a,i){const{maxRetries:n}=a,u=Date.now();R.set(s,u),self.postMessage({type:"KEY_STATUS_UPDATE",payload:{key:s,status:"testing",retryCount:0}}),m(s,a,{stage:"test_start",attempt:1,slotIndex:i,status:"testing",timestamp:u,message:"开始测试"});for(let l=0;l<=n;l++){if(v){m(s,a,{stage:"cancelled",attempt:l+1,slotIndex:i,status:"cancelled",isFinal:!0,finalStatus:"cancelled",totalDurationMs:Date.now()-u,message:"任务被取消"}),R.delete(s);return}const t=l+1,r=Date.now();m(s,a,{stage:"attempt_start",attempt:t,slotIndex:i,status:l===0?"testing":"retrying",timestamp:r,message:"第"+t+"次尝试"});try{l>0&&(self.postMessage({type:"KEY_STATUS_UPDATE",payload:{key:s,status:"retrying",retryCount:l}}),m(s,a,{stage:"retry_wait",attempt:t,slotIndex:i,status:"retrying",message:"等待重试"}),await new Promise(c=>setTimeout(c,300+Math.random()*500)));const e=await C(s,a),o=Date.now()-r;if(m(s,a,{stage:"attempt_result",attempt:t,slotIndex:i,status:e.valid?"success":e.isRateLimit?"rate-limited":"error",durationMs:o,request:e.requestLog,response:e.responseLog,error:e.error,extra:e.extra||null}),e.valid||e.isRateLimit){let c=e;if(e.valid&&a.apiType==="gemini"&&a.enablePaidDetection)try{const S=Date.now(),p=await G(s,a.model,a);m(s,a,{stage:"paid_detection",attempt:t,slotIndex:i,status:p.isPaid===!0?"paid":p.isPaid===!1?"free":"unknown",durationMs:Date.now()-S,request:p.requestLog,response:p.responseLog,error:p.error,extra:{cacheApiStatus:p.cacheApiStatus}}),p.isPaid===!0?c={...e,isPaid:!0,cacheApiStatus:p.cacheApiStatus}:p.isPaid===!1?c={...e,isPaid:!1,cacheApiStatus:p.cacheApiStatus}:c={...e,isPaid:null,cacheApiStatus:p.cacheApiStatus}}catch(S){m(s,a,{stage:"paid_detection",attempt:t,slotIndex:i,status:"error",error:S.message||S,extra:{phase:"paid_detection_failed"}}),c={...e,isPaid:!1}}let h;return c.isPaid===!0?h="paid":e.valid?h="valid":h="rate-limited",self.postMessage({type:"KEY_STATUS_UPDATE",payload:{key:s,status:h,error:e.error,retryCount:l,isPaid:c.isPaid,cacheApiStatus:c.cacheApiStatus}}),m(s,a,{stage:"final",attempt:t,slotIndex:i,status:h,finalStatus:h,isFinal:!0,totalDurationMs:Date.now()-u,error:e.error,extra:{isPaid:c.isPaid,cacheApiStatus:c.cacheApiStatus}}),R.delete(s),c}if(l===n)return self.postMessage({type:"KEY_STATUS_UPDATE",payload:{key:s,status:"invalid",error:e.error,retryCount:l}}),m(s,a,{stage:"final",attempt:t,slotIndex:i,status:"invalid",finalStatus:"invalid",isFinal:!0,totalDurationMs:Date.now()-u,error:e.error}),R.delete(s),e;const d=U(e.error);if(!D(e.error,d))return self.postMessage({type:"KEY_STATUS_UPDATE",payload:{key:s,status:"invalid",error:e.error,retryCount:l}}),m(s,a,{stage:"final",attempt:t,slotIndex:i,status:"invalid",finalStatus:"invalid",isFinal:!0,totalDurationMs:Date.now()-u,error:e.error}),R.delete(s),e;m(s,a,{stage:"retry_scheduled",attempt:t+1,slotIndex:i,status:"retrying",error:e.error,message:"准备进行下一次重试"})}catch(e){if(m(s,a,{stage:"attempt_exception",attempt:l+1,slotIndex:i,status:"error",error:e.message||e,durationMs:Date.now()-r}),l===n){const o="测试异常: "+(e.message||e);return self.postMessage({type:"KEY_STATUS_UPDATE",payload:{key:s,status:"invalid",error:o,retryCount:l}}),m(s,a,{stage:"final",attempt:l+1,slotIndex:i,status:"invalid",finalStatus:"invalid",isFinal:!0,totalDurationMs:Date.now()-u,error:o}),R.delete(s),{valid:!1,error:o,isRateLimit:!1}}}}}function D(s,a){if([403,502,503,504].includes(a))return!0;if(s&&typeof s=="string"){const i=s.toLowerCase();if(i.includes("timeout")||i.includes("network")||i.includes("连接")||i.includes("fetch"))return!0}return!1}function U(s){if(!s||typeof s!="string")return null;const a=s.match(/$(\d{3})$/);if(a)return parseInt(a[1]);if(s.includes("HTTP ")){const i=s.match(/HTTP (\d{3})/);if(i)return parseInt(i[1])}return null}function L(s,a,i){if(i)return(i.endsWith("/")?i.slice(0,-1):i)+a;switch(s){case"openai":return"https://openai.weiruchenai.me/v1"+a;case"claude":return"https://claude.weiruchenai.me/v1"+a;case"gemini":return"https://gemini.weiruchenai.me/v1beta"+a;case"deepseek":return"https://api.deepseek.com/v1"+a;case"siliconcloud":return"https://api.siliconflow.cn/v1"+a;case"xai":return"https://api.x.ai/v1"+a;case"openrouter":return"https://openrouter.ai/api/v1"+a;default:throw new Error("Unsupported API type: "+s)}}async function C(s,a){const{apiType:i,model:n}=a;switch(i){case"openai":return await N(s,n,a);case"claude":return await q(s,n,a);case"gemini":return await M(s,n,a);case"deepseek":return await J(s,n,a);case"siliconcloud":return await H(s,n,a);case"xai":return await j(s,n,a);case"openrouter":return await F(s,n,a);default:return{valid:!1,error:"不支持的API类型",isRateLimit:!1}}}async function N(s,a,i){const n=L("openai","/chat/completions",i.proxyUrl),u={model:a,messages:[{role:"user",content:"Hi"}],max_tokens:1},l={Authorization:"Bearer "+s,"Content-Type":"application/json"},t=y({url:n,method:"POST",headers:l,body:JSON.stringify(u)});try{const r=await fetch(n,{method:"POST",headers:l,body:JSON.stringify(u)}),e=await g(r);if(!r.ok)return r.status===401?{valid:!1,error:"认证失败 (401)",isRateLimit:!1,requestLog:t,responseLog:e}:r.status===403?{valid:!1,error:"权限不足 (403)",isRateLimit:!1,requestLog:t,responseLog:e}:r.status===429?{valid:!1,error:"Rate Limited (429)",isRateLimit:!0,requestLog:t,responseLog:e}:{valid:!1,error:"HTTP "+r.status,isRateLimit:r.status===429,requestLog:t,responseLog:e};if(!e.body||e.body.trim()==="")return{valid:!1,error:f("emptyResponse"),isRateLimit:!1,requestLog:t,responseLog:e};const o=e.parsed;if(!o)return{valid:!1,error:f("jsonParseError"),isRateLimit:!1,requestLog:t,responseLog:e};if(o&&o.error){const d=o.error.message||o.error.toString();if(typeof d=="string"){const c=d.toLowerCase();if(c.includes("rate limit")||c.includes("too many requests")||c.includes("quota exceeded"))return{valid:!1,error:"Rate Limited: "+d,isRateLimit:!0,requestLog:t,responseLog:e}}}return o&&Array.isArray(o.choices)?{valid:!0,error:null,isRateLimit:!1,requestLog:t,responseLog:e}:{valid:!1,error:"响应格式错误",isRateLimit:!1,requestLog:t,responseLog:e}}catch(r){const e=r&&r.message?r.message:String(r);return r.name==="TypeError"&&e.includes("fetch")?{valid:!1,error:f("networkError"),isRateLimit:!1,requestLog:t,responseLog:null}:{valid:!1,error:"请求失败: "+e,isRateLimit:!1,requestLog:t,responseLog:null}}}async function q(s,a,i){const n=L("claude","/messages",i.proxyUrl),u={model:a,max_tokens:1,messages:[{role:"user",content:"Hi"}]},l={"x-api-key":s,"Content-Type":"application/json","anthropic-version":"2023-06-01"},t=y({url:n,method:"POST",headers:l,body:JSON.stringify(u)});try{const r=await fetch(n,{method:"POST",headers:l,body:JSON.stringify(u)}),e=await g(r);if(r.status===401)return{valid:!1,error:"认证失败 (401)",isRateLimit:!1,requestLog:t,responseLog:e};if(r.status===403)return{valid:!1,error:"权限不足 (403)",isRateLimit:!1,requestLog:t,responseLog:e};if(r.status===429)return{valid:!1,error:"Rate Limited (429)",isRateLimit:!0,requestLog:t,responseLog:e};if(r.status===400){const o=e.parsed;return o&&o.error?o.error.type==="authentication_error"?{valid:!1,error:"认证错误",isRateLimit:!1,requestLog:t,responseLog:e}:o.error.type==="rate_limit_error"?{valid:!1,error:"Rate Limit Error",isRateLimit:!0,requestLog:t,responseLog:e}:o.error.type==="invalid_request_error"?{valid:!0,error:null,isRateLimit:!1,requestLog:t,responseLog:e}:{valid:!1,error:"API错误: "+(o.error.type||"unknown"),isRateLimit:!1,requestLog:t,responseLog:e}:{valid:!1,error:f("jsonParseError"),isRateLimit:!1,requestLog:t,responseLog:e}}return r.ok?{valid:!0,error:null,isRateLimit:!1,requestLog:t,responseLog:e}:{valid:!1,error:"HTTP "+r.status,isRateLimit:!1,requestLog:t,responseLog:e}}catch(r){const e=r&&r.message?r.message:String(r);return r.name==="TypeError"&&e.includes("fetch")?{valid:!1,error:f("networkError"),isRateLimit:!1,requestLog:t,responseLog:null}:{valid:!1,error:"请求失败: "+e,isRateLimit:!1,requestLog:t,responseLog:null}}}async function M(s,a,i){const n=L("gemini","/models/"+a+":generateContent?key="+s,i.proxyUrl),u={contents:[{parts:[{text:"Hi"}]}]},l={"Content-Type":"application/json"},t=y({url:n,method:"POST",headers:l,body:JSON.stringify(u)});try{const r=await fetch(n,{method:"POST",headers:l,body:JSON.stringify(u)}),e=await g(r);if(!r.ok)return r.status===400?{valid:!1,error:f("invalidKey",400),isRateLimit:!1,requestLog:t,responseLog:e}:r.status===401?{valid:!1,error:f("authFailed",401),isRateLimit:!1,requestLog:t,responseLog:e}:r.status===403?{valid:!1,error:f("permissionDenied",403),isRateLimit:!1,requestLog:t,responseLog:e}:r.status===429?{valid:!1,error:f("rateLimited",429),isRateLimit:!0,requestLog:t,responseLog:e}:{valid:!1,error:"HTTP "+r.status,isRateLimit:r.status===429,requestLog:t,responseLog:e};const o=e.parsed;if(!e.body||e.body.trim()==="")return{valid:!1,error:f("emptyResponse"),isRateLimit:!1,requestLog:t,responseLog:e};if(!o)return{valid:!1,error:f("jsonParseError"),isRateLimit:!1,requestLog:t,responseLog:e};if(o&&Array.isArray(o.candidates)&&o.candidates.length>0)return{valid:!0,error:null,isRateLimit:!1,requestLog:t,responseLog:e};if(o&&o.error){const d=o.error.message||o.error.toString();if(typeof d=="string"){const c=d.toLowerCase();if(c.includes("quota exceeded")||c.includes("rate limit")||c.includes("too many requests"))return{valid:!1,error:"Rate Limited: "+d,isRateLimit:!0,requestLog:t,responseLog:e}}return{valid:!1,error:"API错误: "+d,isRateLimit:!1,requestLog:t,responseLog:e}}return{valid:!1,error:"响应格式错误",isRateLimit:!1,requestLog:t,responseLog:e}}catch(r){const e=r&&r.message?r.message:String(r);return r.name==="TypeError"&&e.includes("fetch")?{valid:!1,error:f("networkError"),isRateLimit:!1,requestLog:t,responseLog:null}:r.name==="SyntaxError"&&e.includes("JSON")?{valid:!1,error:f("jsonParseError"),isRateLimit:!1,requestLog:t,responseLog:null}:{valid:!1,error:"请求失败: "+e,isRateLimit:!1,requestLog:t,responseLog:null}}}async function J(s,a,i){const n=L("deepseek","/chat/completions",i.proxyUrl),u={model:a,messages:[{role:"user",content:"Hi"}],max_tokens:1},l={Authorization:"Bearer "+s,"Content-Type":"application/json"},t=y({url:n,method:"POST",headers:l,body:JSON.stringify(u)});try{const r=await fetch(n,{method:"POST",headers:l,body:JSON.stringify(u)}),e=await g(r);return r.ok?{valid:!0,error:null,isRateLimit:!1,requestLog:t,responseLog:e}:r.status===401?{valid:!1,error:"认证失败 (401)",isRateLimit:!1,requestLog:t,responseLog:e}:r.status===403?{valid:!1,error:"权限不足 (403)",isRateLimit:!1,requestLog:t,responseLog:e}:r.status===429?{valid:!1,error:"Rate Limited (429)",isRateLimit:!0,requestLog:t,responseLog:e}:e.parsed&&e.parsed.error&&e.parsed.error.message?{valid:!1,error:e.parsed.error.message,isRateLimit:!1,requestLog:t,responseLog:e}:{valid:!1,error:"HTTP "+r.status,isRateLimit:r.status===429,requestLog:t,responseLog:e}}catch(r){const e=r&&r.message?r.message:String(r);return r.name==="TypeError"&&e.includes("fetch")?{valid:!1,error:f("networkError"),isRateLimit:!1,requestLog:t,responseLog:null}:{valid:!1,error:"请求失败: "+e,isRateLimit:!1,requestLog:t,responseLog:null}}}async function H(s,a,i){const n=L("siliconcloud","/chat/completions",i.proxyUrl),u={model:a,messages:[{role:"user",content:"Hi"}],max_tokens:1},l={Authorization:"Bearer "+s,"Content-Type":"application/json"},t=y({url:n,method:"POST",headers:l,body:JSON.stringify(u)});try{const r=await fetch(n,{method:"POST",headers:l,body:JSON.stringify(u)}),e=await g(r);if(!r.ok)return r.status===401?{valid:!1,error:"认证失败 (401)",isRateLimit:!1,requestLog:t,responseLog:e}:r.status===403?{valid:!1,error:"权限不足 (403)",isRateLimit:!1,requestLog:t,responseLog:e}:r.status===429?{valid:!1,error:"Rate Limited (429)",isRateLimit:!0,requestLog:t,responseLog:e}:e.parsed&&e.parsed.error&&e.parsed.error.message?{valid:!1,error:e.parsed.error.message,isRateLimit:!1,requestLog:t,responseLog:e}:{valid:!1,error:"HTTP "+r.status,isRateLimit:r.status===429,requestLog:t,responseLog:e};const o=e.parsed;if(!e.body||e.body.trim()==="")return{valid:!1,error:f("emptyResponse"),isRateLimit:!1,requestLog:t,responseLog:e};if(!o)return{valid:!1,error:f("jsonParseError"),isRateLimit:!1,requestLog:t,responseLog:e};if(o&&o.error){const d=o.error.message||o.error.toString();if(typeof d=="string"){const c=d.toLowerCase();if(c.includes("rate limit")||c.includes("too many requests")||c.includes("quota exceeded"))return{valid:!1,error:"Rate Limited: "+d,isRateLimit:!0,requestLog:t,responseLog:e}}}return o&&Array.isArray(o.choices)?{valid:!0,error:null,isRateLimit:!1,requestLog:t,responseLog:e}:{valid:!1,error:"响应格式错误",isRateLimit:!1,requestLog:t,responseLog:e}}catch(r){const e=r&&r.message?r.message:String(r);return r.name==="TypeError"&&e.includes("fetch")?{valid:!1,error:f("networkError"),isRateLimit:!1,requestLog:t,responseLog:null}:{valid:!1,error:"请求失败: "+e,isRateLimit:!1,requestLog:t,responseLog:null}}}async function j(s,a,i){const n=L("xai","/chat/completions",i.proxyUrl),u={model:a,messages:[{role:"user",content:"Hi"}],max_tokens:1},l={Authorization:"Bearer "+s,"Content-Type":"application/json"},t=y({url:n,method:"POST",headers:l,body:JSON.stringify(u)});try{const r=await fetch(n,{method:"POST",headers:l,body:JSON.stringify(u)}),e=await g(r);if(!r.ok)return r.status===401?{valid:!1,error:"认证失败 (401)",isRateLimit:!1,requestLog:t,responseLog:e}:r.status===403?{valid:!1,error:"权限不足 (403)",isRateLimit:!1,requestLog:t,responseLog:e}:r.status===429?{valid:!1,error:"Rate Limited (429)",isRateLimit:!0,requestLog:t,responseLog:e}:e.parsed&&e.parsed.error&&e.parsed.error.message?{valid:!1,error:e.parsed.error.message,isRateLimit:!1,requestLog:t,responseLog:e}:{valid:!1,error:"HTTP "+r.status,isRateLimit:r.status===429,requestLog:t,responseLog:e};const o=e.parsed;if(!e.body||e.body.trim()==="")return{valid:!1,error:f("emptyResponse"),isRateLimit:!1,requestLog:t,responseLog:e};if(!o)return{valid:!1,error:f("jsonParseError"),isRateLimit:!1,requestLog:t,responseLog:e};if(o&&o.error){const d=o.error.message||o.error.toString();if(typeof d=="string"){const c=d.toLowerCase();if(c.includes("rate limit")||c.includes("too many requests")||c.includes("quota exceeded"))return{valid:!1,error:"Rate Limited: "+d,isRateLimit:!0,requestLog:t,responseLog:e}}}return o&&Array.isArray(o.choices)?{valid:!0,error:null,isRateLimit:!1,requestLog:t,responseLog:e}:{valid:!1,error:"响应格式错误",isRateLimit:!1,requestLog:t,responseLog:e}}catch(r){const e=r&&r.message?r.message:String(r);return r.name==="TypeError"&&e.includes("fetch")?{valid:!1,error:f("networkError"),isRateLimit:!1,requestLog:t,responseLog:null}:{valid:!1,error:"请求失败: "+e,isRateLimit:!1,requestLog:t,responseLog:null}}}async function F(s,a,i){const n=L("openrouter","/chat/completions",i.proxyUrl),u={model:a,messages:[{role:"user",content:"Hi"}],max_tokens:1},l={Authorization:"Bearer "+s,"Content-Type":"application/json","HTTP-Referer":"https://api-key-tester.com","X-Title":"API Key Tester"},t=y({url:n,method:"POST",headers:l,body:JSON.stringify(u)});try{const r=await fetch(n,{method:"POST",headers:l,body:JSON.stringify(u)}),e=await g(r);if(!r.ok)return r.status===401?{valid:!1,error:"认证失败 (401)",isRateLimit:!1,requestLog:t,responseLog:e}:r.status===403?{valid:!1,error:"权限不足 (403)",isRateLimit:!1,requestLog:t,responseLog:e}:r.status===429?{valid:!1,error:"Rate Limited (429)",isRateLimit:!0,requestLog:t,responseLog:e}:e.parsed&&e.parsed.error&&e.parsed.error.message?{valid:!1,error:e.parsed.error.message,isRateLimit:!1,requestLog:t,responseLog:e}:{valid:!1,error:"HTTP "+r.status,isRateLimit:r.status===429,requestLog:t,responseLog:e};const o=e.parsed;if(!e.body||e.body.trim()==="")return{valid:!1,error:f("emptyResponse"),isRateLimit:!1,requestLog:t,responseLog:e};if(!o)return{valid:!1,error:f("jsonParseError"),isRateLimit:!1,requestLog:t,responseLog:e};if(o&&o.error){const d=o.error.message||o.error.toString();if(typeof d=="string"){const c=d.toLowerCase();if(c.includes("rate limit")||c.includes("too many requests")||c.includes("quota exceeded"))return{valid:!1,error:"Rate Limited: "+d,isRateLimit:!0,requestLog:t,responseLog:e}}}return o&&Array.isArray(o.choices)?{valid:!0,error:null,isRateLimit:!1,requestLog:t,responseLog:e}:{valid:!1,error:"响应格式错误",isRateLimit:!1,requestLog:t,responseLog:e}}catch(r){const e=r&&r.message?r.message:String(r);return r.name==="TypeError"&&e.includes("fetch")?{valid:!1,error:f("networkError"),isRateLimit:!1,requestLog:t,responseLog:null}:{valid:!1,error:"请求失败: "+e,isRateLimit:!1,requestLog:t,responseLog:null}}}async function G(s,a,i){const n="You are an expert at analyzing transcripts.".repeat(128),u=L("gemini","/cachedContents",i.proxyUrl),l={model:"models/gemini-2.5-flash",contents:[{parts:[{text:n}],role:"user"}],ttl:"30s"},t={"Content-Type":"application/json","x-goog-api-key":s},r=y({url:u,method:"POST",headers:t,body:JSON.stringify(l)});try{const e=await fetch(u,{method:"POST",headers:t,body:JSON.stringify(l)}),o=await g(e);if(e.ok)return{isPaid:!0,error:null,cacheApiStatus:e.status,requestLog:r,responseLog:o};if(e.status===429)return{isPaid:!1,error:null,cacheApiStatus:e.status,requestLog:r,responseLog:o};if(e.status===400||e.status===401||e.status===403)return{isPaid:!1,error:null,cacheApiStatus:e.status,requestLog:r,responseLog:o};const d=o.body||"";return{isPaid:null,error:"HTTP "+e.status+": "+d,cacheApiStatus:e.status,requestLog:r,responseLog:o}}catch(e){return{isPaid:null,error:e&&e.message?e.message:String(e),requestLog:r,responseLog:null}}}
-//# sourceMappingURL=worker.js.map
+// Web Worker 用于处理 API 密钥测试
+let isProcessing = false;
+let shouldCancel = false;
+let currentLanguage = 'zh'; // 默认中文
+const keyGlobalStartTime = new Map();
+
+const MAX_LOG_BODY_LENGTH = 4000;
+
+const truncateForLog = (value, maxLength = MAX_LOG_BODY_LENGTH) => {
+  if (value == null) return value;
+  const str = typeof value === 'string' ? value : JSON.stringify(value);
+  if (str.length <= maxLength) return str;
+  return str.slice(0, maxLength) + '\n...(+' + (str.length - maxLength) + ' chars)';
+};
+
+const headersToObject = (headers) => {
+  if (!headers) return null;
+  try {
+    if (typeof headers.forEach === 'function') {
+      const result = {};
+      headers.forEach((value, key) => {
+        result[key] = value;
+      });
+      return result;
+    }
+    return { ...headers };
+  } catch (error) {
+    return { error: 'serialize_headers_failed', message: error.message };
+  }
+};
+
+const createRequestLog = ({ url, method, headers, body }) => ({
+  url,
+  method,
+  headers: headersToObject(headers),
+  body: truncateForLog(body)
+});
+
+const createResponseLog = async (response) => {
+  if (!response) return null;
+  const clone = response.clone ? response.clone() : response;
+  let bodyText = null;
+  try {
+    bodyText = await clone.text();
+  } catch (error) {
+    bodyText = '<<无法读取响应正文: ' + error.message + '>>';
+  }
+  let parsed = null;
+  try {
+    parsed = bodyText ? JSON.parse(bodyText) : null;
+  } catch (error) {
+    parsed = null;
+  }
+  return {
+    status: response.status,
+    statusText: response.statusText,
+    headers: headersToObject(response.headers),
+    body: truncateForLog(bodyText),
+    parsed
+  };
+};
+
+const postLogEvent = (key, config, event) => {
+  if (!key) return;
+  self.postMessage({
+    type: 'LOG_EVENT',
+    payload: {
+      key,
+      apiType: config.apiType,
+      model: config.model,
+      metadata: {
+        proxyUrl: config.proxyUrl,
+        enablePaidDetection: config.enablePaidDetection,
+        concurrency: config.concurrency
+      },
+      event
+    }
+  });
+};
+
+// 错误信息翻译
+const ERROR_MESSAGES = {
+  zh: {
+    invalidKey: 'API密钥无效',
+    authFailed: '认证失败',
+    permissionDenied: '权限不足',
+    rateLimited: '速率限制',
+    emptyResponse: '空响应',
+    jsonParseError: 'JSON解析失败',
+    responseFormatError: '响应格式错误',
+    networkError: '网络连接失败',
+    requestFailed: '请求失败',
+    testException: '测试异常',
+    authError: '认证错误',
+    apiError: 'API错误',
+    quotaExceeded: '配额超出'
+  },
+  en: {
+    invalidKey: 'Invalid API Key',
+    authFailed: 'Auth Failed',
+    permissionDenied: 'Permission Denied',
+    rateLimited: 'Rate Limited',
+    emptyResponse: 'Empty Response',
+    jsonParseError: 'JSON Parse Error',
+    responseFormatError: 'Response Format Error',
+    networkError: 'Network Connection Failed',
+    requestFailed: 'Request Failed',
+    testException: 'Test Exception',
+    authError: 'Authentication Error',
+    apiError: 'API Error',
+    quotaExceeded: 'Quota Exceeded'
+  }
+};
+
+function getErrorMessage(key, statusCode = null) {
+  const messages = ERROR_MESSAGES[currentLanguage] || ERROR_MESSAGES.zh;
+  const message = messages[key] || key;
+  return statusCode ? `${message} (${statusCode})` : message;
+}
+
+// 监听主线程消息
+self.onmessage = function (e) {
+  const { type, payload } = e.data;
+
+  switch (type) {
+    case 'START_TESTING':
+      startTesting(payload);
+      break;
+    case 'CANCEL_TESTING':
+      shouldCancel = true;
+      break;
+    case 'SET_LANGUAGE':
+      currentLanguage = payload.language;
+      break;
+    case 'PING':
+      self.postMessage({ type: 'PONG' });
+      break;
+    default:
+      console.warn('Unknown message type:', type);
+  }
+};
+
+async function startTesting({ apiKeys, apiType, model, proxyUrl, concurrency, maxRetries, enablePaidDetection }) {
+  if (isProcessing) {
+    return;
+  }
+
+  isProcessing = true;
+  shouldCancel = false;
+
+  try {
+    await processKeysWithConcurrency(apiKeys, {
+      apiType,
+      model,
+      proxyUrl,
+      concurrency,
+      maxRetries,
+      enablePaidDetection
+    });
+  } finally {
+    isProcessing = false;
+    shouldCancel = false;
+    self.postMessage({ type: 'TESTING_COMPLETE' });
+  }
+}
+
+async function processKeysWithConcurrency(apiKeys, config) {
+  const { concurrency } = config;
+  const keyQueue = [...apiKeys];
+  const activeSlots = new Array(concurrency).fill(null);
+  let nextKeyIndex = 0;
+
+  // 初始填满所有并发槽位
+  for (let i = 0; i < concurrency && i < keyQueue.length; i++) {
+    activeSlots[i] = processKeyWithRetry(keyQueue[nextKeyIndex], config, i);
+    nextKeyIndex++;
+  }
+
+  // 持续处理直到所有密钥完成或被取消
+  while (activeSlots.some(slot => slot !== null) && !shouldCancel) {
+    // 等待任意一个槽位完成
+    const completedIndex = await waitForAnySlotCompletion(activeSlots);
+
+    // 如果还有待测试的密钥，启动新的测试占用这个槽位
+    if (nextKeyIndex < keyQueue.length) {
+      activeSlots[completedIndex] = processKeyWithRetry(keyQueue[nextKeyIndex], config, completedIndex);
+      nextKeyIndex++;
+    } else {
+      // 没有新密钥了，释放槽位
+      activeSlots[completedIndex] = null;
+    }
+  }
+}
+
+async function waitForAnySlotCompletion(activeSlots) {
+  const activePromises = activeSlots
+    .map((promise, index) => promise ? promise.then(() => index) : null)
+    .filter(p => p !== null);
+
+  if (activePromises.length === 0) {
+    throw new Error('没有活跃的测试任务');
+  }
+
+  return await Promise.race(activePromises);
+}
+
+async function processKeyWithRetry(apiKey, config, slotIndex) {
+  const { maxRetries } = config;
+
+  const globalStart = Date.now();
+  keyGlobalStartTime.set(apiKey, globalStart);
+
+  self.postMessage({
+    type: 'KEY_STATUS_UPDATE',
+    payload: {
+      key: apiKey,
+      status: 'testing',
+      retryCount: 0
+    }
+  });
+
+  postLogEvent(apiKey, config, {
+    stage: 'test_start',
+    attempt: 1,
+    slotIndex,
+    status: 'testing',
+    timestamp: globalStart,
+    message: '开始测试'
+  });
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    if (shouldCancel) {
+      postLogEvent(apiKey, config, {
+        stage: 'cancelled',
+        attempt: attempt + 1,
+        slotIndex,
+        status: 'cancelled',
+        isFinal: true,
+        finalStatus: 'cancelled',
+        totalDurationMs: Date.now() - globalStart,
+        message: '任务被取消'
+      });
+      keyGlobalStartTime.delete(apiKey);
+      return;
+    }
+
+    const attemptIndex = attempt + 1;
+    const attemptStart = Date.now();
+
+    postLogEvent(apiKey, config, {
+      stage: 'attempt_start',
+      attempt: attemptIndex,
+      slotIndex,
+      status: attempt === 0 ? 'testing' : 'retrying',
+      timestamp: attemptStart,
+      message: '第' + attemptIndex + '次尝试'
+    });
+
+    try {
+      if (attempt > 0) {
+        self.postMessage({
+          type: 'KEY_STATUS_UPDATE',
+          payload: {
+            key: apiKey,
+            status: 'retrying',
+            retryCount: attempt
+          }
+        });
+
+        postLogEvent(apiKey, config, {
+          stage: 'retry_wait',
+          attempt: attemptIndex,
+          slotIndex,
+          status: 'retrying',
+          message: '等待重试'
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 500));
+      }
+
+      const result = await testApiKey(apiKey, config);
+      const attemptDuration = Date.now() - attemptStart;
+
+      postLogEvent(apiKey, config, {
+        stage: 'attempt_result',
+        attempt: attemptIndex,
+        slotIndex,
+        status: result.valid ? 'success' : (result.isRateLimit ? 'rate-limited' : 'error'),
+        durationMs: attemptDuration,
+        request: result.requestLog,
+        response: result.responseLog,
+        error: result.error,
+        extra: result.extra || null
+      });
+
+      if (result.valid || result.isRateLimit) {
+        let finalResult = result;
+
+        if (result.valid && config.apiType === 'gemini' && config.enablePaidDetection) {
+          try {
+            const paidStart = Date.now();
+            const paidResult = await testGeminiPaidKey(apiKey, config.model, config);
+
+            postLogEvent(apiKey, config, {
+              stage: 'paid_detection',
+              attempt: attemptIndex,
+              slotIndex,
+              status: paidResult.isPaid === true ? 'paid' : (paidResult.isPaid === false ? 'free' : 'unknown'),
+              durationMs: Date.now() - paidStart,
+              request: paidResult.requestLog,
+              response: paidResult.responseLog,
+              error: paidResult.error,
+              extra: { cacheApiStatus: paidResult.cacheApiStatus }
+            });
+
+            if (paidResult.isPaid === true) {
+              finalResult = { ...result, isPaid: true, cacheApiStatus: paidResult.cacheApiStatus };
+            } else if (paidResult.isPaid === false) {
+              finalResult = { ...result, isPaid: false, cacheApiStatus: paidResult.cacheApiStatus };
+            } else {
+              finalResult = { ...result, isPaid: null, cacheApiStatus: paidResult.cacheApiStatus };
+            }
+          } catch (error) {
+            postLogEvent(apiKey, config, {
+              stage: 'paid_detection',
+              attempt: attemptIndex,
+              slotIndex,
+              status: 'error',
+              error: error.message || error,
+              extra: { phase: 'paid_detection_failed' }
+            });
+            finalResult = { ...result, isPaid: false };
+          }
+        }
+
+        let finalStatus;
+        if (finalResult.isPaid === true) {
+          finalStatus = 'paid';
+        } else if (result.valid) {
+          finalStatus = 'valid';
+        } else {
+          finalStatus = 'rate-limited';
+        }
+
+        self.postMessage({
+          type: 'KEY_STATUS_UPDATE',
+          payload: {
+            key: apiKey,
+            status: finalStatus,
+            error: result.error,
+            retryCount: attempt,
+            isPaid: finalResult.isPaid,
+            cacheApiStatus: finalResult.cacheApiStatus
+          }
+        });
+
+        postLogEvent(apiKey, config, {
+          stage: 'final',
+          attempt: attemptIndex,
+          slotIndex,
+          status: finalStatus,
+          finalStatus,
+          isFinal: true,
+          totalDurationMs: Date.now() - globalStart,
+          error: result.error,
+          extra: {
+            isPaid: finalResult.isPaid,
+            cacheApiStatus: finalResult.cacheApiStatus
+          }
+        });
+
+        keyGlobalStartTime.delete(apiKey);
+        return finalResult;
+      }
+
+      if (attempt === maxRetries) {
+        self.postMessage({
+          type: 'KEY_STATUS_UPDATE',
+          payload: {
+            key: apiKey,
+            status: 'invalid',
+            error: result.error,
+            retryCount: attempt
+          }
+        });
+
+        postLogEvent(apiKey, config, {
+          stage: 'final',
+          attempt: attemptIndex,
+          slotIndex,
+          status: 'invalid',
+          finalStatus: 'invalid',
+          isFinal: true,
+          totalDurationMs: Date.now() - globalStart,
+          error: result.error
+        });
+
+        keyGlobalStartTime.delete(apiKey);
+        return result;
+      }
+
+      const statusCode = extractStatusCode(result.error);
+      if (!shouldRetry(result.error, statusCode)) {
+        self.postMessage({
+          type: 'KEY_STATUS_UPDATE',
+          payload: {
+            key: apiKey,
+            status: 'invalid',
+            error: result.error,
+            retryCount: attempt
+          }
+        });
+
+        postLogEvent(apiKey, config, {
+          stage: 'final',
+          attempt: attemptIndex,
+          slotIndex,
+          status: 'invalid',
+          finalStatus: 'invalid',
+          isFinal: true,
+          totalDurationMs: Date.now() - globalStart,
+          error: result.error
+        });
+
+        keyGlobalStartTime.delete(apiKey);
+        return result;
+      }
+
+      postLogEvent(apiKey, config, {
+        stage: 'retry_scheduled',
+        attempt: attemptIndex + 1,
+        slotIndex,
+        status: 'retrying',
+        error: result.error,
+        message: '准备进行下一次重试'
+      });
+
+    } catch (error) {
+      postLogEvent(apiKey, config, {
+        stage: 'attempt_exception',
+        attempt: attempt + 1,
+        slotIndex,
+        status: 'error',
+        error: error.message || error,
+        durationMs: Date.now() - attemptStart
+      });
+
+      if (attempt === maxRetries) {
+        const finalError = '测试异常: ' + (error.message || error);
+        self.postMessage({
+          type: 'KEY_STATUS_UPDATE',
+          payload: {
+            key: apiKey,
+            status: 'invalid',
+            error: finalError,
+            retryCount: attempt
+          }
+        });
+
+        postLogEvent(apiKey, config, {
+          stage: 'final',
+          attempt: attempt + 1,
+          slotIndex,
+          status: 'invalid',
+          finalStatus: 'invalid',
+          isFinal: true,
+          totalDurationMs: Date.now() - globalStart,
+          error: finalError
+        });
+
+        keyGlobalStartTime.delete(apiKey);
+        return { valid: false, error: finalError, isRateLimit: false };
+      }
+    }
+  }
+}
+
+function shouldRetry(error, statusCode) {
+  // 403、502、503、504 等临时错误需要重试
+  if ([403, 502, 503, 504].includes(statusCode)) {
+    return true;
+  }
+
+  if (error && typeof error === 'string') {
+    const errorLower = error.toLowerCase();
+    if (errorLower.includes('timeout') ||
+      errorLower.includes('network') ||
+      errorLower.includes('连接') ||
+      errorLower.includes('fetch')) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function extractStatusCode(error) {
+  if (!error || typeof error !== 'string') return null;
+
+  const match = error.match(/$(\d{3})$/);
+  if (match) {
+    return parseInt(match[1]);
+  }
+
+  if (error.includes('HTTP ')) {
+    const httpMatch = error.match(/HTTP (\d{3})/);
+    if (httpMatch) {
+      return parseInt(httpMatch[1]);
+    }
+  }
+
+  return null;
+}
+
+function getApiUrl(apiType, endpoint, proxyUrl) {
+  if (proxyUrl) {
+    const baseUrl = proxyUrl.endsWith('/') ? proxyUrl.slice(0, -1) : proxyUrl;
+    return baseUrl + endpoint;
+  } else {
+    switch (apiType) {
+      case 'openai':
+        return 'https://openai.weiruchenai.me/v1' + endpoint;
+      case 'claude':
+        return 'https://claude.weiruchenai.me/v1' + endpoint;
+      case 'gemini':
+        return 'https://gemini.weiruchenai.me/v1beta' + endpoint;
+      case 'deepseek':
+        return 'https://api.deepseek.com/v1' + endpoint;
+      case 'siliconcloud':
+        return 'https://api.siliconflow.cn/v1' + endpoint;
+      case 'xai':
+        return 'https://api.x.ai/v1' + endpoint;
+      case 'openrouter':
+        return 'https://openrouter.ai/api/v1' + endpoint;
+      default:
+        throw new Error('Unsupported API type: ' + apiType);
+    }
+  }
+}
+
+async function testApiKey(apiKey, config) {
+  const { apiType, model } = config;
+
+  switch (apiType) {
+    case 'openai':
+      return await testOpenAIKey(apiKey, model, config);
+    case 'claude':
+      return await testClaudeKey(apiKey, model, config);
+    case 'gemini':
+      return await testGeminiKey(apiKey, model, config);
+    case 'deepseek':
+      return await testDeepSeekKey(apiKey, model, config);
+    case 'siliconcloud':
+      return await testSiliconCloudKey(apiKey, model, config);
+    case 'xai':
+      return await testXAIKey(apiKey, model, config);
+    case 'openrouter':
+      return await testOpenRouterKey(apiKey, model, config);
+    default:
+      return { valid: false, error: '不支持的API类型', isRateLimit: false };
+  }
+}
+
+async function testOpenAIKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('openai', '/chat/completions', config.proxyUrl);
+  const payload = {
+    model: model,
+    messages: [{ role: 'user', content: 'Hi' }],
+    max_tokens: 1
+  };
+  const headers = {
+    'Authorization': 'Bearer ' + apiKey,
+    'Content-Type': 'application/json'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+    const responseLog = await createResponseLog(response);
+
+    if (!response.ok) {
+      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true, requestLog, responseLog };
+      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429, requestLog, responseLog };
+    }
+
+    if (!responseLog.body || responseLog.body.trim() === '') {
+      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false, requestLog, responseLog };
+    }
+
+    const data = responseLog.parsed;
+    if (!data) {
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog };
+    }
+
+    if (data && data.error) {
+      const errorMessage = data.error.message || data.error.toString();
+      if (typeof errorMessage === 'string') {
+        const lower = errorMessage.toLowerCase();
+        if (lower.includes('rate limit') || lower.includes('too many requests') || lower.includes('quota exceeded')) {
+          return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true, requestLog, responseLog };
+        }
+      }
+    }
+
+    if (data && Array.isArray(data.choices)) {
+      return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
+    }
+
+    return { valid: false, error: '响应格式错误', isRateLimit: false, requestLog, responseLog };
+  } catch (error) {
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
+    }
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
+  }
+}
+
+async function testClaudeKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('claude', '/messages', config.proxyUrl);
+  const payload = {
+    model: model,
+    max_tokens: 1,
+    messages: [{ role: 'user', content: 'Hi' }]
+  };
+  const headers = {
+    'x-api-key': apiKey,
+    'Content-Type': 'application/json',
+    'anthropic-version': '2023-06-01'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+    const responseLog = await createResponseLog(response);
+
+    if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false, requestLog, responseLog };
+    if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false, requestLog, responseLog };
+    if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true, requestLog, responseLog };
+
+    if (response.status === 400) {
+      const errorData = responseLog.parsed;
+      if (errorData && errorData.error) {
+        if (errorData.error.type === 'authentication_error') {
+          return { valid: false, error: '认证错误', isRateLimit: false, requestLog, responseLog };
+        }
+        if (errorData.error.type === 'rate_limit_error') {
+          return { valid: false, error: 'Rate Limit Error', isRateLimit: true, requestLog, responseLog };
+        }
+        if (errorData.error.type === 'invalid_request_error') {
+          return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
+        }
+        return { valid: false, error: 'API错误: ' + (errorData.error.type || 'unknown'), isRateLimit: false, requestLog, responseLog };
+      }
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog };
+    }
+
+    if (response.ok) {
+      return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
+    }
+
+    return { valid: false, error: 'HTTP ' + response.status, isRateLimit: false, requestLog, responseLog };
+  } catch (error) {
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
+    }
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
+  }
+}
+
+async function testGeminiKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('gemini', '/models/' + model + ':generateContent?key=' + apiKey, config.proxyUrl);
+  const payload = {
+    contents: [
+      {
+        parts: [
+          {
+            text: 'Hi'
+          }
+        ]
+      }
+    ]
+  };
+  const headers = {
+    'Content-Type': 'application/json'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+    const responseLog = await createResponseLog(response);
+
+    if (!response.ok) {
+      if (response.status === 400) return { valid: false, error: getErrorMessage('invalidKey', 400), isRateLimit: false, requestLog, responseLog };
+      if (response.status === 401) return { valid: false, error: getErrorMessage('authFailed', 401), isRateLimit: false, requestLog, responseLog };
+      if (response.status === 403) return { valid: false, error: getErrorMessage('permissionDenied', 403), isRateLimit: false, requestLog, responseLog };
+      if (response.status === 429) return { valid: false, error: getErrorMessage('rateLimited', 429), isRateLimit: true, requestLog, responseLog };
+      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429, requestLog, responseLog };
+    }
+
+    const data = responseLog.parsed;
+    if (!responseLog.body || responseLog.body.trim() === '') {
+      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false, requestLog, responseLog };
+    }
+
+    if (!data) {
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog };
+    }
+
+    if (data && Array.isArray(data.candidates) && data.candidates.length > 0) {
+      return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
+    }
+
+    if (data && data.error) {
+      const errorMessage = data.error.message || data.error.toString();
+      if (typeof errorMessage === 'string') {
+        const lower = errorMessage.toLowerCase();
+        if (lower.includes('quota exceeded') || lower.includes('rate limit') || lower.includes('too many requests')) {
+          return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true, requestLog, responseLog };
+        }
+      }
+      return { valid: false, error: 'API错误: ' + errorMessage, isRateLimit: false, requestLog, responseLog };
+    }
+
+    return { valid: false, error: '响应格式错误', isRateLimit: false, requestLog, responseLog };
+  } catch (error) {
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
+    }
+    if (error.name === 'SyntaxError' && message.includes('JSON')) {
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog: null };
+    }
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
+  }
+}
+
+async function testDeepSeekKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('deepseek', '/chat/completions', config.proxyUrl);
+  const payload = {
+    model: model,
+    messages: [{ role: 'user', content: 'Hi' }],
+    max_tokens: 1
+  };
+  const headers = {
+    'Authorization': 'Bearer ' + apiKey,
+    'Content-Type': 'application/json'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+    const responseLog = await createResponseLog(response);
+
+    if (!response.ok) {
+      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true, requestLog, responseLog };
+      if (responseLog.parsed && responseLog.parsed.error && responseLog.parsed.error.message) {
+        return { valid: false, error: responseLog.parsed.error.message, isRateLimit: false, requestLog, responseLog };
+      }
+      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429, requestLog, responseLog };
+    }
+
+    return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
+  } catch (error) {
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
+    }
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
+  }
+}
+
+async function testSiliconCloudKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('siliconcloud', '/chat/completions', config.proxyUrl);
+  const payload = {
+    model: model,
+    messages: [{ role: 'user', content: 'Hi' }],
+    max_tokens: 1
+  };
+  const headers = {
+    'Authorization': 'Bearer ' + apiKey,
+    'Content-Type': 'application/json'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+    const responseLog = await createResponseLog(response);
+
+    if (!response.ok) {
+      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true, requestLog, responseLog };
+      if (responseLog.parsed && responseLog.parsed.error && responseLog.parsed.error.message) {
+        return { valid: false, error: responseLog.parsed.error.message, isRateLimit: false, requestLog, responseLog };
+      }
+      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429, requestLog, responseLog };
+    }
+
+    const data = responseLog.parsed;
+    if (!responseLog.body || responseLog.body.trim() === '') {
+      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false, requestLog, responseLog };
+    }
+
+    if (!data) {
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog };
+    }
+
+    if (data && data.error) {
+      const errorMessage = data.error.message || data.error.toString();
+      if (typeof errorMessage === 'string') {
+        const lower = errorMessage.toLowerCase();
+        if (lower.includes('rate limit') || lower.includes('too many requests') || lower.includes('quota exceeded')) {
+          return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true, requestLog, responseLog };
+        }
+      }
+    }
+
+    if (data && Array.isArray(data.choices)) {
+      return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
+    }
+
+    return { valid: false, error: '响应格式错误', isRateLimit: false, requestLog, responseLog };
+  } catch (error) {
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
+    }
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
+  }
+}
+
+async function testXAIKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('xai', '/chat/completions', config.proxyUrl);
+  const payload = {
+    model: model,
+    messages: [{ role: 'user', content: 'Hi' }],
+    max_tokens: 1
+  };
+  const headers = {
+    'Authorization': 'Bearer ' + apiKey,
+    'Content-Type': 'application/json'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+    const responseLog = await createResponseLog(response);
+
+    if (!response.ok) {
+      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true, requestLog, responseLog };
+      if (responseLog.parsed && responseLog.parsed.error && responseLog.parsed.error.message) {
+        return { valid: false, error: responseLog.parsed.error.message, isRateLimit: false, requestLog, responseLog };
+      }
+      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429, requestLog, responseLog };
+    }
+
+    const data = responseLog.parsed;
+    if (!responseLog.body || responseLog.body.trim() === '') {
+      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false, requestLog, responseLog };
+    }
+
+    if (!data) {
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog };
+    }
+
+    if (data && data.error) {
+      const errorMessage = data.error.message || data.error.toString();
+      if (typeof errorMessage === 'string') {
+        const lower = errorMessage.toLowerCase();
+        if (lower.includes('rate limit') || lower.includes('too many requests') || lower.includes('quota exceeded')) {
+          return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true, requestLog, responseLog };
+        }
+      }
+    }
+
+    if (data && Array.isArray(data.choices)) {
+      return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
+    }
+
+    return { valid: false, error: '响应格式错误', isRateLimit: false, requestLog, responseLog };
+  } catch (error) {
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
+    }
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
+  }
+}
+
+async function testOpenRouterKey(apiKey, model, config) {
+  const apiUrl = getApiUrl('openrouter', '/chat/completions', config.proxyUrl);
+  const payload = {
+    model: model,
+    messages: [{ role: 'user', content: 'Hi' }],
+    max_tokens: 1
+  };
+  const headers = {
+    'Authorization': 'Bearer ' + apiKey,
+    'Content-Type': 'application/json',
+    'HTTP-Referer': 'https://api-key-tester.com',
+    'X-Title': 'API Key Tester'
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+    const responseLog = await createResponseLog(response);
+
+    if (!response.ok) {
+      if (response.status === 401) return { valid: false, error: '认证失败 (401)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 403) return { valid: false, error: '权限不足 (403)', isRateLimit: false, requestLog, responseLog };
+      if (response.status === 429) return { valid: false, error: 'Rate Limited (429)', isRateLimit: true, requestLog, responseLog };
+      if (responseLog.parsed && responseLog.parsed.error && responseLog.parsed.error.message) {
+        return { valid: false, error: responseLog.parsed.error.message, isRateLimit: false, requestLog, responseLog };
+      }
+      return { valid: false, error: 'HTTP ' + response.status, isRateLimit: response.status === 429, requestLog, responseLog };
+    }
+
+    const data = responseLog.parsed;
+    if (!responseLog.body || responseLog.body.trim() === '') {
+      return { valid: false, error: getErrorMessage('emptyResponse'), isRateLimit: false, requestLog, responseLog };
+    }
+
+    if (!data) {
+      return { valid: false, error: getErrorMessage('jsonParseError'), isRateLimit: false, requestLog, responseLog };
+    }
+
+    if (data && data.error) {
+      const errorMessage = data.error.message || data.error.toString();
+      if (typeof errorMessage === 'string') {
+        const lower = errorMessage.toLowerCase();
+        if (lower.includes('rate limit') || lower.includes('too many requests') || lower.includes('quota exceeded')) {
+          return { valid: false, error: 'Rate Limited: ' + errorMessage, isRateLimit: true, requestLog, responseLog };
+        }
+      }
+    }
+
+    if (data && Array.isArray(data.choices)) {
+      return { valid: true, error: null, isRateLimit: false, requestLog, responseLog };
+    }
+
+    return { valid: false, error: '响应格式错误', isRateLimit: false, requestLog, responseLog };
+  } catch (error) {
+    const message = error && error.message ? error.message : String(error);
+    if (error.name === 'TypeError' && message.includes('fetch')) {
+      return { valid: false, error: getErrorMessage('networkError'), isRateLimit: false, requestLog, responseLog: null };
+    }
+    return { valid: false, error: '请求失败: ' + message, isRateLimit: false, requestLog, responseLog: null };
+  }
+}
+
+async function testGeminiPaidKey(apiKey, model, config) {
+  const longText = 'You are an expert at analyzing transcripts.'.repeat(128);
+  const apiUrl = getApiUrl('gemini', '/cachedContents', config.proxyUrl);
+  const payload = {
+    model: 'models/gemini-2.5-flash',
+    contents: [
+      {
+        parts: [
+          {
+            text: longText
+          }
+        ],
+        role: 'user'
+      }
+    ],
+    ttl: '30s'
+  };
+  const headers = {
+    'Content-Type': 'application/json',
+    'x-goog-api-key': apiKey
+  };
+  const requestLog = createRequestLog({ url: apiUrl, method: 'POST', headers, body: JSON.stringify(payload) });
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload)
+    });
+    const responseLog = await createResponseLog(response);
+
+    if (response.ok) {
+      return { isPaid: true, error: null, cacheApiStatus: response.status, requestLog, responseLog };
+    }
+
+    if (response.status === 429) {
+      return { isPaid: false, error: null, cacheApiStatus: response.status, requestLog, responseLog };
+    }
+
+    if (response.status === 400 || response.status === 401 || response.status === 403) {
+      return { isPaid: false, error: null, cacheApiStatus: response.status, requestLog, responseLog };
+    }
+
+    const bodyText = responseLog.body || '';
+    return {
+      isPaid: null,
+      error: 'HTTP ' + response.status + ': ' + bodyText,
+      cacheApiStatus: response.status,
+      requestLog,
+      responseLog
+    };
+  } catch (error) {
+    const message = error && error.message ? error.message : String(error);
+    return { isPaid: null, error: message, requestLog, responseLog: null };
+  }
+}
