@@ -14,18 +14,7 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
-    rollupOptions: {
-      input: {
-        main: './index.html',
-        worker: './public/worker.js'
-      },
-      output: {
-        entryFileNames: (chunkInfo) => {
-          return chunkInfo.name === 'worker' ? 'worker.js' : 'assets/[name]-[hash].js'
-        }
-      }
-    }
+    sourcemap: true
   },
   define: {
     'process.env': {
