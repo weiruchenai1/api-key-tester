@@ -25,8 +25,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build project
-        run: npm run build
+      - name: Build project for GitHub Pages
+        run: npm run build:pages
 
       - name: Add 404.html for SPA routing
         run: cp dist/index.html dist/404.html

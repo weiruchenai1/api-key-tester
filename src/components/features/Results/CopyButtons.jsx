@@ -49,9 +49,20 @@ const CopyButtons = () => {
       textArea.value = textToCopy;
       document.body.appendChild(textArea);
       textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      showToast.success(successMessage);
+      let copied = false;
+      try {
+        copied = document.execCommand('copy');
+      } catch (error) {
+        copied = false;
+      } finally {
+        document.body.removeChild(textArea);
+      }
+
+      if (copied) {
+        showToast.success(successMessage);
+      } else {
+        showToast.error(t('copyFailed') || '复制失败，请手动复制！');
+      }
     };
 
     if (navigator.clipboard?.writeText) {

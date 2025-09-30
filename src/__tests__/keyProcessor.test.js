@@ -6,7 +6,7 @@ import { vi } from 'vitest';
  * Tests the actual API available in keyProcessor.js
  */
 
-const keyProcessor = require('../utils/keyProcessor');
+import * as keyProcessor from '../utils/keyProcessor.js';
 
 describe('Key Processing Utilities', () => {
   test('module exports expected API surface', () => {
@@ -70,7 +70,8 @@ describe('Key Processing Utilities', () => {
     });
 
     test('validates OpenAI keys with sk- prefix', () => {
-      const validKey = 'sk-' + 'a'.repeat(20);
+      // gitleaks:allow (test fixture)
+      const validKey = 'sk-FAKE-' + 'a'.repeat(20);
       expect(keyProcessor.validateApiKey(validKey, 'openai')).toEqual({
         valid: true,
         key: validKey
@@ -78,7 +79,8 @@ describe('Key Processing Utilities', () => {
     });
 
     test('validates Claude keys with sk- prefix', () => {
-      const validKey = 'sk-' + 'a'.repeat(20);
+      // gitleaks:allow (test fixture)
+      const validKey = 'sk-FAKE-' + 'a'.repeat(20);
       expect(keyProcessor.validateApiKey(validKey, 'claude')).toEqual({
         valid: true,
         key: validKey
@@ -86,7 +88,8 @@ describe('Key Processing Utilities', () => {
     });
 
     test('rejects OpenAI keys without sk- prefix', () => {
-      const invalidKey = 'ai-' + 'a'.repeat(20);
+      // gitleaks:allow (test fixture)
+      const invalidKey = 'ai-FAKE-' + 'a'.repeat(20);
       expect(keyProcessor.validateApiKey(invalidKey, 'openai')).toEqual({
         valid: false,
         reason: 'invalid_format'
@@ -94,7 +97,8 @@ describe('Key Processing Utilities', () => {
     });
 
     test('validates Gemini keys with AIzaSy prefix', () => {
-      const validKey = 'AIzaSy' + 'a'.repeat(20);
+      // gitleaks:allow (test fixture)
+      const validKey = 'AIzaSy-FAKE-' + 'a'.repeat(20);
       expect(keyProcessor.validateApiKey(validKey, 'gemini')).toEqual({
         valid: true,
         key: validKey
@@ -102,7 +106,8 @@ describe('Key Processing Utilities', () => {
     });
 
     test('rejects Gemini keys without AIzaSy prefix', () => {
-      const invalidKey = 'gemini-' + 'a'.repeat(20);
+      // gitleaks:allow (test fixture)
+      const invalidKey = 'gemini-FAKE-' + 'a'.repeat(20);
       expect(keyProcessor.validateApiKey(invalidKey, 'gemini')).toEqual({
         valid: false,
         reason: 'invalid_format'
@@ -118,8 +123,9 @@ describe('Key Processing Utilities', () => {
     });
 
     test('trims whitespace from keys', () => {
-      const keyWithSpaces = '  sk-' + 'a'.repeat(20) + '  ';
-      const expectedKey = 'sk-' + 'a'.repeat(20);
+      // gitleaks:allow (test fixture)
+      const keyWithSpaces = '  sk-FAKE-' + 'a'.repeat(20) + '  ';
+      const expectedKey = 'sk-FAKE-' + 'a'.repeat(20);
       expect(keyProcessor.validateApiKey(keyWithSpaces, 'openai')).toEqual({
         valid: true,
         key: expectedKey
@@ -196,7 +202,8 @@ describe('Key Processing Utilities', () => {
     });
 
     test('truncates long keys with ellipsis', () => {
-      const longKey = 'sk-verylongkeyhere1234567890abcdef';
+      // gitleaks:allow (test fixture)
+      const longKey = 'sk-FAKE-verylongkeyhere1234567890abcdef';
       const result = keyProcessor.formatKeyForDisplay(longKey, 15);
       
       expect(result.length).toBeLessThanOrEqual(15);
@@ -205,7 +212,8 @@ describe('Key Processing Utilities', () => {
     });
 
     test('uses default maxLength of 20', () => {
-      const longKey = 'sk-verylongkeyhere1234567890abcdef';
+      // gitleaks:allow (test fixture)
+      const longKey = 'sk-FAKE-verylongkeyhere1234567890abcdef';
       const result = keyProcessor.formatKeyForDisplay(longKey);
       
       expect(result.length).toBeLessThanOrEqual(20);
@@ -224,7 +232,8 @@ describe('Key Processing Utilities', () => {
     });
 
     test('preserves start and end of key', () => {
-      const key = 'sk-1234567890abcdefghijklmnop';
+      // gitleaks:allow (test fixture)
+      const key = 'sk-FAKE-1234567890abcdefghijklmnop';
       const result = keyProcessor.formatKeyForDisplay(key, 15);
       
       expect(result).toMatch(/^sk-.*\.\.\..*op$/);
@@ -368,10 +377,11 @@ describe('Key Processing Utilities', () => {
   });
 
   describe('generateTestReport', () => {
+    // gitleaks:allow (test fixtures)
     const keyResults = [
-      { key: 'sk-validkey1234567890', status: 'valid', retryCount: 0 },
-      { key: 'sk-invalidkey1234567890', status: 'invalid', error: 'Invalid key', retryCount: 2 },
-      { key: 'sk-rateLimitedKey1234567890', status: 'rate-limited', retryCount: 1 }
+      { key: 'sk-FAKE-validkey1234567890', status: 'valid', retryCount: 0 },
+      { key: 'sk-FAKE-invalidkey1234567890', status: 'invalid', error: 'Invalid key', retryCount: 2 },
+      { key: 'sk-FAKE-rateLimitedKey1234567890', status: 'rate-limited', retryCount: 1 }
     ];
 
     test('generates report with timestamp and summary', () => {
@@ -411,8 +421,9 @@ describe('Key Processing Utilities', () => {
     });
 
     test('handles missing retryCount', () => {
+      // gitleaks:allow (test fixture)
       const keyResultsNoRetry = [
-        { key: 'sk-test123', status: 'valid' }
+        { key: 'sk-FAKE-test123', status: 'valid' }
       ];
       const report = keyProcessor.generateTestReport(keyResultsNoRetry);
       

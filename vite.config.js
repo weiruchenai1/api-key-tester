@@ -4,12 +4,10 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
-  // Use different base paths for different deployment platforms
+  // Default '/' for Docker, Vercel, CF Pages; use a dedicated mode for GH Pages
   base: process.env.DOCKER_BUILD === 'true'
     ? '/'
-    : (process.env.CF_PAGES || process.env.CF_PAGES_URL) 
-      ? '/' // Cloudflare Pages uses root path
-      : (mode === 'production' ? '/api-key-tester/' : '/'), // GitHub Pages uses subpath
+    : (mode === 'gh-pages' ? '/api-key-tester/' : (process.env.VITE_BASE || '/')),
   server: {
     port: 3000,
     open: true

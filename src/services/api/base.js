@@ -1,10 +1,10 @@
-import { testOpenAIKey, getOpenAIModels } from './openai';
-import { testClaudeKey, getClaudeModels } from './claude';
-import { testGeminiKey, getGeminiModels } from './gemini';
-import { testDeepSeekKey, getDeepSeekModels } from './deepseek';
-import { testSiliconCloudKey, getSiliconCloudModels, getSiliconCloudBalance } from './siliconcloud';
-import { testXAIKey, getXAIModels } from './xai';
-import { testOpenRouterKey, getOpenRouterModels } from './openrouter';
+import { testOpenAIKey, getOpenAIModels } from './openai.js';
+import { testClaudeKey, getClaudeModels } from './claude.js';
+import { testGeminiKey, getGeminiModels } from './gemini.js';
+import { testDeepSeekKey, getDeepSeekModels } from './deepseek.js';
+import { testSiliconCloudKey, getSiliconCloudModels, getSiliconCloudBalance } from './siliconcloud.js';
+import { testXAIKey, getXAIModels } from './xai.js';
+import { testOpenRouterKey, getOpenRouterModels } from './openrouter.js';
 
 export const getApiUrl = (apiType, endpoint, proxyUrl) => {
   if (proxyUrl) {

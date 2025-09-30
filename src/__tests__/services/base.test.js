@@ -81,8 +81,8 @@ describe('API Base Service', () => {
 
   describe('testApiKey', () => {
     test('should call correct API test function', async () => {
-      const { testOpenAIKey } = require('../../services/api/openai');
-      const { testClaudeKey } = require('../../services/api/claude');
+      const { testOpenAIKey } = await import('../../services/api/openai.js');
+      const { testClaudeKey } = await import('../../services/api/claude.js');
       
       testOpenAIKey.mockResolvedValue({ valid: true });
       testClaudeKey.mockResolvedValue({ valid: true });
@@ -107,8 +107,8 @@ describe('API Base Service', () => {
 
   describe('getAvailableModels', () => {
     test('should call correct model fetcher function', async () => {
-      const { getOpenAIModels } = require('../../services/api/openai');
-      const { getGeminiModels } = require('../../services/api/gemini');
+      const { getOpenAIModels } = await import('../../services/api/openai.js');
+      const { getGeminiModels } = await import('../../services/api/gemini.js');
       
       getOpenAIModels.mockResolvedValue(['gpt-3.5-turbo', 'gpt-4']);
       getGeminiModels.mockResolvedValue(['gemini-pro']);
@@ -128,7 +128,7 @@ describe('API Base Service', () => {
     });
 
     test('should handle errors gracefully', async () => {
-      const { getOpenAIModels } = require('../../services/api/openai');
+      const { getOpenAIModels } = await import('../../services/api/openai.js');
       getOpenAIModels.mockRejectedValue(new Error('Network error'));
       
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation();
@@ -143,7 +143,7 @@ describe('API Base Service', () => {
 
   describe('getApiBalance', () => {
     test('should call SiliconCloud balance function', async () => {
-      const { getSiliconCloudBalance } = require('../../services/api/siliconcloud');
+      const { getSiliconCloudBalance } = await import('../../services/api/siliconcloud.js');
       getSiliconCloudBalance.mockResolvedValue({ success: true, balance: 100 });
       
       const result = await getApiBalance('test-key', 'siliconcloud', 'proxy');
@@ -174,7 +174,7 @@ describe('API Base Service', () => {
     });
 
     test('should handle errors gracefully', async () => {
-      const { getSiliconCloudBalance } = require('../../services/api/siliconcloud');
+      const { getSiliconCloudBalance } = await import('../../services/api/siliconcloud.js');
       getSiliconCloudBalance.mockRejectedValue(new Error('Network error'));
       
       const consoleSpy = vi.spyOn(console, 'error').mockImplementation();

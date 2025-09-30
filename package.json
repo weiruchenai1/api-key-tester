@@ -1,6 +1,7 @@
 {
   "name": "api-key-tester",
   "version": "1.0.0",
+  "type": "module",
   "private": true,
   "homepage": ".",
   "description": "批量检测 Gemini、Claude、GPT API 密钥有效性的 React 应用",
@@ -24,6 +25,7 @@
     "dev": "vite",
     "start": "vite",
     "build": "vite build",
+    "build:pages": "vite build --mode gh-pages",
     "preview": "vite preview",
     "test": "vitest",
     "test:coverage": "vitest --coverage",

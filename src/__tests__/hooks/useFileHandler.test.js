@@ -35,7 +35,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useFileHandler } from '../../hooks/useFileHandler';
 import { useLanguage } from '../../hooks/useLanguage';
 
-const { extractApiKeys } = require('../../utils/fileHandler');
+import { extractApiKeys } from '../../utils/fileHandler.js';
 
 // Mock FileReader
 class MockFileReader {
@@ -218,9 +218,9 @@ describe('useFileHandler Hook', () => {
         })
       }));
       
-      const { extractApiKeys: isolatedExtractApiKeys } = require('../../utils/fileHandler');
-      const { useFileHandler: isolatedUseFileHandler } = require('../../hooks/useFileHandler');
-      const { renderHook, act } = require('@testing-library/react');
+      const { extractApiKeys: isolatedExtractApiKeys } = await import('../../utils/fileHandler.js');
+      const { useFileHandler: isolatedUseFileHandler } = await import('../../hooks/useFileHandler.js');
+      const { renderHook, act } = await import('@testing-library/react');
       
       const { result } = renderHook(() => isolatedUseFileHandler());
       

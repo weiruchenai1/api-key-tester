@@ -3,7 +3,7 @@
  * Focus: ensuring recent performance utilities and instrumentation behave as expected.
  */
 
-const { performance, PerformanceObserver } = require('perf_hooks');
+import { performance, PerformanceObserver } from 'perf_hooks';
 
 describe('Performance instrumentation suite', () => {
   describe('execution timing helpers', () => {
