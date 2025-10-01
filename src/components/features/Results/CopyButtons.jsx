@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
+import { showToast } from '../../../utils/toast.jsx';
 
 const CopyButtons = () => {
   const { t } = useLanguage();
@@ -37,22 +38,48 @@ const CopyButtons = () => {
     }
 
     if (keysToCopy.length === 0) {
-      alert(t('noKeysToCopy') || '没有可复制的密钥！');
+      showToast.warning(t('noKeysToCopy') || '没有可复制的密钥！');
       return;
     }
 
-    navigator.clipboard.writeText(keysToCopy.join('\n')).then(() => {
-      alert((t('keysCopied') || '已复制 {count} 个密钥到剪贴板！').replace('{count}', keysToCopy.length));
-    }).catch(() => {
+    const textToCopy = keysToCopy.join('\n');
+    const successMessage = (t('keysCopied') || '已复制 {count} 个密钥到剪贴板！').replace('{count}', keysToCopy.length);
+    const fallbackCopy = () => {
       const textArea = document.createElement('textarea');
-      textArea.value = keysToCopy.join('\n');
+      textArea.value = textToCopy;
+      textArea.setAttribute('readonly', '');
+      Object.assign(textArea.style, {
+        position: 'fixed',
+        top: '-9999px',
+        left: '-9999px',
+      });
       document.body.appendChild(textArea);
       textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
+      textArea.setSelectionRange(0, textToCopy.length);
+      let copied = false;
+      try {
+        copied = document.execCommand('copy');
+      } catch (error) {
+        copied = false;
+      } finally {
+        document.body.removeChild(textArea);
+      }
 
-      alert((t('keysCopied') || '已复制 {count} 个密钥到剪贴板！').replace('{count}', keysToCopy.length));
-    });
+      if (copied) {
+        showToast.success(successMessage);
+      } else {
+        showToast.error(t('copyFailed') || '复制失败，请手动复制！');
+      }
+    };
+
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(textToCopy)
+        .then(() => showToast.success(successMessage))
+        .catch(fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
   };
 
   // 根据当前活跃标签页显示对应的复制按钮

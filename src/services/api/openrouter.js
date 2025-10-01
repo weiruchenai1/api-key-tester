@@ -1,4 +1,4 @@
-import { getApiUrl } from './base';
+import { getApiUrl } from './base.js';
 
 export const testOpenRouterKey = async (apiKey, model, proxyUrl) => {
   try {
