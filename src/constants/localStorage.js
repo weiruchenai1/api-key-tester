@@ -41,3 +41,15 @@ export const ADVANCED_SETTINGS_KEYS = Object.freeze({
   // 代理设置
   PROXY_SETTINGS: k('advanced:proxySettings'),
 });
+
+// 便于清理/迁移：汇总所有键名
+export const KEY_GROUPS = Object.freeze({
+  PAID_DETECTION: PAID_DETECTION_KEYS,
+  USER_CONFIG: USER_CONFIG_KEYS,
+  TEST_RESULT: TEST_RESULT_KEYS,
+  ADVANCED: ADVANCED_SETTINGS_KEYS,
+});
+
+export const ALL_KEYS = Object.freeze(
+  Object.values(KEY_GROUPS).flatMap(group => Object.values(group))
+);

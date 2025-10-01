@@ -17,10 +17,17 @@ export default defineConfig(({ mode }) => ({
     sourcemap: true
   },
   define: {
-    'process.env': {
-      NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development'),
-      PUBLIC_URL: JSON.stringify(process.env.PUBLIC_URL || '')
-    }
+    // Ensure production React bundle for non-dev modes
+    'process.env.NODE_ENV': JSON.stringify(
+      mode === 'development' ? 'development' : 'production'
+    ),
+    // Keep CRA-compatible PUBLIC_URL in sync with hosting base
+    'process.env.PUBLIC_URL': JSON.stringify(
+      process.env.PUBLIC_URL ||
+        (mode === 'gh-pages'
+          ? '/api-key-tester/'
+          : (process.env.VITE_BASE || '/'))
+    )
   },
   test: {
     globals: true,
