@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { USER_CONFIG_KEYS, ALL_KEYS } from '../constants/localStorage';
 
 /**
  * 自定义Hook用于本地存储
@@ -11,7 +12,16 @@ export const useLocalStorage = (key, initialValue) => {
   const [storedValue, setStoredValue] = useState(() => {
     try {
       const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      if (!item) return initialValue;
+      
+      // Try to parse as JSON first
+      try {
+        return JSON.parse(item);
+      } catch (parseError) {
+        // If JSON parsing fails, return the raw string
+        // This handles cases where values are stored as plain strings
+        return item;
+      }
     } catch (error) {
       console.warn(`读取localStorage失败 (key: ${key}):`, error);
       return initialValue;
@@ -51,13 +61,13 @@ export const useUserConfig = () => {
   const [isCustomModel, setIsCustomModel] = useLocalStorage('isCustomModel', false);
 
   // 高级设置
-  const [concurrency, setConcurrency] = useLocalStorage('concurrency', 3);
+  const [concurrency, setConcurrency] = useLocalStorage(USER_CONFIG_KEYS.CONCURRENCY, 3);
   const [maxRetries, setMaxRetries] = useLocalStorage('maxRetries', 2);
   const [retryDelay, setRetryDelay] = useLocalStorage('retryDelay', 1000);
 
   // 主题和语言设置
-  const [theme, setTheme] = useLocalStorage('theme', 'system');
-  const [language, setLanguage] = useLocalStorage('language', 'zh');
+  const [theme, setTheme] = useLocalStorage(USER_CONFIG_KEYS.THEME, 'system');
+  const [language, setLanguage] = useLocalStorage(USER_CONFIG_KEYS.LANGUAGE, 'zh');
 
   // Gemini付费检测设置
   const [enablePaidDetection, setEnablePaidDetection] = useLocalStorage('enablePaidDetection', false);
@@ -78,17 +88,27 @@ export const useUserConfig = () => {
 
   // 清除所有配置
   const clearAllConfig = () => {
-    const keys = [
+    // 使用统一的键名清理
+    const legacyKeys = [
       'apiType', 'proxyUrl', 'testModel', 'customModel', 'isCustomModel',
-      'concurrency', 'maxRetries', 'retryDelay', 'theme', 'language',
-      'enablePaidDetection', 'recentProxyUrls'
+      'maxRetries', 'retryDelay', 'enablePaidDetection', 'recentProxyUrls'
     ];
-
-    keys.forEach(key => {
+    
+    // 清理新的命名空间键名
+    ALL_KEYS.forEach(key => {
       try {
         window.localStorage.removeItem(key);
       } catch (error) {
         console.warn(`清除配置失败 (key: ${key}):`, error);
+      }
+    });
+    
+    // 清理遗留的旧键名
+    legacyKeys.forEach(key => {
+      try {
+        window.localStorage.removeItem(key);
+      } catch (error) {
+        console.warn(`清除遗留配置失败 (key: ${key}):`, error);
       }
     });
 

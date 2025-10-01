@@ -13,27 +13,20 @@ export const useWebWorker = () => {
     // 初始化 Web Worker
     const initWorker = () => {
       try {
-        // 确保在GitHub Pages和本地环境都能正确找到worker路径
+        // 使用import.meta.env来获取Vite的BASE_URL
+        const baseUrl = import.meta.env.BASE_URL || '/';
         let workerPath;
-        const isProduction = process.env.NODE_ENV === 'production';
-        const publicUrl = process.env.PUBLIC_URL || '';
         
-        if (isProduction) {
-          // 生产环境：GitHub Pages需要使用PUBLIC_URL
-          workerPath = publicUrl ? `${publicUrl}/worker.js` : './worker.js';
-        } else {
-          // 开发环境：使用绝对路径
+        // 开发环境和生产环境都使用相对于BASE_URL的路径
+        if (baseUrl === '/') {
           workerPath = '/worker.js';
+        } else {
+          // 确保BASE_URL以/结尾，worker.js不以/开头
+          const cleanBase = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
+          workerPath = cleanBase + 'worker.js';
         }
         
-        console.log('Environment info:', {
-          NODE_ENV: process.env.NODE_ENV,
-          PUBLIC_URL: process.env.PUBLIC_URL,
-          isProduction,
-          workerPath,
-          currentOrigin: window.location.origin,
-          currentPathname: window.location.pathname
-        });
+        console.log('Worker path:', workerPath, 'BASE_URL:', baseUrl);
         workerRef.current = new Worker(workerPath);
 
         workerRef.current.onmessage = (e) => {
@@ -41,7 +34,6 @@ export const useWebWorker = () => {
 
           switch (type) {
             case 'PONG':
-              console.log('Worker connected successfully');
               setIsWorkerReady(true);
               break;
             case 'KEY_STATUS_UPDATE':
@@ -67,7 +59,6 @@ export const useWebWorker = () => {
 
         workerRef.current.onerror = (error) => {
           console.error('Worker error:', error);
-          console.error('Worker path attempted:', workerPath);
           setIsWorkerReady(false);
         };
 
@@ -87,11 +78,6 @@ export const useWebWorker = () => {
 
       } catch (error) {
         console.error('Failed to create worker:', error);
-        console.error('Current environment:', {
-          NODE_ENV: process.env.NODE_ENV,
-          PUBLIC_URL: process.env.PUBLIC_URL,
-          location: window.location
-        });
         setIsWorkerReady(false);
       }
     };

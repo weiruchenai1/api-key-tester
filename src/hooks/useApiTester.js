@@ -4,6 +4,7 @@ import { useWebWorker } from './useWebWorker';
 import { getAvailableModels as getAvailableModelsFromApi } from '../services/api/base';
 import { getLogCollector } from '../utils/logCollector';
 import { clearLogEntries } from '../utils/logStorage';
+import { showToast } from '../utils/toast.jsx';
 
 export const useApiTester = () => {
   const { state, dispatch } = useAppState();
@@ -76,13 +77,13 @@ export const useApiTester = () => {
 
       if (models && models.length > 0) {
         dispatch({ type: 'SET_DETECTED_MODELS', payload: models });
-        alert(`检测到 ${models.length} 个可用模型`);
+        showToast.success(`检测到 ${models.length} 个可用模型`);
       } else {
-        alert('未检测到可用模型，请检查API密钥和网络设置');
+        showToast.warning('未检测到可用模型，请检查API密钥和网络设置');
       }
     } catch (error) {
       console.error('模型检测失败:', error);
-      alert('模型检测失败: ' + error.message);
+      showToast.error('模型检测失败: ' + error.message);
     } finally {
       setIsDetecting(false);
     }

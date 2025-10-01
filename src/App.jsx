@@ -8,13 +8,13 @@ import KeyInput from './components/features/KeyInput';
 import Controls from './components/features/Controls';
 import Results from './components/features/Results';
 import AdvancedSettings from './components/features/AdvancedSettings';
+import ToastProvider from './components/common/ToastProvider';
 import { useLanguage } from './hooks/useLanguage';
 
 const AppContent = () => {
   const { t } = useLanguage();
   const [isAdvancedSettingsOpen, setIsAdvancedSettingsOpen] = useState(false);
 
-  // 左侧功能区（移除Controls的function-card包装）
   const leftPanel = (
     <div>
       <div className="function-card">
@@ -25,7 +25,6 @@ const AppContent = () => {
         <KeyInput />
       </div>
 
-      {/* Controls组件不再包装在function-card中 */}
       <Controls />
 
       <div className="function-card usage-card">
@@ -58,13 +57,13 @@ const AppContent = () => {
     </div>
   );
 
-  // 右侧状态区
   const rightPanel = (
     <Results />
   );
 
   return (
     <>
+      <ToastProvider />
       <AppLayout>
         {{
           leftPanel,
