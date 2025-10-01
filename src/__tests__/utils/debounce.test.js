@@ -103,7 +103,7 @@ describe('Debounce Utility', () => {
     expect(mockFn2).toHaveBeenCalledWith('fn2');
   });
 
-  test('should preserve this context', () => {
+  test('should work with pre-bound functions', () => {
     const obj = {
       value: 'test',
       getValue: function() {
@@ -123,7 +123,7 @@ describe('Debounce Utility', () => {
     expect(spy).toHaveBeenCalledWith('test');
   });
 
-  test('should preserve this context with direct method binding', () => {
+  test('should work with pre-bound methods', () => {
     let result = null;
     const obj = {
       value: 'direct-test',

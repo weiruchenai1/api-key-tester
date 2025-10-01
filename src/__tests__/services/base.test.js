@@ -6,38 +6,38 @@ import { vi } from 'vitest';
 import { getApiUrl, testApiKey, getAvailableModels, getApiBalance } from '../../services/api/base.js';
 
 // Mock all API service modules
-vi.mock('../../services/api/openai', () => ({
+vi.mock('../../services/api/openai.js', () => ({
   testOpenAIKey: vi.fn(),
   getOpenAIModels: vi.fn()
 }));
 
-vi.mock('../../services/api/claude', () => ({
+vi.mock('../../services/api/claude.js', () => ({
   testClaudeKey: vi.fn(),
   getClaudeModels: vi.fn()
 }));
 
-vi.mock('../../services/api/gemini', () => ({
+vi.mock('../../services/api/gemini.js', () => ({
   testGeminiKey: vi.fn(),
   getGeminiModels: vi.fn()
 }));
 
-vi.mock('../../services/api/deepseek', () => ({
+vi.mock('../../services/api/deepseek.js', () => ({
   testDeepSeekKey: vi.fn(),
   getDeepSeekModels: vi.fn()
 }));
 
-vi.mock('../../services/api/siliconcloud', () => ({
+vi.mock('../../services/api/siliconcloud.js', () => ({
   testSiliconCloudKey: vi.fn(),
   getSiliconCloudModels: vi.fn(),
   getSiliconCloudBalance: vi.fn()
 }));
 
-vi.mock('../../services/api/xai', () => ({
+vi.mock('../../services/api/xai.js', () => ({
   testXAIKey: vi.fn(),
   getXAIModels: vi.fn()
 }));
 
-vi.mock('../../services/api/openrouter', () => ({
+vi.mock('../../services/api/openrouter.js', () => ({
   testOpenRouterKey: vi.fn(),
   getOpenRouterModels: vi.fn()
 }));

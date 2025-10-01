@@ -119,7 +119,7 @@ describe('File Handling Utilities', () => {
 
     test('should accept .txt files by extension', () => {
       const file = new File(['content'], 'test.txt', { type: '' });
-      const result = validateFile(file);
+      const result = validateFileType(file);
       
       expect(result.valid).toBe(true);
     });
@@ -137,7 +137,7 @@ describe('File Handling Utilities', () => {
       
       global.FileReader = vi.fn(() => mockReader);
       
-      const promise = readFileAsync(file);
+      const promise = readFileAsText(file);
       vi.advanceTimersByTime(10);
       
       const result = await promise;
@@ -146,7 +146,7 @@ describe('File Handling Utilities', () => {
 
     test('should handle file read errors', async () => {
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
-      const error = new Error('Read failed');
+      const error = new Error('文件读取失败');
       
       // Create a fresh mock for this test
       const mockReader = new MockFileReader();
@@ -155,10 +155,10 @@ describe('File Handling Utilities', () => {
       
       global.FileReader = vi.fn(() => mockReader);
       
-      const promise = readFileAsync(file);
+      const promise = readFileAsText(file);
       vi.advanceTimersByTime(10);
       
-      await expect(promise).rejects.toBe(error);
+      await expect(promise).rejects.toThrow('文件读取失败');
     });
   });
 
