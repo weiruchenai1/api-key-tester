@@ -96,7 +96,7 @@ describe('useFileHandler Hook', () => {
       type: 'SHOW_MESSAGE',
       payload: {
         type: 'error',
-        message: undefined
+        message: '请选择文本文件(.txt)'
       }
     });
   });

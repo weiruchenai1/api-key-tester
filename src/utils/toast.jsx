@@ -21,6 +21,11 @@ export const showToast = {
         borderLeftColor: "var(--color-info)",
         borderLeftWidth: "4px",
       },
+      ariaProps: {
+        role: "status",
+        "aria-live": "polite",
+        "aria-label": `信息通知: ${message}`
+      },
     });
   },
   
@@ -34,9 +39,10 @@ export const showToast = {
         borderLeftColor: "var(--color-warning)",
         borderLeftWidth: "4px",
       },
-      iconTheme: {
-        primary: "var(--color-warning)",
-        secondary: "var(--bg-card)",
+      ariaProps: {
+        role: "alert",
+        "aria-live": "assertive",
+        "aria-label": `警告通知: ${message}`
       },
     });
   },
@@ -61,7 +67,20 @@ export const showConfirm = (message, options = {}) => {
 
     toast(
       (t) => (
-        <div style={{ minWidth: "250px" }}>
+        <div 
+          style={{ minWidth: "250px" }}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              toast.dismiss(t.id);
+              resolve(false);
+            } else if (e.key === 'Enter') {
+              toast.dismiss(t.id);
+              resolve(true);
+            }
+          }}
+          tabIndex={-1}
+          autoFocus
+        >
           <div style={{ 
             marginBottom: "12px", 
             fontSize: "var(--font-size-sm)",
@@ -80,6 +99,7 @@ export const showConfirm = (message, options = {}) => {
                 cursor: "pointer",
                 fontSize: "var(--font-size-xs)",
                 transition: "var(--transition-fast)",
+                outline: "none",
               }}
               onClick={() => {
                 toast.dismiss(t.id);
@@ -90,6 +110,13 @@ export const showConfirm = (message, options = {}) => {
               }}
               onMouseOut={(e) => {
                 e.target.style.backgroundColor = "var(--bg-input)";
+              }}
+              onFocus={(e) => {
+                e.target.style.outline = "2px solid var(--color-primary)";
+                e.target.style.outlineOffset = "2px";
+              }}
+              onBlur={(e) => {
+                e.target.style.outline = "none";
               }}
             >
               {cancelText}
@@ -104,11 +131,20 @@ export const showConfirm = (message, options = {}) => {
                 cursor: "pointer",
                 fontSize: "var(--font-size-xs)",
                 transition: "var(--transition-fast)",
+                outline: "none",
               }}
               onClick={() => {
                 toast.dismiss(t.id);
                 resolve(true);
               }}
+              onFocus={(e) => {
+                e.target.style.outline = "2px solid white";
+                e.target.style.outlineOffset = "2px";
+              }}
+              onBlur={(e) => {
+                e.target.style.outline = "none";
+              }}
+              autoFocus
             >
               {confirmText}
             </button>
@@ -125,17 +161,31 @@ export const showConfirm = (message, options = {}) => {
           padding: "16px",
           boxShadow: "var(--shadow-sm)",
         },
+        ariaProps: {
+          role: "alertdialog",
+          "aria-modal": "true",
+          "aria-label": "确认对话框"
+        },
       }
     );
   });
 };
 
 // 替换 alert 的函数
-export const alert = (message) => {
+/**
+ * 显示信息提示 - 非阻塞式，与原生 alert() 不同
+ * @param {string} message - 要显示的消息
+ */
+export const showAlert = (message) => {
   showToast.info(message);
 };
 
-// 替换 confirm 的函数  
-export const confirm = (message) => {
+// 替换 confirm 的函数
+/**
+ * 显示确认对话框 - 返回 Promise，与原生 confirm() 不同
+ * @param {string} message - 要显示的消息
+ * @returns {Promise<boolean>} 用户选择结果的 Promise
+ */
+export const showConfirmDialog = (message) => {
   return showConfirm(message);
 };

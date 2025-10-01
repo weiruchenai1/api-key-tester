@@ -1,4 +1,5 @@
 import { getApiUrl } from './base.js';
+import { ERROR_MESSAGES } from '../../constants/api.js';
 
 export const testSiliconCloudKey = async (apiKey, model, proxyUrl) => {
   try {
@@ -18,7 +19,7 @@ export const testSiliconCloudKey = async (apiKey, model, proxyUrl) => {
     });
 
     if (response.status === 429) {
-      return { valid: false, error: '速率限制', isRateLimit: true };
+      return { valid: false, error: ERROR_MESSAGES.RATE_LIMIT_ERROR, isRateLimit: true };
     }
 
     if (!response.ok) {
@@ -30,7 +31,19 @@ export const testSiliconCloudKey = async (apiKey, model, proxyUrl) => {
       };
     }
 
-    return { valid: true, error: null, isRateLimit: false };
+    // Parse and validate JSON response in success path
+    try {
+      const data = await response.json();
+      
+      // Check if response has the expected structure (choices array)
+      if (data && Array.isArray(data.choices)) {
+        return { valid: true, error: null, isRateLimit: false };
+      } else {
+        return { valid: false, error: '响应格式错误', isRateLimit: false };
+      }
+    } catch (parseError) {
+      return { valid: false, error: ERROR_MESSAGES.PARSE_ERROR, isRateLimit: false };
+    }
   } catch (error) {
     return { valid: false, error: error.message, isRateLimit: false };
   }

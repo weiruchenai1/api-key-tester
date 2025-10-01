@@ -1,4 +1,5 @@
 import { getApiUrl } from './base.js';
+import { ERROR_MESSAGES } from '../../constants/api.js';
 
 export const testOpenRouterKey = async (apiKey, model, proxyUrl) => {
   try {
@@ -18,7 +19,7 @@ export const testOpenRouterKey = async (apiKey, model, proxyUrl) => {
     });
 
     if (response.status === 429) {
-      return { valid: false, error: '速率限制', isRateLimit: true };
+      return { valid: false, error: ERROR_MESSAGES.RATE_LIMIT_ERROR, isRateLimit: true };
     }
 
     if (!response.ok) {
@@ -30,7 +31,13 @@ export const testOpenRouterKey = async (apiKey, model, proxyUrl) => {
       };
     }
 
-    return { valid: true, error: null, isRateLimit: false };
+    // Parse JSON response in success path to catch parsing errors
+    try {
+      await response.json();
+      return { valid: true, error: null, isRateLimit: false };
+    } catch (parseError) {
+      return { valid: false, error: parseError.message, isRateLimit: false };
+    }
   } catch (error) {
     return { valid: false, error: error.message, isRateLimit: false };
   }

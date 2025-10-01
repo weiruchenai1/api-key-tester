@@ -4,6 +4,12 @@ import { vi } from 'vitest';
  */
 
 import { showToast } from '../../utils/toast.jsx';
+import {
+  validateFileType,
+  readFileAsText,
+  downloadFile,
+  exportResultsAsJson
+} from '../../utils/fileHandler.js';
 
 // Mock toast
 vi.mock('../../utils/toast.jsx', () => ({
@@ -44,54 +50,6 @@ class MockFileReader {
 
 global.FileReader = MockFileReader;
 
-// Simple utility functions for testing (extracted from existing codebase logic)
-const validateFile = (file) => {
-  if (!file) return { valid: false, error: 'No file selected' };
-  
-  if (file.type !== 'text/plain' && !file.name.endsWith('.txt')) {
-    return { valid: false, error: '请选择文本文件(.txt)' };
-  }
-  
-  if (file.size > 10 * 1024 * 1024) {
-    return { valid: false, error: '文件大小不能超过10MB' };
-  }
-  
-  return { valid: true };
-};
-
-const readFileAsync = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (e) => resolve(e.target.result);
-    reader.onerror = (e) => reject(e.target.error);
-    reader.readAsText(file);
-  });
-};
-
-const exportData = (data, filename = 'export.txt') => {
-  if (!data || data.length === 0) {
-    showToast.warning('没有数据可导出');
-    return false;
-  }
-
-  try {
-    const blob = new Blob([data], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-    showToast.success('导出成功');
-    return true;
-  } catch (error) {
-    showToast.error('导出失败: ' + error.message);
-    return false;
-  }
-};
-
 describe('File Handling Utilities', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -129,32 +87,34 @@ describe('File Handling Utilities', () => {
   describe('File Validation', () => {
     test('should validate text files successfully', () => {
       const file = new File(['content'], 'test.txt', { type: 'text/plain' });
-      const result = validateFile(file);
+      const result = validateFileType(file);
       
       expect(result.valid).toBe(true);
     });
 
     test('should reject non-text files', () => {
       const file = new File(['binary'], 'test.exe', { type: 'application/exe' });
-      const result = validateFile(file);
+      const result = validateFileType(file);
       
       expect(result.valid).toBe(false);
-      expect(result.error).toBe('请选择文本文件(.txt)');
+      expect(result.reason).toBe('invalid_type');
     });
 
     test('should reject files larger than 10MB', () => {
       const file = new File(['x'.repeat(100)], 'large.txt', { type: 'text/plain' });
       Object.defineProperty(file, 'size', { value: 11 * 1024 * 1024 });
       
-      const result = validateFile(file);
+      const result = validateFileType(file);
       
       expect(result.valid).toBe(false);
-      expect(result.error).toBe('文件大小不能超过10MB');
+      expect(result.reason).toBe('too_large');
     });
 
     test('should reject null/undefined files', () => {
-      expect(validateFile(null).valid).toBe(false);
-      expect(validateFile(undefined).valid).toBe(false);
+      expect(validateFileType(null).valid).toBe(false);
+      expect(validateFileType(null).reason).toBe('no_file');
+      expect(validateFileType(undefined).valid).toBe(false);
+      expect(validateFileType(undefined).reason).toBe('no_file');
     });
 
     test('should accept .txt files by extension', () => {
@@ -203,47 +163,39 @@ describe('File Handling Utilities', () => {
   });
 
   describe('File Export', () => {
-    test('should export data successfully', () => {
-      const data = 'sk-test123\nsk-test456';
-      const result = exportData(data, 'keys.txt');
+    test('should create blob for JSON export successfully', () => {
+      const keyResults = [
+        { key: 'sk-test123', status: 'valid' },
+        { key: 'sk-test456', status: 'invalid' }
+      ];
+      const summary = { total: 2, valid: 1, invalid: 1 };
       
-      expect(result).toBe(true);
-      expect(global.URL.createObjectURL).toHaveBeenCalled();
+      const blob = exportResultsAsJson(keyResults, summary);
+      
+      expect(blob).toBeInstanceOf(Blob);
+      expect(blob.type).toBe('application/json');
+    });
+
+    test('should download file successfully', () => {
+      const blob = new Blob(['test data'], { type: 'text/plain' });
+      
+      downloadFile(blob, 'test.txt');
+      
+      expect(global.URL.createObjectURL).toHaveBeenCalledWith(blob);
       expect(global.URL.revokeObjectURL).toHaveBeenCalledWith('blob:mock-url');
-      expect(showToast.success).toHaveBeenCalledWith('导出成功');
+      expect(global.document.createElement).toHaveBeenCalledWith('a');
+      expect(global.document.body.appendChild).toHaveBeenCalled();
+      expect(global.document.body.removeChild).toHaveBeenCalled();
     });
 
-    test('should handle empty data', () => {
-      const result = exportData('');
-      
-      expect(result).toBe(false);
-      expect(showToast.warning).toHaveBeenCalledWith('没有数据可导出');
-      expect(global.URL.createObjectURL).not.toHaveBeenCalled();
-    });
-
-    test('should handle null data', () => {
-      const result = exportData(null);
-      
-      expect(result).toBe(false);
-      expect(showToast.warning).toHaveBeenCalledWith('没有数据可导出');
-    });
-
-    test('should handle export errors', () => {
+    test('should handle download errors', () => {
       global.URL.createObjectURL = vi.fn(() => {
         throw new Error('Blob creation failed');
       });
       
-      const result = exportData('test data');
+      const blob = new Blob(['test data'], { type: 'text/plain' });
       
-      expect(result).toBe(false);
-      expect(showToast.error).toHaveBeenCalledWith('导出失败: Blob creation failed');
-    });
-
-    test('should use default filename', () => {
-      const result = exportData('test data');
-      
-      expect(result).toBe(true);
-      expect(showToast.success).toHaveBeenCalledWith('导出成功');
+      expect(() => downloadFile(blob, 'test.txt')).toThrow('Blob creation failed');
     });
   });
 
@@ -253,7 +205,7 @@ describe('File Handling Utilities', () => {
       const file = new File([originalData], 'input.txt', { type: 'text/plain' });
       
       // Step 1: Validate
-      const validation = validateFile(file);
+      const validation = validateFileType(file);
       expect(validation.valid).toBe(true);
       
       // Step 2: Read
@@ -262,19 +214,25 @@ describe('File Handling Utilities', () => {
       mockReader.error = null;
       global.FileReader = vi.fn(() => mockReader);
       
-      const promise = readFileAsync(file);
+      const promise = readFileAsText(file);
       vi.advanceTimersByTime(10);
       const content = await promise;
       
       expect(content).toBe(originalData);
       
-      // Step 3: Process (simple transformation)
-      const processedData = content.split('\n').map(line => line.trim()).join('\n');
+      // Step 3: Process and export - create JSON export
+      const keyResults = content.split('\n').map(key => ({ key: key.trim(), status: 'pending' }));
+      const summary = { total: keyResults.length, valid: 0, invalid: 0, pending: keyResults.length };
       
       // Step 4: Export
-      const result = exportData(processedData, 'output.txt');
-      expect(result).toBe(true);
-      expect(showToast.success).toHaveBeenCalledWith('导出成功');
+      const blob = exportResultsAsJson(keyResults, summary);
+      expect(blob).toBeInstanceOf(Blob);
+      expect(blob.type).toBe('application/json');
+      
+      // Step 5: Download
+      downloadFile(blob, 'results.json');
+      expect(global.URL.createObjectURL).toHaveBeenCalledWith(blob);
+      expect(global.document.createElement).toHaveBeenCalledWith('a');
     });
   });
 });

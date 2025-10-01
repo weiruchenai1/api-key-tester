@@ -3,7 +3,10 @@ import { vi } from 'vitest';
  * WorkerManager测试
  */
 
-import WorkerManager from '../../services/worker/workerManager';
+import WorkerManager from '../../services/worker/workerManager.js';
+
+// Preserve original Worker to prevent test pollution
+const OriginalWorker = global.Worker;
 
 // Mock Worker
 class MockWorker {
@@ -26,12 +29,9 @@ class MockWorker {
   }
 }
 
-// Mock global Worker
-global.Worker = MockWorker;
-
 describe('WorkerManager', () => {
   beforeEach(() => {
-    global.Worker = MockWorker;
+    global.Worker = MockWorker; // override for each test
     // Reset WorkerManager state
     WorkerManager.worker = null;
     WorkerManager.isReady = false;
@@ -47,6 +47,10 @@ describe('WorkerManager', () => {
   afterEach(() => {
     WorkerManager.terminate();
     vi.useRealTimers();
+  });
+
+  afterAll(() => {
+    global.Worker = OriginalWorker; // restore
   });
 
   describe('init', () => {

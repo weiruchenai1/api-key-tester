@@ -4,7 +4,7 @@ import { vi } from 'vitest';
  */
 
 import toast from 'react-hot-toast';
-import { showToast, showConfirm, alert, confirm } from '../../utils/toast.jsx';
+import { showToast, showConfirm, showAlert, showConfirmDialog } from '../../utils/toast.jsx';
 import { render, fireEvent } from '@testing-library/react';
 
 // Mock react-hot-toast
@@ -57,6 +57,11 @@ describe('Toast Utils', () => {
           borderLeftColor: "var(--color-info)",
           borderLeftWidth: "4px",
         },
+        ariaProps: {
+          role: "status",
+          "aria-live": "polite",
+          "aria-label": "信息通知: Info message"
+        },
       });
     });
 
@@ -71,9 +76,10 @@ describe('Toast Utils', () => {
           borderLeftColor: "var(--color-warning)",
           borderLeftWidth: "4px",
         },
-        iconTheme: {
-          primary: "var(--color-warning)",
-          secondary: "var(--bg-card)",
+        ariaProps: {
+          role: "alert",
+          "aria-live": "assertive",
+          "aria-label": "警告通知: Warning message"
         },
       });
     });
@@ -108,6 +114,11 @@ describe('Toast Utils', () => {
             borderRadius: "var(--border-radius)",
             padding: "16px",
             boxShadow: "var(--shadow-sm)",
+          },
+          ariaProps: {
+            role: "alertdialog",
+            "aria-modal": "true",
+            "aria-label": "确认对话框"
           },
         }
       );
@@ -223,18 +234,18 @@ describe('Toast Utils', () => {
     });
   });
 
-  describe('alert function', () => {
+  describe('showAlert function', () => {
     test('should call showToast.info', () => {
       const spy = vi.spyOn(showToast, 'info');
-      alert('Alert message');
+      showAlert('Alert message');
       expect(spy).toHaveBeenCalledWith('Alert message');
       spy.mockRestore();
     });
   });
 
-  describe('confirm function', () => {
+  describe('showConfirmDialog function', () => {
     test('should call showConfirm', () => {
-      const result = confirm('Confirm message');
+      const result = showConfirmDialog('Confirm message');
       expect(result).toBeInstanceOf(Promise);
       expect(toast).toHaveBeenCalled();
     });

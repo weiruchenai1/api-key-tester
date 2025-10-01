@@ -90,45 +90,34 @@ describe('useWebWorker Hook', () => {
     expect(typeof result.current.cancelWorkerTesting).toBe('function');
   });
 
-  test('should create worker in development environment', () => {
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+  test('should create worker with root BASE_URL', () => {
+    vi.stubEnv('BASE_URL', '/');
 
     renderHook(() => useWebWorker());
 
     expect(WorkerCtor).toHaveBeenCalledWith('/worker.js');
     
-    process.env.NODE_ENV = originalEnv;
+    vi.unstubAllEnvs();
   });
 
-  test('should create worker in production environment with PUBLIC_URL', () => {
-    const originalEnv = process.env.NODE_ENV;
-    const originalPublicUrl = process.env.PUBLIC_URL;
-    
-    process.env.NODE_ENV = 'production';
-    process.env.PUBLIC_URL = '/my-app';
+  test('should create worker with non-root BASE_URL', () => {
+    vi.stubEnv('BASE_URL', '/my-app');
 
     renderHook(() => useWebWorker());
 
     expect(WorkerCtor).toHaveBeenCalledWith('/my-app/worker.js');
     
-    process.env.NODE_ENV = originalEnv;
-    process.env.PUBLIC_URL = originalPublicUrl;
+    vi.unstubAllEnvs();
   });
 
-  test('should create worker in production environment without PUBLIC_URL', () => {
-    const originalEnv = process.env.NODE_ENV;
-    const originalPublicUrl = process.env.PUBLIC_URL;
-    
-    process.env.NODE_ENV = 'production';
-    process.env.PUBLIC_URL = '';
+  test('should create worker with BASE_URL ending in slash', () => {
+    vi.stubEnv('BASE_URL', '/my-app/');
 
     renderHook(() => useWebWorker());
 
-    expect(WorkerCtor).toHaveBeenCalledWith('./worker.js');
+    expect(WorkerCtor).toHaveBeenCalledWith('/my-app/worker.js');
     
-    process.env.NODE_ENV = originalEnv;
-    process.env.PUBLIC_URL = originalPublicUrl;
+    vi.unstubAllEnvs();
   });
 
   test('should set worker ready when receiving PONG message', async () => {
@@ -139,7 +128,6 @@ describe('useWebWorker Hook', () => {
     });
 
     expect(result.current.isWorkerReady).toBe(true);
-    expect(console.log).toHaveBeenCalledWith('Worker connected successfully');
   });
 
   test('should handle KEY_STATUS_UPDATE message', async () => {

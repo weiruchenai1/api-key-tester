@@ -8,8 +8,9 @@ vi.mock('../../services/api/base', () => ({
   getApiUrl: vi.fn()
 }));
 
-import { testClaudeKey, getClaudeModels } from '../../services/api/claude';
-import { getApiUrl } from '../../services/api/base';
+import { testClaudeKey, getClaudeModels } from '../../services/api/claude.js';
+import { getApiUrl } from '../../services/api/base.js';
+import { ERROR_MESSAGES } from '../../constants/api.js';
 
 // Mock fetch
 const originalFetch = global.fetch;
@@ -263,7 +264,7 @@ describe('Claude API Service', () => {
 
       expect(result).toEqual({
         valid: false,
-        error: 'JSON解析失败',
+        error: ERROR_MESSAGES.PARSE_ERROR,
         isRateLimit: false
       });
     });
@@ -290,24 +291,34 @@ describe('Claude API Service', () => {
 
       const result = await testClaudeKey(mockApiKey, mockModel);
 
-      expect(result).toEqual({
-        valid: false,
-        error: '网络连接失败',
-        isRateLimit: false
-      });
+      expect(result.valid).toBe(false);
+      expect(result.isRateLimit).toBe(false);
+      expect(result.error).toBe(ERROR_MESSAGES.NETWORK_ERROR);
     });
 
-    test('should handle other errors', async () => {
-      const error = new Error('Custom error');
-      mockFetch.mockRejectedValue(error);
+    test('should handle other network-like errors', async () => {
+      const abortError = new Error('AbortError: Request was aborted');
+      abortError.name = 'AbortError';
+      mockFetch.mockRejectedValue(abortError);
 
       const result = await testClaudeKey(mockApiKey, mockModel);
 
-      expect(result).toEqual({
-        valid: false,
-        error: '请求失败: Custom error',
-        isRateLimit: false
-      });
+      expect(result.valid).toBe(false);
+      expect(result.isRateLimit).toBe(false);
+      // For non-TypeError network errors, it falls back to generic error message
+      expect(result.error).toContain('请求失败:');
+    });
+
+    test('should handle generic request errors', async () => {
+      const genericError = new Error('Some other error');
+      mockFetch.mockRejectedValue(genericError);
+
+      const result = await testClaudeKey(mockApiKey, mockModel);
+
+      expect(result.valid).toBe(false);
+      expect(result.isRateLimit).toBe(false);
+      expect(result.error).toContain('请求失败:');
+      expect(result.error).toContain('Some other error');
     });
   });
 

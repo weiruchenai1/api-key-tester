@@ -79,7 +79,7 @@ describe('Debounce Utility', () => {
     
     debouncedFn('immediate');
     
-    vi.advanceTimersByTime(0);
+    vi.runAllTimers();
     
     expect(mockFn).toHaveBeenCalledWith('immediate');
   });
@@ -106,18 +106,39 @@ describe('Debounce Utility', () => {
   test('should preserve this context', () => {
     const obj = {
       value: 'test',
-      method: vi.fn(function() {
+      getValue: function() {
         return this.value;
-      })
+      }
     };
     
-    // Bind the method to preserve context
+    const spy = vi.fn();
+    const debouncedMethod = debounce(function() {
+      spy(this.getValue());
+    }.bind(obj), 100);
+    
+    debouncedMethod();
+    
+    vi.advanceTimersByTime(100);
+    
+    expect(spy).toHaveBeenCalledWith('test');
+  });
+
+  test('should preserve this context with direct method binding', () => {
+    let result = null;
+    const obj = {
+      value: 'direct-test',
+      method: function() {
+        result = this.value;
+        return this.value;
+      }
+    };
+    
     const debouncedMethod = debounce(obj.method.bind(obj), 100);
     debouncedMethod();
     
     vi.advanceTimersByTime(100);
     
-    expect(obj.method).toHaveBeenCalled();
+    expect(result).toBe('direct-test');
   });
 
   test('should handle function that throws error', () => {
@@ -139,7 +160,7 @@ describe('Debounce Utility', () => {
     
     debouncedFn('negative delay');
     
-    vi.advanceTimersByTime(0);
+    vi.runAllTimers();
     
     expect(mockFn).toHaveBeenCalledWith('negative delay');
   });

@@ -14,8 +14,6 @@ import {
 // Mock FileReader
 class MockFileReader {
   constructor() {
-    this.result = null;
-    this.error = null;
     this.onload = null;
     this.onerror = null;
   }
@@ -31,6 +29,8 @@ class MockFileReader {
   }
 }
 
+MockFileReader.prototype.result = null;
+MockFileReader.prototype.error = null;
 global.FileReader = MockFileReader;
 
 describe('FileHandler Utilities', () => {

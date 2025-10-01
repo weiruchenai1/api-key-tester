@@ -3,7 +3,7 @@ import { vi } from 'vitest';
  * API服务基础功能测试
  */
 
-import { getApiUrl, testApiKey, getAvailableModels, getApiBalance } from '../../services/api/base';
+import { getApiUrl, testApiKey, getAvailableModels, getApiBalance } from '../../services/api/base.js';
 
 // Mock all API service modules
 vi.mock('../../services/api/openai', () => ({

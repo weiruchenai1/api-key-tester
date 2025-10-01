@@ -4,6 +4,7 @@ import { vi } from 'vitest';
  */
 
 import { testOpenRouterKey, getOpenRouterModels } from '../../services/api/openrouter';
+import { ERROR_MESSAGES } from '../../constants/api.js';
 
 // Mock base module
 vi.mock('../../services/api/base', () => ({
@@ -87,7 +88,7 @@ describe('OpenRouter API Service', () => {
 
       expect(result).toEqual({
         valid: false,
-        error: '速率限制',
+        error: ERROR_MESSAGES.RATE_LIMIT_ERROR,
         isRateLimit: true
       });
     });
@@ -132,8 +133,8 @@ describe('OpenRouter API Service', () => {
       const result = await testOpenRouterKey(mockApiKey, mockModel);
 
       expect(result).toEqual({
-        valid: true,
-        error: null,
+        valid: false,
+        error: 'Invalid JSON',
         isRateLimit: false
       });
     });

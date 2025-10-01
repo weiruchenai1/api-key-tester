@@ -41,11 +41,12 @@ global.URL = {
 };
 
 // Mock FileReader
-global.FileReader = vi.fn(() => ({
-  readAsText: vi.fn(),
-  onload: null,
-  onerror: null
-}));
+global.FileReader = vi.fn(function() {
+  this.readAsText = vi.fn();
+  this.onload = null;
+  this.onerror = null;
+  return this;
+});
 
 describe('useLocalStorage Hook', () => {
   beforeEach(() => {
@@ -260,7 +261,23 @@ describe('useUserConfig Hook', () => {
       result.current.clearAllConfig();
     });
 
-    expect(mockLocalStorage.removeItem).toHaveBeenCalledTimes(12);
+    // Verify all expected keys are removed
+    const expectedNewKeys = [
+      'akt:gemini:promptDisabled', 'akt:gemini:defaultSetting',
+      'akt:user:theme', 'akt:user:language', 'akt:user:concurrency', 'akt:user:retrySettings',
+      'akt:test:history', 'akt:test:lastResults',
+      'akt:advanced:logSettings', 'akt:advanced:proxySettings'
+    ];
+    const expectedLegacyKeys = [
+      'apiType', 'proxyUrl', 'testModel', 'customModel', 'isCustomModel',
+      'maxRetries', 'retryDelay', 'enablePaidDetection', 'recentProxyUrls'
+    ];
+    
+    // Check that both new and legacy keys are removed
+    [...expectedNewKeys, ...expectedLegacyKeys].forEach(key => {
+      expect(mockLocalStorage.removeItem).toHaveBeenCalledWith(key);
+    });
+    
     expect(window.location.reload).toHaveBeenCalled();
   });
 
@@ -314,18 +331,24 @@ describe('useUserConfig Hook', () => {
       concurrency: 5
     };
 
-    const mockFileReader = {
-      readAsText: vi.fn(),
-      onload: null,
-      onerror: null
-    };
-    global.FileReader.mockReturnValue(mockFileReader);
+    // Create a specific mock instance that will be returned by FileReader constructor
+    let mockFileReaderInstance;
+    const FileReaderMock = vi.fn().mockImplementation(function() {
+      mockFileReaderInstance = {
+        readAsText: vi.fn(),
+        onload: null,
+        onerror: null
+      };
+      return mockFileReaderInstance;
+    });
+    
+    global.FileReader = FileReaderMock;
 
     const importPromise = result.current.importConfig(mockFile);
 
-    // Simulate successful file read
+    // Simulate successful file read on the actual instance
     act(() => {
-      mockFileReader.onload({ target: { result: JSON.stringify(mockConfig) } });
+      mockFileReaderInstance.onload({ target: { result: JSON.stringify(mockConfig) } });
     });
 
     const resultMessage = await importPromise;
@@ -335,6 +358,8 @@ describe('useUserConfig Hook', () => {
     expect(result.current.theme).toBe('dark');
     expect(result.current.language).toBe('en');
     expect(result.current.concurrency).toBe(5);
+    expect(FileReaderMock).toHaveBeenCalledWith();
+    expect(mockFileReaderInstance.readAsText).toHaveBeenCalledWith(mockFile);
   });
 
   test('should handle invalid configuration file', async () => {
@@ -343,21 +368,29 @@ describe('useUserConfig Hook', () => {
     const mockFile = new File(['{}'], 'config.json');
     const invalidConfig = { noVersion: true };
 
-    const mockFileReader = {
-      readAsText: vi.fn(),
-      onload: null,
-      onerror: null
-    };
-    global.FileReader.mockReturnValue(mockFileReader);
+    // Create a specific mock instance that will be returned by FileReader constructor
+    let mockFileReaderInstance;
+    const FileReaderMock = vi.fn().mockImplementation(function() {
+      mockFileReaderInstance = {
+        readAsText: vi.fn(),
+        onload: null,
+        onerror: null
+      };
+      return mockFileReaderInstance;
+    });
+    
+    global.FileReader = FileReaderMock;
 
     const importPromise = result.current.importConfig(mockFile);
 
-    // Simulate file read with invalid config
+    // Simulate file read with invalid config on the actual instance
     act(() => {
-      mockFileReader.onload({ target: { result: JSON.stringify(invalidConfig) } });
+      mockFileReaderInstance.onload({ target: { result: JSON.stringify(invalidConfig) } });
     });
 
     await expect(importPromise).rejects.toContain('配置文件格式错误');
+    expect(FileReaderMock).toHaveBeenCalledWith();
+    expect(mockFileReaderInstance.readAsText).toHaveBeenCalledWith(mockFile);
   });
 
   test('should handle file read errors', async () => {
@@ -365,21 +398,29 @@ describe('useUserConfig Hook', () => {
     
     const mockFile = new File(['{}'], 'config.json');
 
-    const mockFileReader = {
-      readAsText: vi.fn(),
-      onload: null,
-      onerror: null
-    };
-    global.FileReader.mockReturnValue(mockFileReader);
+    // Create a specific mock instance that will be returned by FileReader constructor
+    let mockFileReaderInstance;
+    const FileReaderMock = vi.fn().mockImplementation(function() {
+      mockFileReaderInstance = {
+        readAsText: vi.fn(),
+        onload: null,
+        onerror: null
+      };
+      return mockFileReaderInstance;
+    });
+    
+    global.FileReader = FileReaderMock;
 
     const importPromise = result.current.importConfig(mockFile);
 
-    // Simulate file read error
+    // Simulate file read error on the actual instance
     act(() => {
-      mockFileReader.onerror();
+      mockFileReaderInstance.onerror();
     });
 
     await expect(importPromise).rejects.toBe('文件读取失败');
+    expect(FileReaderMock).toHaveBeenCalledWith();
+    expect(mockFileReaderInstance.readAsText).toHaveBeenCalledWith(mockFile);
   });
 
   test('should handle JSON parse errors during import', async () => {
@@ -387,20 +428,28 @@ describe('useUserConfig Hook', () => {
     
     const mockFile = new File(['{}'], 'config.json');
 
-    const mockFileReader = {
-      readAsText: vi.fn(),
-      onload: null,
-      onerror: null
-    };
-    global.FileReader.mockReturnValue(mockFileReader);
+    // Create a specific mock instance that will be returned by FileReader constructor
+    let mockFileReaderInstance;
+    const FileReaderMock = vi.fn().mockImplementation(function() {
+      mockFileReaderInstance = {
+        readAsText: vi.fn(),
+        onload: null,
+        onerror: null
+      };
+      return mockFileReaderInstance;
+    });
+    
+    global.FileReader = FileReaderMock;
 
     const importPromise = result.current.importConfig(mockFile);
 
-    // Simulate file read with invalid JSON
+    // Simulate file read with invalid JSON on the actual instance
     act(() => {
-      mockFileReader.onload({ target: { result: 'invalid json {' } });
+      mockFileReaderInstance.onload({ target: { result: 'invalid json {' } });
     });
 
     await expect(importPromise).rejects.toContain('配置文件格式错误');
+    expect(FileReaderMock).toHaveBeenCalledWith();
+    expect(mockFileReaderInstance.readAsText).toHaveBeenCalledWith(mockFile);
   });
 });

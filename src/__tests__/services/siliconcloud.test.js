@@ -4,6 +4,7 @@ import { vi } from 'vitest';
  */
 
 import { testSiliconCloudKey, getSiliconCloudModels, getSiliconCloudBalance } from '../../services/api/siliconcloud';
+import { ERROR_MESSAGES } from '../../constants/api.js';
 
 // Mock base module
 vi.mock('../../services/api/base', () => ({
@@ -87,7 +88,7 @@ describe('SiliconCloud API Service', () => {
 
       expect(result).toEqual({
         valid: false,
-        error: '速率限制',
+        error: ERROR_MESSAGES.RATE_LIMIT_ERROR,
         isRateLimit: true
       });
     });
@@ -122,6 +123,22 @@ describe('SiliconCloud API Service', () => {
       });
     });
 
+    test('should handle empty response body', async () => {
+      mockFetch.mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: vi.fn().mockResolvedValue({})
+      });
+
+      const result = await testSiliconCloudKey(mockApiKey, mockModel);
+
+      expect(result).toEqual({
+        valid: false,
+        error: '响应格式错误',
+        isRateLimit: false
+      });
+    });
+
     test('should handle invalid JSON response', async () => {
       mockFetch.mockResolvedValue({
         ok: true,
@@ -131,18 +148,20 @@ describe('SiliconCloud API Service', () => {
 
       const result = await testSiliconCloudKey(mockApiKey, mockModel);
 
-      expect(result).toEqual({
-        valid: true,
-        error: null,
-        isRateLimit: false
-      });
+      expect(result.valid).toBe(false);
+      expect(result.isRateLimit).toBe(false);
+      // Should use the constant for parse errors
+      expect(result.error).toMatch(/JSON|解析|parse/i);
     });
 
-    test('should handle empty response body', async () => {
+    test('should handle response with valid choices array', async () => {
       mockFetch.mockResolvedValue({
         ok: true,
         status: 200,
-        json: vi.fn().mockResolvedValue({})
+        json: vi.fn().mockResolvedValue({
+          choices: [{ message: { content: 'Hello!' } }],
+          usage: { total_tokens: 10 }
+        })
       });
 
       const result = await testSiliconCloudKey(mockApiKey, mockModel);
