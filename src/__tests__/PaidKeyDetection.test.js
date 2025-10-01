@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * 付费Key检测功能测试
  * 验证修改后的逻辑：valid: true = 免费key，isPaid: true = 付费key
@@ -9,15 +10,15 @@ import '@testing-library/jest-dom';
 
 // Mock Worker环境
 global.self = {
-  postMessage: jest.fn()
+  postMessage: vi.fn()
 };
 
 // Mock fetch
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('付费Key检测逻辑测试', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Worker检测流程测试', () => {

@@ -8,7 +8,7 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: (key) => store[key] || null,
-    setItem: (key, value) => store[key] = value.toString(),
+    setItem: (key, value) => store[key] = value != null ? value.toString() : 'undefined',
     removeItem: (key) => delete store[key],
     clear: () => store = {},
     get length() { return Object.keys(store).length; },
@@ -18,6 +18,94 @@ const localStorageMock = (() => {
 
 Object.defineProperty(window, 'localStorage', {
   value: localStorageMock
+});
+
+describe('LocalStorage Functionality', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  test('should save and retrieve basic configuration', () => {
+    const testConfig = {
+      apiType: 'claude',
+      testModel: 'claude-3-5-sonnet-20241022',
+      theme: 'dark',
+      language: 'en'
+    };
+
+    // 保存配置
+    Object.entries(testConfig).forEach(([key, value]) => {
+      localStorage.setItem(key, JSON.stringify(value));
+    });
+
+    // 读取配置
+    const savedConfig = {};
+    Object.keys(testConfig).forEach(key => {
+      const item = localStorage.getItem(key);
+      savedConfig[key] = item ? JSON.parse(item) : null;
+    });
+
+    // 验证数据一致性
+    expect(savedConfig).toEqual(testConfig);
+  });
+
+  test('should handle complex data types', () => {
+    const complexData = {
+      recentProxyUrls: [
+        'https://api.example1.com',
+        'https://api.example2.com',
+        'https://api.example3.com'
+      ],
+      settings: {
+        concurrency: 8,
+        maxRetries: 5,
+        retryDelay: 2000
+      }
+    };
+
+    // 保存复杂数据
+    localStorage.setItem('complexData', JSON.stringify(complexData));
+
+    // 读取复杂数据
+    const retrieved = JSON.parse(localStorage.getItem('complexData'));
+
+    expect(retrieved).toEqual(complexData);
+    expect(Array.isArray(retrieved.recentProxyUrls)).toBe(true);
+    expect(retrieved.recentProxyUrls).toHaveLength(3);
+  });
+
+  test('should handle null and undefined values', () => {
+    expect(localStorage.getItem('nonExistent')).toBeNull();
+
+    localStorage.setItem('nullValue', JSON.stringify(null));
+    expect(JSON.parse(localStorage.getItem('nullValue'))).toBeNull();
+
+    // undefined在JSON中会变成字符串"undefined"
+    localStorage.setItem('undefinedValue', JSON.stringify(undefined));
+    const undefinedResult = localStorage.getItem('undefinedValue');
+    expect(undefinedResult).toBe('undefined');
+  });
+
+  test('should clear all data', () => {
+    localStorage.setItem('key1', 'value1');
+    localStorage.setItem('key2', 'value2');
+    
+    expect(localStorage.length).toBe(2);
+    
+    localStorage.clear();
+    
+    expect(localStorage.length).toBe(0);
+    expect(localStorage.getItem('key1')).toBeNull();
+    expect(localStorage.getItem('key2')).toBeNull();
+  });
+
+  test('should handle localStorage operations gracefully', () => {
+    expect(() => {
+      localStorage.setItem('test', 'value');
+      localStorage.getItem('test');
+      localStorage.removeItem('test');
+    }).not.toThrow();
+  });
 });
 
 // 测试配置数据

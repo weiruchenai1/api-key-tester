@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * End-to-End Test for Paid Key Detection
  * Simulates the complete user workflow
@@ -8,16 +9,16 @@ import { act } from 'react-dom/test-utils';
 
 // Mock the worker
 const mockWorker = {
-  postMessage: jest.fn(),
-  terminate: jest.fn(),
+  postMessage: vi.fn(),
+  terminate: vi.fn(),
   onmessage: null
 };
 
 // Mock worker constructor
-global.Worker = jest.fn(() => mockWorker);
+global.Worker = vi.fn(() => mockWorker);
 
 // Mock fetch for API calls
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('Paid Key Detection E2E Test', () => {
   beforeEach(() => {

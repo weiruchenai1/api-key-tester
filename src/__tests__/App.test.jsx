@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from '../App';
@@ -7,7 +8,7 @@ import App from '../App';
 describe('App Component', () => {
   beforeEach(() => {
     // Clear all mocks before each test
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     // Reset localStorage mock
     if (global.localStorage.getItem.mockReturnValue) {
       global.localStorage.getItem.mockReturnValue(null);
