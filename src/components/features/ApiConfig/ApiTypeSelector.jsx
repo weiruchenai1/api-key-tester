@@ -1,41 +1,27 @@
-import React, { useState } from 'react';
+import React, { useCallback } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
+import { usePaidDetectionPrompt } from '../../../hooks/usePaidDetectionPrompt';
 import PaidDetectionPrompt from '../PaidDetectionPrompt';
 
 const ApiTypeSelector = () => {
   const { t } = useLanguage();
   const { state, dispatch } = useAppState();
-  const [showPaidDetectionPrompt, setShowPaidDetectionPrompt] = useState(false);
+  const { showPaidDetectionPrompt, hidePrompt, handleConfirm, handleApiTypeChange } = usePaidDetectionPrompt();
 
-  // 检查是否需要显示付费检测弹窗
-  const checkPaidDetectionPrompt = (apiType) => {
-    // 只对Gemini显示弹窗
-    if (apiType !== 'gemini') return false;
-    
-    // 检查是否已经禁用了提示
-    const promptDisabled = localStorage.getItem('geminiPaidDetectionPromptDisabled') === 'true';
-    if (promptDisabled) {
-      // 如果禁用了提示，使用默认设置
-      const defaultSetting = localStorage.getItem('geminiPaidDetectionDefault') === 'true';
-      dispatch({ type: 'SET_PAID_DETECTION', payload: defaultSetting });
-      return false;
-    }
-    
-    return true;
-  };
-
-  const handleApiTypeChange = (e) => {
-    const apiType = e.target.value;
+  const handleApiTypeSelect = useCallback((apiType) => {
     dispatch({ type: 'SET_API_TYPE', payload: apiType });
     // 清空检测到的模型
     dispatch({ type: 'CLEAR_DETECTED_MODELS' });
-    
-    // 检查是否需要显示付费检测弹窗
-    if (checkPaidDetectionPrompt(apiType)) {
-      setShowPaidDetectionPrompt(true);
-    }
-  };
+  }, [dispatch]);
+
+  const onApiTypeChange = useCallback(
+    (e) => {
+      const apiType = e.target.value;
+      handleApiTypeChange(apiType, handleApiTypeSelect);
+    },
+    [handleApiTypeChange, handleApiTypeSelect]
+  );
 
   return (
     <div className="space-y-sm">
@@ -44,7 +30,7 @@ const ApiTypeSelector = () => {
         id="apiType"
         className="form-field"
         value={state.apiType}
-        onChange={handleApiTypeChange}
+        onChange={onApiTypeChange}
       >
         <option value="openai">OpenAI GPT</option>
         <option value="claude">Claude</option>
@@ -58,10 +44,8 @@ const ApiTypeSelector = () => {
       {/* Gemini付费检测弹窗 */}
       <PaidDetectionPrompt
         isOpen={showPaidDetectionPrompt}
-        onClose={() => setShowPaidDetectionPrompt(false)}
-        onConfirm={(enablePaidDetection) => {
-          dispatch({ type: 'SET_PAID_DETECTION', payload: enablePaidDetection });
-        }}
+        onClose={hidePrompt}
+        onConfirm={handleConfirm}
       />
     </div>
   );

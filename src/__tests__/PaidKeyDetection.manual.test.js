@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * Manual Test Script for Paid Key Detection
  * 这是一个手动测试脚本，提供基础的自动化测试用例
@@ -17,7 +18,7 @@ describe('Paid Key Detection Manual Tests', () => {
 
   beforeEach(() => {
     // Reset any global state
-    global.fetch = jest.fn();
+    global.fetch = vi.fn();
   });
 
   describe('Test Configuration Validation', () => {

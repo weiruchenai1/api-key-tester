@@ -1,6 +1,7 @@
 import React, { createContext, useReducer, useContext, useEffect, useRef, useMemo } from 'react';
 import { debounce } from '../utils/debounce';
 import { getAllLogEntries } from '../utils/logStorage';
+import { initializeLogCollector, getLogCollector } from '../utils/logCollector';
 
 // 清理旧的localStorage数据
 const cleanupOldData = () => {
@@ -470,25 +471,23 @@ export const AppStateProvider = ({ children }) => {
 
   // 初始化日志收集器
   useEffect(() => {
-    import('../utils/logCollector')
-      .then(({ initializeLogCollector, getLogCollector }) => {
-        if (!logCollectorRef.current) {
-          logCollectorRef.current = initializeLogCollector(dispatch);
+    try {
+      if (!logCollectorRef.current) {
+        logCollectorRef.current = initializeLogCollector(dispatch);
+      }
+      const collector = getLogCollector();
+      if (collector) {
+        if (typeof collector.setEnabled === 'function') {
+          collector.setEnabled(true);
         }
-        const collector = getLogCollector();
-        if (collector) {
-          if (typeof collector.setEnabled === 'function') {
-            collector.setEnabled(true);
-          }
-          if (typeof collector.hydrateLogs === 'function' && (stateRef.current.logs || []).length > 0) {
-            collector.hydrateLogs(stateRef.current.logs || []);
-            hasHydratedLogsRef.current = true;
-          }
+        if (typeof collector.hydrateLogs === 'function' && (stateRef.current.logs || []).length > 0) {
+          collector.hydrateLogs(stateRef.current.logs || []);
+          hasHydratedLogsRef.current = true;
         }
-      })
-      .catch(() => {
-        // 安静失败，不影响主要功能
-      });
+      }
+    } catch (error) {
+      // 安静失败，不影响主要功能
+    }
   }, [dispatch]);
 
   const value = {

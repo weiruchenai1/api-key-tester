@@ -1,4 +1,4 @@
-import { getApiUrl } from './base';
+import { getApiUrl } from './base.js';
 
 export const testXAIKey = async (apiKey, model, proxyUrl) => {
   try {

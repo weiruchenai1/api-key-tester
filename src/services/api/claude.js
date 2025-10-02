@@ -1,4 +1,5 @@
-import { getApiUrl } from './base';
+import { getApiUrl } from './base.js';
+import { ERROR_MESSAGES } from '../../constants/api.js';
 
 export const testClaudeKey = async (apiKey, model, proxyUrl) => {
   try {
@@ -37,7 +38,7 @@ export const testClaudeKey = async (apiKey, model, proxyUrl) => {
         }
         return { valid: false, error: 'API错误: ' + (errorData.error.type || 'unknown'), isRateLimit: false };
       } catch {
-        return { valid: false, error: 'JSON解析失败', isRateLimit: false };
+        return { valid: false, error: ERROR_MESSAGES.PARSE_ERROR, isRateLimit: false };
       }
     }
 
@@ -48,7 +49,7 @@ export const testClaudeKey = async (apiKey, model, proxyUrl) => {
     }
   } catch (error) {
     if (error.name === 'TypeError' && error.message.includes('fetch')) {
-      return { valid: false, error: '网络连接失败', isRateLimit: false };
+      return { valid: false, error: ERROR_MESSAGES.NETWORK_ERROR, isRateLimit: false };
     }
     return { valid: false, error: '请求失败: ' + error.message, isRateLimit: false };
   }

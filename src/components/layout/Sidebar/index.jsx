@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
+import { usePaidDetectionPrompt } from '../../../hooks/usePaidDetectionPrompt';
 import PaidDetectionPrompt from '../../features/PaidDetectionPrompt';
+import { showToast } from '../../../utils/toast.jsx';
 import styles from './Sidebar.module.css';
 
 const ApiProvider = ({ type, icon, name, isActive, onClick, isCollapsed, isDisabled }) => {
@@ -26,34 +28,21 @@ const ApiProvider = ({ type, icon, name, isActive, onClick, isCollapsed, isDisab
 const Sidebar = ({ isCollapsed }) => {
   const { t } = useLanguage();
   const { state, dispatch } = useAppState();
-  const [showPaidDetectionPrompt, setShowPaidDetectionPrompt] = useState(false);
+  const { showPaidDetectionPrompt, hidePrompt, handleConfirm, handleApiTypeChange } = usePaidDetectionPrompt();
 
-  const checkPaidDetectionPrompt = (apiType) => {
-    if (apiType !== 'gemini') return false;
-
-    const promptDisabled = localStorage.getItem('geminiPaidDetectionPromptDisabled') === 'true';
-    if (promptDisabled) {
-      const defaultSetting = localStorage.getItem('geminiPaidDetectionDefault') === 'true';
-      dispatch({ type: 'SET_PAID_DETECTION', payload: defaultSetting });
-      return false;
-    }
-
-    return true;
+  const handleApiTypeSelect = (apiType) => {
+    dispatch({ type: 'SET_API_TYPE', payload: apiType });
+    dispatch({ type: 'CLEAR_DETECTED_MODELS' });
   };
 
-  const handleApiTypeChange = (apiType) => {
+  const handleProviderClick = (apiType) => {
     // 如果正在测试，阻止切换并给出提示
     if (state.isTesting) {
-      alert(t('cannotSwitchWhileTesting'));
+      showToast.warning(t('cannotSwitchWhileTesting'));
       return;
     }
 
-    dispatch({ type: 'SET_API_TYPE', payload: apiType });
-    dispatch({ type: 'CLEAR_DETECTED_MODELS' });
-
-    if (checkPaidDetectionPrompt(apiType)) {
-      setShowPaidDetectionPrompt(true);
-    }
+    handleApiTypeChange(apiType, handleApiTypeSelect);
   };
 
   const apiProviders = [
@@ -147,7 +136,7 @@ const Sidebar = ({ isCollapsed }) => {
               icon={provider.icon}
               name={provider.name}
               isActive={state.apiType === provider.type}
-              onClick={handleApiTypeChange}
+              onClick={handleProviderClick}
               isCollapsed={isCollapsed}
               isDisabled={state.isTesting && state.apiType !== provider.type}
             />
@@ -157,10 +146,8 @@ const Sidebar = ({ isCollapsed }) => {
 
       <PaidDetectionPrompt
         isOpen={showPaidDetectionPrompt}
-        onClose={() => setShowPaidDetectionPrompt(false)}
-        onConfirm={(enablePaidDetection) => {
-          dispatch({ type: 'SET_PAID_DETECTION', payload: enablePaidDetection });
-        }}
+        onClose={hidePrompt}
+        onConfirm={handleConfirm}
       />
     </>
   );

@@ -1,0 +1,37 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vitejs.dev/config/
+export default defineConfig(({ mode }) => ({
+  plugins: [react()],
+  // Default '/' for Docker, Vercel, CF Pages; use a dedicated mode for GH Pages
+  base: process.env.DOCKER_BUILD === 'true'
+    ? '/'
+    : (mode === 'gh-pages' ? '/api-key-tester/' : (process.env.VITE_BASE || '/')),
+  server: {
+    port: 3000,
+    open: true
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: true
+  },
+  define: {
+    // Ensure production React bundle for non-dev modes
+    'process.env.NODE_ENV': JSON.stringify(
+      mode === 'development' ? 'development' : 'production'
+    ),
+    // Keep CRA-compatible PUBLIC_URL in sync with hosting base
+    'process.env.PUBLIC_URL': JSON.stringify(
+      process.env.PUBLIC_URL ||
+        (mode === 'gh-pages'
+          ? '/api-key-tester/'
+          : (process.env.VITE_BASE || '/'))
+    )
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/setupTests.js'
+  }
+}))

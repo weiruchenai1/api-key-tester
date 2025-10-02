@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useUserConfig } from '../../../hooks/useLocalStorage';
 import { useLanguage } from '../../../hooks/useLanguage';
+import { PAID_DETECTION_KEYS } from '../../../constants/localStorage';
 import styles from './PaidDetectionPrompt.module.css';
 
 const PaidDetectionPrompt = ({ isOpen, onClose, onConfirm }) => {
@@ -14,8 +15,8 @@ const PaidDetectionPrompt = ({ isOpen, onClose, onConfirm }) => {
     
     // 如果用户选择不再提示，保存到本地存储
     if (dontShowAgain) {
-      localStorage.setItem('geminiPaidDetectionPromptDisabled', 'true');
-      localStorage.setItem('geminiPaidDetectionDefault', enablePaidDetection.toString());
+      localStorage.setItem(PAID_DETECTION_KEYS.GEMINI_PROMPT_DISABLED, 'true');
+      localStorage.setItem(PAID_DETECTION_KEYS.GEMINI_DEFAULT_SETTING, enablePaidDetection.toString());
     }
     
     onConfirm(enablePaidDetection);

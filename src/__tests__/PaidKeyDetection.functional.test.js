@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 /**
  * 付费Key检测功能验证测试
  * 实际可运行的功能测试，验证修改后的逻辑
@@ -6,11 +7,11 @@
 import { testGeminiPaidKey } from '../services/api/gemini';
 
 // Mock fetch for testing
-global.fetch = jest.fn();
+global.fetch = vi.fn();
 
 describe('付费Key检测核心功能验证', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('testGeminiPaidKey函数测试', () => {
