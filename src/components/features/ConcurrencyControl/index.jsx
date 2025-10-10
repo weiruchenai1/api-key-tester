@@ -2,6 +2,7 @@ import React from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useConcurrency } from '../../../hooks/useConcurrency';
+import FormField from '../../common/FormField';
 import styles from './ConcurrencyControl.module.css';
 
 const ConcurrencyControl = () => {
@@ -21,35 +22,17 @@ const ConcurrencyControl = () => {
     updateConcurrency(parseInt(e.target.value));
   };
 
-  const handlePresetClick = (value) => {
-    updateConcurrency(value);
-  };
-
-  const presets = [
-    { value: 1, key: 'slow' },
-    { value: 5, key: 'normal' },
-    { value: 10, key: 'fast' },
-    { value: 20, key: 'ultra' }
-  ];
 
   return (
-    <div className="input-group">
-      <label>{t('concurrencyControl')}</label>
+    <FormField
+      id="concurrency-count"
+      label={t('concurrencyControl')}
+    >
       <div className={styles.concurrencyContainer}>
-        <div className={styles.concurrencyInputSection}>
-          <input
-            type="number"
-            className="form-control"
-            value={state.concurrency}
-            min="1"
-            max="100"
-            onChange={handleInputChange}
-            disabled={state.isTesting}
-          />
-        </div>
         <div className={styles.concurrencySliderSection}>
           <div className={styles.concurrencySliderContainer}>
             <input
+              id="concurrency-count"
               type="range"
               className={styles.concurrencySlider}
               min="1"
@@ -57,25 +40,23 @@ const ConcurrencyControl = () => {
               value={Math.min(state.concurrency, 50)}
               onChange={handleSliderChange}
               disabled={state.isTesting}
+              aria-label={t('concurrencyControl') || 'Concurrency slider'}
             />
-            <span className={styles.concurrencySliderValue}>{state.concurrency}</span>
-          </div>
-          <div className={styles.concurrencyPresetButtons}>
-            {presets.map(preset => (
-              <button
-                key={preset.value}
-                type="button"
-                className={`${styles.concurrencyPresetBtn} ${state.concurrency === preset.value ? styles.active : ''}`}
-                onClick={() => handlePresetClick(preset.value)}
-                disabled={state.isTesting}
-              >
-                {t(preset.key)}
-              </button>
-            ))}
+            <input
+              id="concurrency-count-number"
+              type="number"
+              className={styles.concurrencySliderValue}
+              value={state.concurrency}
+              min="1"
+              max="100"
+              onChange={handleInputChange}
+              disabled={state.isTesting}
+              aria-label={t('concurrencyControl') + ' ' + (t('value') || 'value')}
+            />
           </div>
         </div>
       </div>
-    </div>
+    </FormField>
   );
 };
 

@@ -9,10 +9,7 @@
   left: 0;
   top: 60px;
   z-index: 999;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-
-  /* PC端展开时添加阴影效果 */
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -42,7 +39,6 @@
   padding: 8px 12px;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   gap: 12px;
   min-height: 36px;
   justify-content: flex-start;
@@ -67,8 +63,6 @@
   background: rgba(175, 184, 193, 0.12);
   border-color: rgba(175, 184, 193, 0.2);
   color: var(--text-primary);
-  transform: translateY(-0.5px);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
 /* GitHub风格的选中状态 - 无左侧指示条 */
@@ -91,15 +85,12 @@
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
 }
 
-:global(.dark-theme) .sidebar.collapsed {
-  box-shadow: none;
-}
-
 :global(.dark-theme) .apiProvider:hover:not(.active) {
   background: rgba(110, 118, 129, 0.12);
   border-color: rgba(110, 118, 129, 0.2);
   color: var(--text-primary);
 }
+
 
 :global(.dark-theme) .apiProvider.active {
   background: linear-gradient(135deg,
@@ -119,7 +110,6 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0.7;
 }
 
@@ -127,7 +117,6 @@
 .apiProvider:hover .providerIcon,
 .apiProvider.active .providerIcon {
   opacity: 1;
-  transform: scale(1.05);
 }
 
 .providerName {
@@ -135,7 +124,6 @@
   font-size: inherit;
   white-space: nowrap;
   overflow: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0.9;
   letter-spacing: -0.01em;
 }
@@ -144,6 +132,7 @@
 .apiProvider.active .providerName {
   opacity: 1;
 }
+
 
 /* 折叠时隐藏提供商名称 */
 .sidebar.collapsed .providerName {
@@ -164,12 +153,12 @@
     border-right: 1px solid var(--border-color);
     flex-direction: column;
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
   }
 
-  /* 移动端折叠时完全隐藏 */
+  /* 移动端折叠时完全收缩到屏幕外 */
   .sidebar.collapsed {
-    transform: translateX(-160px);
-    width: 160px;
+    transform: translateX(-100%);
     box-shadow: none;
   }
 
@@ -183,15 +172,6 @@
 }
 
 /* 减少动画在低性能设备上的影响 */
-@media (prefers-reduced-motion: reduce) {
-
-  .apiProvider,
-  .providerIcon,
-  .providerName,
-  .sidebar {
-    transition: none;
-  }
-}
 
 /* 为高对比度模式提供更好的可访问性 */
 @media (prefers-contrast: high) {
@@ -215,4 +195,12 @@
 
 :global(.dark-theme) .apiProvider:focus {
   outline-color: #58a6ff;
+}
+
+/* 为请求减少动画的用户禁用过渡效果 */
+@media (prefers-reduced-motion: reduce) {
+  .sidebar,
+  .sidebar.collapsed {
+    transition: none !important;
+  }
 }

@@ -350,7 +350,8 @@ async function processKeyWithRetry(apiKey, config, slotIndex) {
             error: result.error,
             retryCount: attempt,
             isPaid: finalResult.isPaid,
-            cacheApiStatus: finalResult.cacheApiStatus
+            cacheApiStatus: finalResult.cacheApiStatus,
+            statusCode: extractStatusCode(result.error)
           }
         });
 
@@ -380,7 +381,8 @@ async function processKeyWithRetry(apiKey, config, slotIndex) {
             key: apiKey,
             status: 'invalid',
             error: result.error,
-            retryCount: attempt
+            retryCount: attempt,
+            statusCode: extractStatusCode(result.error)
           }
         });
 
@@ -407,7 +409,8 @@ async function processKeyWithRetry(apiKey, config, slotIndex) {
             key: apiKey,
             status: 'invalid',
             error: result.error,
-            retryCount: attempt
+            retryCount: attempt,
+            statusCode: extractStatusCode(result.error)
           }
         });
 
@@ -453,7 +456,8 @@ async function processKeyWithRetry(apiKey, config, slotIndex) {
             key: apiKey,
             status: 'invalid',
             error: finalError,
-            retryCount: attempt
+            retryCount: attempt,
+            statusCode: extractStatusCode(finalError)
           }
         });
 
@@ -497,11 +501,13 @@ function shouldRetry(error, statusCode) {
 function extractStatusCode(error) {
   if (!error || typeof error !== 'string') return null;
 
-  const match = error.match(/$(\d{3})$/);
+  // 匹配括号中的3位数字状态码，如 "认证失败 (401)" 或 "权限不足 (403)"
+  const match = error.match(/\((\d{3})\)$/);
   if (match) {
     return parseInt(match[1]);
   }
 
+  // 匹配 "HTTP" + 空格 + 状态码的格式
   if (error.includes('HTTP ')) {
     const httpMatch = error.match(/HTTP (\d{3})/);
     if (httpMatch) {

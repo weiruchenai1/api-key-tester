@@ -1,5 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
+import Card from '../../common/Card';
+import EmptyState from '../../common/EmptyState';
 
 const LogsPreviewPanel = ({ logs = [], onExpandLogs }) => {
   const { t } = useLanguage();
@@ -71,8 +73,8 @@ const LogsPreviewPanel = ({ logs = [], onExpandLogs }) => {
       : errorMessage;
 
     return (
-      <div key={log.id} className={`card-base card-padding-sm mb-xs ${
-        log.status === 'error' ? 'border-l-4 border-error' : 'border-l-4 border-success'
+      <div key={log.id} className={`p-sm mb-xs border-l-4 ${
+        log.status === 'error' ? 'border-error' : 'border-success'
       }`}>
         <div className="flex items-center justify-between mb-xs">
           <div className="flex items-center gap-sm text-xs">
@@ -102,14 +104,12 @@ const LogsPreviewPanel = ({ logs = [], onExpandLogs }) => {
 
   if (logs.length === 0) {
     return (
-      <div className="card-base card-padding mb-md">
+      <Card variant="base" padding="md" className="mb-md">
         <div className="flex items-center justify-between mb-md">
           <h4 className="text-base font-semibold text-primary">{t('recentLogs')}</h4>
         </div>
-        <div className="empty-state">
-          <div className="empty-state-text">{t('noLogsYet')}</div>
-        </div>
-      </div>
+        <EmptyState message={t('noLogsYet')} />
+      </Card>
     );
   }
 
@@ -193,20 +193,16 @@ const LogsPreviewPanel = ({ logs = [], onExpandLogs }) => {
           filteredLogs.length > 0 ? (
             filteredLogs.map(log => renderLogItem(log, false))
           ) : (
-            <div className="empty-state">
-              <div className="empty-state-text">
-                {searchTerm ? t('noMatchingLogs') : 
-                 filter === 'errors' ? t('noRecentErrors') : t('noLogsYet')}
-              </div>
-            </div>
+            <EmptyState 
+              message={searchTerm ? t('noMatchingLogs') : 
+                      filter === 'errors' ? t('noRecentErrors') : t('noLogsYet')}
+            />
           )
         ) : (
           compactLogs.length > 0 ? (
             compactLogs.map(log => renderLogItem(log, true))
           ) : (
-            <div className="empty-state">
-              <div className="empty-state-text">{t('noRecentErrors')}</div>
-            </div>
+            <EmptyState message={t('noRecentErrors')} />
           )
         )}
       </div>

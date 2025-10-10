@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
+import FormField from '../../common/FormField';
 import styles from './RetryControl.module.css';
 
 const RetryControl = () => {
@@ -20,35 +21,18 @@ const RetryControl = () => {
     dispatch({ type: 'SET_RETRY_COUNT', payload: value });
   };
 
-  const handlePresetClick = (value) => {
-    dispatch({ type: 'SET_RETRY_COUNT', payload: value });
-  };
-
-  const presets = [
-    { value: 0, key: 'noRetry' },
-    { value: 2, key: 'lightRetry' },
-    { value: 3, key: 'normalRetry' },
-    { value: 5, key: 'heavyRetry' }
-  ];
 
   return (
-    <div className="input-group">
-      <label>{t('retryControl')}</label>
+    <FormField
+      id="retry-count"
+      label={t('retryControl')}
+      help={<small className="text-xs text-tertiary">{t('retryHelp')}</small>}
+    >
       <div className={styles.retryContainer}>
-        <div className={styles.retryInputSection}>
-          <input
-            type="number"
-            className="form-control"
-            value={state.retryCount}
-            min="0"
-            max="10"
-            onChange={handleInputChange}
-            disabled={state.isTesting}
-          />
-        </div>
         <div className={styles.retrySliderSection}>
           <div className={styles.retrySliderContainer}>
             <input
+              id="retry-count"
               type="range"
               className={styles.retrySlider}
               min="0"
@@ -56,26 +40,23 @@ const RetryControl = () => {
               value={state.retryCount}
               onChange={handleSliderChange}
               disabled={state.isTesting}
+              aria-label={t('retryControl') || 'Retry count slider'}
             />
-            <span className={styles.retrySliderValue}>{state.retryCount}</span>
-          </div>
-          <div className={styles.retryPresetButtons}>
-            {presets.map(preset => (
-              <button
-                key={preset.value}
-                type="button"
-                className={`${styles.retryPresetBtn} ${state.retryCount === preset.value ? styles.active : ''}`}
-                onClick={() => handlePresetClick(preset.value)}
-                disabled={state.isTesting}
-              >
-                {t(preset.key)}
-              </button>
-            ))}
+            <input
+              id="retry-count-number"
+              type="number"
+              className={styles.retrySliderValue}
+              value={state.retryCount}
+              min="0"
+              max="10"
+              onChange={handleInputChange}
+              disabled={state.isTesting}
+              aria-label={t('retryControl') + ' ' + (t('value') || 'value')}
+            />
           </div>
         </div>
       </div>
-      <small className="text-xs text-tertiary">{t('retryHelp')}</small>
-    </div>
+    </FormField>
   );
 };
 

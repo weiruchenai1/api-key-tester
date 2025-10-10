@@ -36,8 +36,14 @@ const AppLayout = ({ children }) => {
       }
     };
 
+    // 同时监听鼠标和触摸事件，确保移动端兼容性
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
   }, [isSidebarCollapsed]);
 
   return (

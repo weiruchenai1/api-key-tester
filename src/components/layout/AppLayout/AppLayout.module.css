@@ -38,10 +38,9 @@
   flex-direction: column;
 }
 
-/* 双栏布局 - 确保两列完全等高 */
+/* 双栏布局 - 使用flex布局确保两列完全等高 */
 .twoColumnLayout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: var(--spacing-lg);
   flex: 1;
   min-height: 0;
@@ -50,6 +49,7 @@
 
 .leftColumn,
 .rightColumn {
+  flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -59,7 +59,7 @@
 /* 响应式设计 */
 @media (max-width: 992px) {
   .twoColumnLayout {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: var(--spacing-md);
   }
 }

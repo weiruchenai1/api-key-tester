@@ -6,6 +6,14 @@ import { renderHook } from '@testing-library/react';
 import { useVirtualization } from '../../hooks/useVirtualization';
 
 describe('useVirtualization Hook', () => {
+  // 保存原始的 window.matchMedia
+  const originalMatchMedia = window.matchMedia;
+
+  afterEach(() => {
+    // 恢复原始的 window.matchMedia
+    window.matchMedia = originalMatchMedia;
+  });
+
   test('should initialize with correct functions', () => {
     const { result } = renderHook(() => useVirtualization());
 
@@ -21,203 +29,119 @@ describe('useVirtualization Hook', () => {
   });
 
   describe('getItemHeight', () => {
-    let getItemHeight;
+    test('should return desktop height (74px) for screens wider than 768px', () => {
+      // 模拟桌面屏幕
+      window.matchMedia = jest.fn((query) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      }));
 
-    beforeEach(() => {
       const { result } = renderHook(() => useVirtualization());
-      getItemHeight = result.current.getItemHeight;
+      const height = result.current.getItemHeight();
+
+      expect(height).toBe(74); // 桌面端：72px + wrapper padding(2px)
     });
 
-    test('should return default height for null keyData', () => {
-      const height = getItemHeight(null);
-      expect(height).toBe(60);
+    test('should return mobile height (66px) for screens between 481px and 768px', () => {
+      // 模拟移动端屏幕
+      window.matchMedia = jest.fn((query) => ({
+        matches: query === '(max-width: 768px)',
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      }));
+
+      const { result } = renderHook(() => useVirtualization());
+      const height = result.current.getItemHeight();
+
+      expect(height).toBe(66); // 移动端：64px + wrapper padding(2px)
     });
 
-    test('should return default height for undefined keyData', () => {
-      const height = getItemHeight(undefined);
-      expect(height).toBe(60);
+    test('should return extra-small height (62px) for screens 480px or smaller', () => {
+      // 模拟超小屏幕
+      window.matchMedia = jest.fn((query) => ({
+        matches: true,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      }));
+
+      const { result } = renderHook(() => useVirtualization());
+      const height = result.current.getItemHeight();
+
+      expect(height).toBe(62); // 超小屏幕：60px + wrapper padding(2px)
     });
 
-    test('should return base height for minimal keyData', () => {
-      const keyData = { key: 'sk-test' };
-      const height = getItemHeight(keyData);
-      expect(height).toBe(68); // Math.max(60, 68)
-    });
+    test('should return consistent height across multiple calls', () => {
+      // 模拟桌面屏幕
+      window.matchMedia = jest.fn((query) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      }));
 
-    test('should calculate height for short keys', () => {
-      const keyData = { key: 'sk-short-key' };
-      const height = getItemHeight(keyData);
-      expect(height).toBe(68);
-    });
+      const { result } = renderHook(() => useVirtualization());
 
-    test('should add extra height for long keys', () => {
-      const longKey = 'sk-' + 'x'.repeat(100); // 103 characters
-      const keyData = { key: longKey };
-      const height = getItemHeight(keyData);
-      
-      // Should add extra lines for long key
-      // (103 - 60) / 60 = 0.71, ceil = 1 extra line
-      // 60 + (1 * 18) = 78
-      expect(height).toBe(78);
-    });
+      const height1 = result.current.getItemHeight();
+      const height2 = result.current.getItemHeight();
+      const height3 = result.current.getItemHeight();
 
-    test('should add height for model information', () => {
-      const keyData = { 
-        key: 'sk-test',
-        model: 'gpt-4'
-      };
-      const height = getItemHeight(keyData);
-      expect(height).toBe(76); // 60 + 16 for model
-    });
-
-    test('should add height for short error messages', () => {
-      const keyData = { 
-        key: 'sk-test',
-        error: 'Invalid key'
-      };
-      const height = getItemHeight(keyData);
-      expect(height).toBe(76); // 60 + 16 for error
-    });
-
-    test('should add double height for long error messages', () => {
-      const keyData = { 
-        key: 'sk-test',
-        error: 'This is a very long error message that exceeds fifty characters'
-      };
-      const height = getItemHeight(keyData);
-      expect(height).toBe(92); // 60 + (16 * 2) for long error
-    });
-
-    test('should add height for retry information', () => {
-      const keyData = { 
-        key: 'sk-test',
-        retryCount: 2
-      };
-      const height = getItemHeight(keyData);
-      expect(height).toBe(76); // 60 + 16 for retry info
-    });
-
-    test('should add height for valid status', () => {
-      const keyData = { 
-        key: 'sk-test',
-        status: 'valid'
-      };
-      const height = getItemHeight(keyData);
-      expect(height).toBe(76); // 60 + 16 for status
-    });
-
-    test('should add height for paid status', () => {
-      const keyData = { 
-        key: 'sk-test',
-        status: 'paid'
-      };
-      const height = getItemHeight(keyData);
-      expect(height).toBe(76); // 60 + 16 for status
-    });
-
-    test('should add extra height for siliconcloud with valid status', () => {
-      const keyData = { 
-        key: 'sk-test',
-        status: 'valid'
-      };
-      const height = getItemHeight(keyData, 'siliconcloud');
-      expect(height).toBe(92); // 60 + 16 (status) + 16 (balance)
-    });
-
-    test('should add extra height for siliconcloud with paid status', () => {
-      const keyData = { 
-        key: 'sk-test',
-        status: 'paid'
-      };
-      const height = getItemHeight(keyData, 'siliconcloud');
-      expect(height).toBe(92); // 60 + 16 (status) + 16 (balance)
-    });
-
-    test('should not add extra height for siliconcloud with invalid status', () => {
-      const keyData = { 
-        key: 'sk-test',
-        status: 'invalid'
-      };
-      const height = getItemHeight(keyData, 'siliconcloud');
-      expect(height).toBe(68); // base height only
-    });
-
-    test('should calculate height for complex keyData', () => {
-      const keyData = {
-        key: 'sk-' + 'x'.repeat(70), // 73 characters, should add 1 extra line
-        model: 'gpt-4',
-        error: 'This is a long error message that should take two lines',
-        retryCount: 3,
-        status: 'valid'
-      };
-      const height = getItemHeight(keyData, 'openai');
-      
-      // 60 (base) + 18 (long key) + 16 (model) + 32 (long error) + 16 (retry) + 16 (status) = 158
-      expect(height).toBe(158);
-    });
-
-    test('should calculate height for siliconcloud with all features', () => {
-      const keyData = {
-        key: 'sk-test',
-        model: 'Qwen2-72B',
-        error: 'Short error',
-        retryCount: 1,
-        status: 'valid'
-      };
-      const height = getItemHeight(keyData, 'siliconcloud');
-      
-      // 60 (base) + 16 (model) + 16 (error) + 16 (retry) + 16 (status) + 16 (balance) = 140
-      expect(height).toBe(140);
-    });
-
-    test('should enforce minimum height', () => {
-      const keyData = { key: '' }; // Very minimal data
-      const height = getItemHeight(keyData);
-      expect(height).toBeGreaterThanOrEqual(68);
-    });
-
-    test('should handle missing key property', () => {
-      const keyData = { 
-        model: 'gpt-4',
-        status: 'valid'
-      };
-      const height = getItemHeight(keyData);
-      expect(height).toBe(92); // 60 + 16 (model) + 16 (status)
-    });
-
-    test('should handle zero retry count', () => {
-      const keyData = { 
-        key: 'sk-test',
-        retryCount: 0
-      };
-      const height = getItemHeight(keyData);
-      expect(height).toBe(68); // Should not add height for 0 retries
-    });
-
-    test('should handle empty strings', () => {
-      const keyData = { 
-        key: '',
-        model: '',
-        error: ''
-      };
-      const height = getItemHeight(keyData);
-      expect(height).toBe(68); // Should not add height for empty strings
-    });
-
-    test('should be stable across multiple calls', () => {
-      const keyData = { 
-        key: 'sk-test',
-        model: 'gpt-4',
-        status: 'valid'
-      };
-      
-      const height1 = getItemHeight(keyData, 'openai');
-      const height2 = getItemHeight(keyData, 'openai');
-      const height3 = getItemHeight(keyData, 'openai');
-      
       expect(height1).toBe(height2);
       expect(height2).toBe(height3);
-      expect(height1).toBe(92); // 60 + 16 (model) + 16 (status)
+      expect(height1).toBe(74);
+    });
+
+    test('should handle missing window.matchMedia gracefully', () => {
+      // 移除 window.matchMedia
+      window.matchMedia = undefined;
+
+      const { result } = renderHook(() => useVirtualization());
+      const height = result.current.getItemHeight();
+
+      // 应该返回桌面端高度（默认值）
+      expect(height).toBe(74);
+    });
+
+    test('should not accept any parameters', () => {
+      // 模拟桌面屏幕
+      window.matchMedia = jest.fn((query) => ({
+        matches: false,
+        media: query,
+        onchange: null,
+        addListener: jest.fn(),
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(),
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      }));
+
+      const { result } = renderHook(() => useVirtualization());
+
+      // 传递参数应该被忽略，高度只取决于屏幕宽度
+      const heightWithoutParams = result.current.getItemHeight();
+      const heightWithParams = result.current.getItemHeight({ key: 'sk-test' }, 'openai');
+
+      expect(heightWithoutParams).toBe(heightWithParams);
+      expect(heightWithoutParams).toBe(74);
     });
   });
 });

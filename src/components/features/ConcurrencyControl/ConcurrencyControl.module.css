@@ -6,16 +6,11 @@
   justify-content: space-between;
   margin-top: 12px;
   padding: 16px;
-  background: #f1f3f5;
-  border: 2px solid #e9ecef;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  transition: all 0.3s ease;
 }
 
-.concurrencyContainer:hover {
-  border-color: #667eea;
-  background: #f8f9ff;
-}
 
 .concurrencyInputSection {
   flex-shrink: 0;
@@ -26,20 +21,20 @@
   width: 80px !important;
   text-align: center;
   font-weight: 600;
-  color: #667eea !important;
-  background: white !important;
-  border: 2px solid #dee2e6 !important;
+  color: #495057 !important;
+  background: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 .concurrencyInputSection .form-control:focus {
-  border-color: #667eea !important;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1) !important;
 }
 
 .concurrencyInputSection .form-control:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background: #f8f9fa !important;
+  background: var(--bg-tertiary) !important;
 }
 
 .concurrencySliderSection {
@@ -63,9 +58,8 @@
   appearance: none;
   height: 6px;
   border-radius: 3px;
-  background: #dee2e6;
+  background: var(--border-color);
   outline: none;
-  transition: background 0.3s ease;
 }
 
 .concurrencySlider::-webkit-slider-thumb {
@@ -74,22 +68,17 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #667eea;
+  background: #495057;
   cursor: pointer;
-  transition: background 0.3s ease;
   box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
 }
 
-.concurrencySlider::-webkit-slider-thumb:hover {
-  background: #5a67d8;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
 
 .concurrencySlider::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #667eea;
+  background: #495057;
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
@@ -112,12 +101,12 @@
   min-width: 30px;
   text-align: center;
   font-weight: 700;
-  color: #667eea;
+  color: #495057;
   font-size: clamp(14px, 2.5vw, 18px);
-  background: white;
+  background: var(--bg-input);
   padding: 4px 8px;
   border-radius: 6px;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
@@ -139,7 +128,6 @@
   cursor: pointer;
   font-size: 12px;
   font-weight: 500;
-  transition: all 0.3s ease;
   min-width: 60px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   flex: 1;
@@ -147,12 +135,6 @@
   text-align: center;
 }
 
-.concurrencyPresetBtn:hover:not(:disabled) {
-  background: #667eea;
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
 
 .concurrencyPresetBtn.active {
   background: #667eea;
@@ -163,7 +145,6 @@
 .concurrencyPresetBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none !important;
 }
 
 .active {
@@ -172,48 +153,41 @@
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4) !important;
 }
 
-/* 深色主题 - 修改为 #2A2A2A */
+/* 深色主题 */
 :global(.dark-theme) .concurrencyContainer {
-  background: #2A2A2A;
-  border-color: #3c4269;
+  background: var(--bg-card);
+  border-color: var(--border-color);
 }
 
-:global(.dark-theme) .concurrencyContainer:hover {
-  border-color: #4c63d2;
-  background: #323232;
-}
 
 :global(.dark-theme) .concurrencyInputSection .form-control {
-  background: #1e1e1e !important;
-  color: #4c63d2 !important;
-  border-color: #3c4269 !important;
+  background: var(--bg-input) !important;
+  color: #ffffff !important;
+  border-color: var(--border-color) !important;
 }
 
 :global(.dark-theme) .concurrencyInputSection .form-control:focus {
-  border-color: #4c63d2 !important;
-  box-shadow: 0 0 0 3px rgba(76, 99, 210, 0.1) !important;
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
 }
 
 :global(.dark-theme) .concurrencySlider {
-  background: #3c4269;
+  background: var(--border-color);
 }
 
 :global(.dark-theme) .concurrencySlider::-webkit-slider-thumb {
-  background: #4c63d2;
+  background: #ffffff;
 }
 
-:global(.dark-theme) .concurrencySlider::-webkit-slider-thumb:hover {
-  background: #3c52d2;
-}
 
 :global(.dark-theme) .concurrencySlider::-moz-range-thumb {
-  background: #4c63d2;
+  background: #ffffff;
 }
 
 :global(.dark-theme) .concurrencySliderValue {
-  color: #4c63d2;
-  background: #1e1e1e;
-  border-color: #3c4269;
+  color: #e8eaed;
+  background: var(--bg-input);
+  border-color: var(--border-color);
 }
 
 :global(.dark-theme) .concurrencyPresetBtn {
@@ -223,11 +197,6 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-:global(.dark-theme) .concurrencyPresetBtn:hover:not(:disabled) {
-  background: #4c63d2;
-  color: white;
-  box-shadow: 0 4px 12px rgba(76, 99, 210, 0.3);
-}
 
 :global(.dark-theme) .concurrencyPresetBtn.active {
   background: #4c63d2;

@@ -31,7 +31,6 @@ const ProxySettings = () => {
           onChange={handleProxyChange}
         />
       </div>
-      <small className="form-help">{t('proxyHelp')}</small>
     </div>
   );
 };

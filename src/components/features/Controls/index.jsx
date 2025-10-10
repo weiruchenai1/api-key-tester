@@ -5,6 +5,7 @@ import { useApiTester } from '../../../hooks/useApiTester';
 import { deduplicateAndCleanKeys } from '../../../utils/keyProcessor';
 import { getLogCollector } from '../../../utils/logCollector';
 import { showToast } from '../../../utils/toast.jsx';
+import Button from '../../common/Button';
 
 const Controls = () => {
   const { t } = useLanguage();
@@ -88,9 +89,11 @@ const Controls = () => {
   return (
     <div className="space-y-md">
       <div className="controls-container">
-        <button
-          className={`btn-base btn-fixed-lg ${state.isTesting ? 'btn-danger' : 'btn-primary'} flex items-center gap-xs`}
+        <Button
+          variant={state.isTesting ? 'danger' : 'primary'}
+          size="large"
           onClick={handleStartTest}
+          className="btn-fixed-lg flex items-center gap-xs"
         >
           {state.isTesting ? (
             <>
@@ -108,12 +111,14 @@ const Controls = () => {
               {t('startTest')}
             </>
           )}
-        </button>
+        </Button>
 
-        <button
-          className="btn-base btn-fixed-lg btn-secondary flex items-center gap-xs"
+        <Button
+          variant="secondary"
+          size="large"
           onClick={handleDedupeKeys}
           disabled={state.isTesting}
+          className="btn-fixed-lg flex items-center gap-xs"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="23 4 23 10 17 10" />
@@ -121,19 +126,21 @@ const Controls = () => {
             <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
           </svg>
           {t('dedupeKeys')}
-        </button>
+        </Button>
 
-        <button
-          className="btn-base btn-fixed-lg btn-secondary flex items-center gap-xs"
+        <Button
+          variant="secondary"
+          size="large"
           onClick={handleClear}
           disabled={state.isTesting}
+          className="btn-fixed-lg flex items-center gap-xs"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="3,6 5,6 21,6" />
             <path d="m19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
           </svg>
           {t('clear')}
-        </button>
+        </Button>
       </div>
     </div>
   );

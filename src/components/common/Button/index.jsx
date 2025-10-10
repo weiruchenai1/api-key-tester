@@ -7,6 +7,7 @@ const Button = ({
   onClick,
   disabled = false,
   loading = false,
+  icon,
   className = '',
   ...props
 }) => {
@@ -28,7 +29,11 @@ const Button = ({
       disabled={disabled || loading}
       {...props}
     >
-      {loading && <span className="loading-spinner"></span>}
+      {loading ? (
+        <span className="loading-spinner"></span>
+      ) : icon ? (
+        <span className="mr-2">{icon}</span>
+      ) : null}
       {children}
     </button>
   );

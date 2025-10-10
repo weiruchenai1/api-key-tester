@@ -6,6 +6,7 @@ const PasteButton = () => {
   const { t } = useLanguage();
   const { state, dispatch } = useAppState();
   const [isPasting, setIsPasting] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const handlePaste = async () => {
     if (state.isTesting || isPasting) return;
@@ -36,23 +37,28 @@ const PasteButton = () => {
   };
 
   return (
-    <button
-      className="btn-base btn-sm btn-ghost"
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      onClick={handlePaste}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      title={t('paste')}
       style={{
         position: 'absolute',
         top: '8px',
-        right: '8px',
-        zIndex: 10
+        right: '16px',
+        zIndex: 10,
+        cursor: state.isTesting ? 'not-allowed' : 'pointer',
+        opacity: state.isTesting ? 0.5 : 1,
+        transform: isHovered && !state.isTesting ? 'scale(1.1)' : 'scale(1)',
+        transition: 'transform 0.2s ease, opacity 0.2s ease'
       }}
-      onClick={handlePaste}
-      disabled={state.isTesting}
-      title={t('paste')}
     >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-        <path d="m16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-      </svg>
-    </button>
+      <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"></path>
+    </svg>
   );
 };
 

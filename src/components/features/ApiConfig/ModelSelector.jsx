@@ -120,14 +120,23 @@ const ModelSelector = () => {
 
   return (
     <div className="space-y-sm">
-      <label className="text-sm font-medium text-primary">
-        {t('selectModel')}
-        {state.detectedModels.size > 0 && (
-          <span className="text-xs text-success ml-xs">
-            {' '}({t('detected')} {state.detectedModels.size} {t('models')})
-          </span>
+      <div className="flex items-center gap-md">
+        <label className="text-sm font-medium text-primary">
+          {t('selectModel')}
+          {state.detectedModels.size > 0 && (
+            <span className="text-xs text-success ml-xs">
+              {' '}({t('detected')} {state.detectedModels.size} {t('models')})
+            </span>
+          )}
+        </label>
+
+        {/* 付费检测状态信息 */}
+        {state.apiType === 'gemini' && state.enablePaidDetection && (
+          <small className="form-info enabled text-xs">
+            {t('paidDetectionEnabled')}
+          </small>
         )}
-      </label>
+      </div>
       <div className="flex gap-xs">
         {!isCustomModel ? (
           <select
@@ -175,17 +184,6 @@ const ModelSelector = () => {
           )}
         </button>
       </div>
-
-      <small className="form-help">{t('modelHelp')}</small>
-
-      {/* 付费检测状态信息 */}
-      {state.apiType === 'gemini' && (
-        <div className="paid-detection-status">
-          <small className={`form-info ${state.enablePaidDetection ? 'enabled' : 'disabled'}`}>
-            {state.enablePaidDetection ? t('paidDetectionEnabled') : t('paidDetectionDisabled')}
-          </small>
-        </div>
-      )}
 
       <PaidDetectionPrompt
         isOpen={showPaidDetectionPrompt}

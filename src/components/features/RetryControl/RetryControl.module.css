@@ -6,16 +6,11 @@
   justify-content: space-between;
   margin-top: 12px;
   padding: 16px;
-  background: #fff3cd;
-  border: 2px solid #ffeaa7;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  transition: all 0.3s ease;
 }
 
-.retryContainer:hover {
-  border-color: #f39c12;
-  background: #fef9e7;
-}
 
 .retryInputSection {
   flex-shrink: 0;
@@ -26,20 +21,20 @@
   width: 80px !important;
   text-align: center;
   font-weight: 600;
-  color: #f39c12 !important;
-  background: white !important;
-  border: 2px solid #ffeaa7 !important;
+  color: #495057 !important;
+  background: var(--bg-input) !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 .retryInputSection .form-control:focus {
-  border-color: #f39c12 !important;
-  box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1) !important;
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1) !important;
 }
 
 .retryInputSection .form-control:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  background: #f8f9fa !important;
+  background: var(--bg-tertiary) !important;
 }
 
 .retrySliderSection {
@@ -63,9 +58,8 @@
   appearance: none;
   height: 6px;
   border-radius: 3px;
-  background: #ffeaa7;
+  background: var(--border-color);
   outline: none;
-  transition: background 0.3s ease;
 }
 
 .retrySlider::-webkit-slider-thumb {
@@ -74,22 +68,17 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #f39c12;
+  background: #495057;
   cursor: pointer;
-  transition: background 0.3s ease;
   box-shadow: 0 2px 6px rgba(243, 156, 18, 0.3);
 }
 
-.retrySlider::-webkit-slider-thumb:hover {
-  background: #e67e22;
-  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
-}
 
 .retrySlider::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #f39c12;
+  background: #495057;
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 6px rgba(243, 156, 18, 0.3);
@@ -112,12 +101,12 @@
   min-width: 30px;
   text-align: center;
   font-weight: 700;
-  color: #f39c12;
+  color: #495057;
   font-size: clamp(14px, 2.5vw, 18px);
-  background: white;
+  background: var(--bg-input);
   padding: 4px 8px;
   border-radius: 6px;
-  border: 1px solid #ffeaa7;
+  border: 1px solid var(--border-color);
   flex-shrink: 0;
 }
 
@@ -139,7 +128,6 @@
   cursor: pointer;
   font-size: 12px;
   font-weight: 500;
-  transition: all 0.3s ease;
   min-width: 60px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   flex: 1;
@@ -147,15 +135,9 @@
   text-align: center;
 }
 
-.retryPresetBtn:hover:not(:disabled) {
-  background: #f39c12;
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
-}
 
 .retryPresetBtn.active {
-  background: #f39c12;
+  background: #e8eaed;
   color: white;
   box-shadow: 0 4px 12px rgba(243, 156, 18, 0.4);
 }
@@ -163,51 +145,43 @@
 .retryPresetBtn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-  transform: none !important;
 }
 
-/* 深色主题 - 修改为 #2A2A2A */
+/* 深色主题 */
 :global(.dark-theme) .retryContainer {
-  background: #2A2A2A;
-  border-color: #5d4e23;
+  background: var(--bg-card);
+  border-color: var(--border-color);
 }
 
-:global(.dark-theme) .retryContainer:hover {
-  border-color: #d68910;
-  background: #323232;
-}
 
 :global(.dark-theme) .retryInputSection .form-control {
-  background: #1e1e1e !important;
-  color: #d68910 !important;
-  border-color: #5d4e23 !important;
+  background: var(--bg-input) !important;
+  color: #ffffff !important;
+  border-color: var(--border-color) !important;
 }
 
 :global(.dark-theme) .retryInputSection .form-control:focus {
-  border-color: #d68910 !important;
-  box-shadow: 0 0 0 3px rgba(214, 137, 16, 0.1) !important;
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1) !important;
 }
 
 :global(.dark-theme) .retrySlider {
-  background: #5d4e23;
+  background: var(--border-color);
 }
 
 :global(.dark-theme) .retrySlider::-webkit-slider-thumb {
-  background: #d68910;
+  background: #e8eaed;
 }
 
-:global(.dark-theme) .retrySlider::-webkit-slider-thumb:hover {
-  background: #b7791f;
-}
 
 :global(.dark-theme) .retrySlider::-moz-range-thumb {
-  background: #d68910;
+  background: #e8eaed;
 }
 
 :global(.dark-theme) .retrySliderValue {
-  color: #d68910;
-  background: #1e1e1e;
-  border-color: #5d4e23;
+  color: #e8eaed;
+  background: var(--bg-input);
+  border-color: var(--border-color);
 }
 
 :global(.dark-theme) .retryPresetBtn {
@@ -217,14 +191,9 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-:global(.dark-theme) .retryPresetBtn:hover:not(:disabled) {
-  background: #d68910;
-  color: white;
-  box-shadow: 0 4px 12px rgba(214, 137, 16, 0.3);
-}
 
 :global(.dark-theme) .retryPresetBtn.active {
-  background: #d68910;
+  background: #e8eaed;
   color: white;
   box-shadow: 0 4px 12px rgba(214, 137, 16, 0.4);
 }

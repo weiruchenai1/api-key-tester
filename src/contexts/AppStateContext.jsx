@@ -108,6 +108,9 @@ const getInitialState = () => {
       // Gemini付费检测 - 从localStorage获取
       enablePaidDetection: localStorage.getItem('enablePaidDetection') ? JSON.parse(localStorage.getItem('enablePaidDetection')) : false,
 
+      // 日志显示控制 - 从localStorage获取，默认关闭
+      showDetailedLogs: localStorage.getItem('showDetailedLogs') ? JSON.parse(localStorage.getItem('showDetailedLogs')) : false,
+
       // 测试状态
       isTesting: false,
       detectedModels: new Set(),
@@ -130,6 +133,7 @@ const getInitialState = () => {
       activeLogKey: null,
       isLogModalOpen: false,
       enablePaidDetection: false,
+      showDetailedLogs: false,
       isTesting: false,
       keyResults: [],
       showResults: false,
@@ -199,6 +203,12 @@ const appReducer = (state, action) => {
         enablePaidDetection: action.payload,
         // 当启用付费检测时，自动切换到gemini-2.5-flash
         model: action.payload ? 'gemini-2.5-flash' : state.model
+      };
+
+    case 'SET_SHOW_DETAILED_LOGS':
+      return {
+        ...state,
+        showDetailedLogs: action.payload
       };
 
     case 'START_TESTING':
@@ -406,11 +416,12 @@ export const AppStateProvider = ({ children }) => {
       localStorage.setItem('concurrency', JSON.stringify(state.concurrency));
       localStorage.setItem('maxRetries', JSON.stringify(state.retryCount));
       localStorage.setItem('enablePaidDetection', JSON.stringify(state.enablePaidDetection));
+      localStorage.setItem('showDetailedLogs', JSON.stringify(state.showDetailedLogs));
       localStorage.setItem('hasSeenLogTooltip', JSON.stringify(state.hasSeenLogTooltip));
     } catch (error) {
       console.warn('保存全局配置到本地存储失败:', error);
     }
-  }, [state.apiType, state.concurrency, state.retryCount, state.enablePaidDetection, state.hasSeenLogTooltip]);
+  }, [state.apiType, state.concurrency, state.retryCount, state.enablePaidDetection, state.showDetailedLogs, state.hasSeenLogTooltip]);
 
   // 监听API状态变化并防抖保存（避免频繁保存，如输入时的每个字符变化）
   useEffect(() => {
@@ -478,7 +489,7 @@ export const AppStateProvider = ({ children }) => {
       const collector = getLogCollector();
       if (collector) {
         if (typeof collector.setEnabled === 'function') {
-          collector.setEnabled(true);
+          collector.setEnabled(state.showDetailedLogs);
         }
         if (typeof collector.hydrateLogs === 'function' && (stateRef.current.logs || []).length > 0) {
           collector.hydrateLogs(stateRef.current.logs || []);
@@ -488,7 +499,14 @@ export const AppStateProvider = ({ children }) => {
     } catch (error) {
       // 安静失败，不影响主要功能
     }
-  }, [dispatch]);
+  }, [dispatch, state.showDetailedLogs]);
+
+  // 监听日志开关状态变化，关闭时清空日志
+  useEffect(() => {
+    if (!state.showDetailedLogs && (state.logs || []).length > 0) {
+      dispatch({ type: 'CLEAR_LOGS' });
+    }
+  }, [state.showDetailedLogs, dispatch]);
 
   const value = {
     state,
