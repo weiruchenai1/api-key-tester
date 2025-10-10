@@ -3,24 +3,14 @@
   "selectModel": "Test Model",
   "customModel": "Custom",
   "presetModel": "Preset",
-  "modelHelp": "Choose preset model or enter custom model name",
   "modelInputPlaceholder": "Enter custom model name",
   "detectedModelsTitle": "Detected Models",
   "detecting": "Detecting...",
   "detected": "Detected",
   "proxyUrl": "Proxy Server URL (Optional)",
-  "proxyHelp": "Leave empty to use default proxy",
   "concurrencyControl": "Concurrency Control",
   "retryControl": "Retry Control",
   "retryHelp": "Number of retries when encountering temporary errors (like 403), helps improve detection accuracy",
-  "slow": "Slow",
-  "normal": "Normal",
-  "fast": "Fast",
-  "ultra": "Ultra",
-  "noRetry": "No Retry",
-  "lightRetry": "Light",
-  "normalRetry": "Normal",
-  "heavyRetry": "Heavy",
   "apiKeys": "API Key List (one per line)",
   "apiKeysPlaceholder": "Enter API keys, one per line:\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n...",
   "import": "Import",
@@ -213,5 +203,7 @@
     "email": "Email",
     "fetchFailed": "Query Failed",
     "clickToRefresh": "Click refresh button to query balance information"
-  }
+  },
+  "showDetailedLogs": "Show Detailed Logs",
+  "showDetailedLogsDescription": "Control whether to show detailed API call logs"
 }

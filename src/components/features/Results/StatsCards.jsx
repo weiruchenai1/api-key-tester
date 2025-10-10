@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
+import StatCard from '../../common/StatCard';
 
 const StatsCards = () => {
   const { t } = useLanguage();
@@ -61,37 +62,33 @@ const StatsCards = () => {
     }
   ];
 
-  // 修复显示条件：只要开始过测试就一直显示（包括测试完成后）
-  const shouldShowTestingStats = state.showResults;
+  // 始终显示测试状态，即使在空状态下也显示（值为0）
+  const shouldShowTestingStats = true;
 
   return (
     <div className="stats-container">
-      {/* 第一行：主要统计（包含付费密钥） */}
+      {/* 第一行：主要统计（包含付费密钥） - 始终显示 */}
       <div className={`stats ${!hasPaidDetection ? 'no-paid-detection' : ''}`}>
         {mainStats.map(stat => (
-          <div key={stat.key} className="stat-card">
-            <div className={`stat-number ${stat.className}`}>
-              {stat.value}
-            </div>
-            <div className="stat-label">
-              {t(stat.key)}
-            </div>
-          </div>
+          <StatCard
+            key={stat.key}
+            value={stat.value}
+            label={t(stat.key)}
+            variant={stat.className}
+          />
         ))}
       </div>
 
-      {/* 第二行：测试状态（测试开始后一直显示） */}
+      {/* 第二行：测试状态 - 始终显示 */}
       {shouldShowTestingStats && (
         <div className="stats testing-stats">
           {testingStats.map(stat => (
-            <div key={stat.key} className="stat-card">
-              <div className={`stat-number ${stat.className}`}>
-                {stat.value}
-              </div>
-              <div className="stat-label">
-                {t(stat.key)}
-              </div>
-            </div>
+            <StatCard
+              key={stat.key}
+              value={stat.value}
+              label={t(stat.key)}
+              variant={stat.className}
+            />
           ))}
         </div>
       )}

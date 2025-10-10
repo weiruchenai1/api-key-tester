@@ -19,19 +19,8 @@
   max-width: 480px;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  animation: modalSlideIn 0.3s ease-out;
 }
 
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
 
 .header {
   display: flex;
@@ -57,13 +46,8 @@
   color: #6B7280;
   padding: 4px;
   border-radius: 6px;
-  transition: all 0.2s ease;
 }
 
-.closeBtn:hover {
-  background: #E5E7EB;
-  color: #374151;
-}
 
 .content {
   padding: 24px;
@@ -134,7 +118,6 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
   border: 1px solid;
 }
 
@@ -144,11 +127,6 @@
   border-color: #D1D5DB;
 }
 
-.cancelBtn:hover {
-  background: #F9FAFB;
-  color: #374151;
-  border-color: #9CA3AF;
-}
 
 .confirmBtn {
   background: var(--color-primary);
@@ -156,15 +134,7 @@
   border-color: var(--color-primary);
 }
 
-.confirmBtn:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
-  transform: translateY(-1px);
-}
 
-.confirmBtn:active {
-  transform: translateY(0);
-}
 
 /* 暗色主题 */
 :global(.dark-theme) .modal {
@@ -186,10 +156,6 @@
   color: var(--text-secondary);
 }
 
-:global(.dark-theme) .closeBtn:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
 
 :global(.dark-theme) .description {
   color: var(--text-secondary);
@@ -215,18 +181,9 @@
   border-color: var(--border-color);
 }
 
-:global(.dark-theme) .cancelBtn:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-  border-color: var(--text-tertiary);
-}
 
 :global(.dark-theme) .confirmBtn {
   background: var(--color-primary);
   border-color: var(--color-primary);
 }
 
-:global(.dark-theme) .confirmBtn:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
-}

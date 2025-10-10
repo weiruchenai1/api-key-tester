@@ -1,14 +1,16 @@
-import React, { useMemo, useRef, useEffect } from 'react';
+import React, { useMemo, useRef, useEffect, useState } from 'react';
 import { VariableSizeList as List } from 'react-window';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useVirtualization } from '../../../hooks/useVirtualization';
 import KeyBalanceDisplay from '../BalanceDisplay/KeyBalanceDisplay';
+import StatusBadge from '../../common/StatusBadge';
 
 const KeyItem = ({ index, style, data }) => {
   const { t } = useLanguage();
   const { state, dispatch } = useAppState();
   const keyData = data[index];
+  const [isKeyVisible, setIsKeyVisible] = useState(false);
 
   if (!keyData) {
     return <div style={style} className="key-item loading-item">{t('ui.loading')}</div>;
@@ -22,7 +24,7 @@ const KeyItem = ({ index, style, data }) => {
       case 'rate-limited': return 'status-rate-limited';
       case 'retrying': return 'status-retrying';
       case 'testing': return 'status-testing';
-      default: return 'status-testing';
+      default: return 'status-unknown';
     }
   };
 
@@ -67,6 +69,26 @@ const KeyItem = ({ index, style, data }) => {
       return `${t('keyStatus.paidKey')} (${keyData.cacheApiStatus || 200})`;
     }
 
+    // 如果是无效密钥
+    if (keyData.status === 'invalid') {
+      return `${t('statusInvalid') || '无效密钥'} (${keyData.statusCode || 400})`;
+    }
+
+    // 如果是速率限制
+    if (keyData.status === 'rate-limited') {
+      return `${t('statusRateLimit') || '速率限制'} (${keyData.statusCode || 429})`;
+    }
+
+    // 如果是测试中
+    if (keyData.status === 'testing') {
+      return `${t('statusTesting') || '测试中'}`;
+    }
+
+    // 如果是重试中
+    if (keyData.status === 'retrying') {
+      return `${t('statusRetrying') || '重试中'} (${keyData.retryCount || 0})`;
+    }
+
     // 其他情况返回null，不显示额外信息
     return null;
   };
@@ -82,47 +104,133 @@ const KeyItem = ({ index, style, data }) => {
     }
   };
 
+  // 格式化密钥显示 - 参考 new-api 的遮罩规则
+  const formatKey = (key, isVisible) => {
+    if (isVisible) {
+      // 显示完整密钥
+      return key;
+    } else {
+      // 显示遮罩版本：前4位 + 10个星号 + 后4位
+      if (key.length <= 8) return key;
+      return key.substring(0, 4) + '**********' + key.substring(key.length - 4);
+    }
+  };
+
+  // 回退的复制方法（用于不支持 Clipboard API 的浏览器）
+  const fallbackCopy = (text) => {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.setAttribute('readonly', '');
+    Object.assign(textArea.style, {
+      position: 'fixed',
+      top: '-9999px',
+      left: '-9999px'
+    });
+    document.body.appendChild(textArea);
+    textArea.select();
+    textArea.setSelectionRange(0, text.length);
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      console.error('复制失败:', err);
+    } finally {
+      document.body.removeChild(textArea);
+    }
+  };
+
+  // 复制密钥到剪贴板
+  const handleCopyKey = (e) => {
+    e.stopPropagation();
+
+    const text = keyData.key;
+    // 优先使用现代 Clipboard API，如果不支持则回退到 execCommand
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {
+        // 如果 Clipboard API 失败（如权限问题），使用回退方案
+        fallbackCopy(text);
+      });
+    } else {
+      // 浏览器不支持 Clipboard API，使用回退方案
+      fallbackCopy(text);
+    }
+  };
+
+  // 切换密钥显示/隐藏
+  const handleToggleKeyVisibility = (e) => {
+    e.stopPropagation();
+    setIsKeyVisible(!isKeyVisible);
+  };
+
   return (
     <div style={style} className="key-item-wrapper">
-      <div
-        className="key-item"
-        role="button"
-        tabIndex={0}
-        onClick={handleOpenLogs}
-        onKeyDown={handleKeyDown}
-      >
-        <div className="key-content">
-          <div className="key-text">{keyData.key}</div>
-          {keyData.model && (
-            <div className="key-model">{t('keyStatus.model')}: {keyData.model}</div>
-          )}
-          {keyData.error && (
-            <div className={`key-error ${keyData.status === 'rate-limited' ? 'rate-limited-error' : ''}`}>
-              {getLocalizedError(keyData.error)}
-            </div>
-          )}
-          {keyData.retryCount > 0 && (
-            <div className="key-retry">
-              {t('ui.retry')}: {keyData.retryCount}
-            </div>
-          )}
-          {/* 修复后的状态信息显示 */}
-          {getKeyStatusInfo() && (
-            <div className="key-valid-info">
-              {getKeyStatusInfo()}
-            </div>
-          )}
-          {/* 余额显示 - 只在有效的siliconcloud key时显示 */}
-          {(keyData.status === 'valid' || keyData.status === 'paid') && state.apiType === 'siliconcloud' && (
-            <KeyBalanceDisplay 
-              apiKey={keyData.key}
-              apiType={state.apiType}
-              proxyUrl={state.proxyUrl}
-            />
-          )}
+      <div className={`key-item-horizontal ${getStatusClass(keyData.status)}`}>
+        {/* 左侧：状态指示器 */}
+        <div className="key-status-indicator">
+          <span className="key-status-text">{getStatusText(keyData.status)}</span>
         </div>
-        <div className={`key-status ${getStatusClass(keyData.status)}`}>
-          {getStatusText(keyData.status)}
+
+        {/* 中间：密钥显示区域 - 完全参考 new-api 的 Input 组件设计 */}
+        <div className="key-display-container">
+          {/* 模拟 Semi Design Input 组件的结构 */}
+          <div className="semi-input-wrapper semi-input-wrapper-small">
+            {/* 可滚动的密钥显示容器 */}
+            <div className="semi-input-scrollable">
+              <span className="semi-input-text">{formatKey(keyData.key, isKeyVisible)}</span>
+            </div>
+
+            {/* Suffix 区域 - 操作按钮 */}
+            <div className="semi-input-suffix">
+              <button
+                className="semi-button semi-button-borderless semi-button-small semi-button-tertiary"
+                onClick={handleToggleKeyVisibility}
+                aria-label={isKeyVisible ? "Hide key" : "Show key"}
+                title={isKeyVisible ? t('hideKey') || "隐藏密钥" : t('showKey') || "显示密钥"}
+              >
+                {isKeyVisible ? (
+                  // IconEyeClosed - 睁眼
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                  </svg>
+                ) : (
+                  // IconEyeOpened - 闭眼
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+                  </svg>
+                )}
+              </button>
+              <button
+                className="semi-button semi-button-borderless semi-button-small semi-button-tertiary"
+                onClick={handleCopyKey}
+                aria-label="Copy key"
+                title={t('copyKey') || "复制密钥"}
+              >
+                {/* IconCopy */}
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* 状态信息和余额显示 - 点击打开日志 */}
+          <button
+            className="key-info-row key-info-clickable"
+            onClick={handleOpenLogs}
+            onKeyDown={handleKeyDown}
+            aria-label={t('openLogs') || 'Open logs for this key'}
+          >
+            {getKeyStatusInfo() && (
+              <span className="key-status-info">{getKeyStatusInfo()}</span>
+            )}
+            {/* 余额显示 */}
+            {(keyData.status === 'valid' || keyData.status === 'paid') && state.apiType === 'siliconcloud' && (
+              <KeyBalanceDisplay
+                apiKey={keyData.key}
+                apiType={state.apiType}
+                proxyUrl={state.proxyUrl}
+              />
+            )}
+          </button>
         </div>
       </div>
     </div>
@@ -164,8 +272,8 @@ const VirtualizedList = () => {
   const listHeight = 350;
 
   // 创建一个函数来获取每个项目的高度
-  const getItemSize = (index) => {
-    return getItemHeight(filteredKeys[index], state.apiType);
+  const getItemSize = () => {
+    return getItemHeight();
   };
 
   // 当数据变化时重置虚拟化缓存

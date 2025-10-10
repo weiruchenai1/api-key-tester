@@ -3,24 +3,14 @@
   "selectModel": "测试模型",
   "customModel": "自定义",
   "presetModel": "预设",
-  "modelHelp": "可以选择预设模型或输入自定义模型名",
   "modelInputPlaceholder": "输入自定义模型名",
   "detectedModelsTitle": "检测到的模型",
   "detecting": "检测中",
   "detected": "检测到",
   "proxyUrl": "代理服务器 URL (可选)",
-  "proxyHelp": "留空使用默认代理",
   "concurrencyControl": "并发控制",
   "retryControl": "重试控制",
   "retryHelp": "遇到临时错误(如403)时重试次数，有助于提高检测准确性",
-  "slow": "慢速",
-  "normal": "正常",
-  "fast": "快速",
-  "ultra": "极速",
-  "noRetry": "不重试",
-  "lightRetry": "轻度",
-  "normalRetry": "正常",
-  "heavyRetry": "重度",
   "apiKeys": "API 密钥列表 (每行一个)",
   "apiKeysPlaceholder": "请输入API密钥，每行一个：\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\nsk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\n...",
   "import": "导入",
@@ -213,5 +203,7 @@
     "email": "邮箱",
     "fetchFailed": "查询失败",
     "clickToRefresh": "点击刷新按钮查询余额信息"
-  }
+  },
+  "showDetailedLogs": "显示详细日志",
+  "showDetailedLogsDescription": "控制是否显示API调用的详细日志信息"
 }

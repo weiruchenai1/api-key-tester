@@ -2,6 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { useLanguage } from '../../../hooks/useLanguage';
 import { getLogEntryByKey } from '../../../utils/logStorage';
+import Modal from '../../common/Modal';
+import Card from '../../common/Card';
+import EmptyState from '../../common/EmptyState';
 
 const formatTimestamp = (timestamp) => {
   if (!timestamp) return '';
@@ -109,7 +112,7 @@ const KeyLogModal = () => {
   const [persistedLog, setPersistedLog] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const isOpen = state.isLogModalOpen;
+  const isOpen = state.isLogModalOpen && state.showDetailedLogs;
   const activeKey = state.activeLogKey;
   const stateLogEntry = useMemo(() => {
     if (!activeKey) return null;
@@ -174,123 +177,109 @@ const KeyLogModal = () => {
   const metadata = (logEntry && logEntry.metadata) || {};
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style={{ zIndex: 10000 }} onClick={handleClose}>
-      <div className="card-base log-modal-content max-w-2xl m-md" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between p-lg border-b">
-          <div>
-            <h3 className="text-lg font-semibold text-primary">{t('logViewer.title') || '日志详情'}</h3>
-            <div className="text-secondary text-sm font-mono break-all">{activeKey}</div>
-          </div>
-          <button
-            className="btn-base btn-ghost btn-sm w-8 h-8 flex items-center justify-center"
-            onClick={handleClose}
-            aria-label={t('close') || '关闭'}
-          >
-            ×
-          </button>
-        </div>
-
-        <div className="log-modal-body p-lg space-y-lg">
-          {isLoading ? (
-            <div className="empty-state">
-              <div className="empty-state-text">{t('loading') || '加载中...'}</div>
-            </div>
-          ) : logEntry ? (
-            <>
-              <div className="grid gap-md grid-cols-1 md:grid-cols-2">
-                <div className="card-base card-padding">
-                  <div className="text-sm text-secondary mb-xs">{t('logViewer.summary.status') || '最终状态'}</div>
-                  <div className="text-base font-semibold">{statusLabel(finalStatus, t) || '-'}</div>
-                  {logEntry.totalDurationMs ? (
-                    <div className="text-xs text-secondary mt-xs">
-                      {(t('logViewer.summary.duration') || '总耗时') + ': ' + formatDuration(logEntry.totalDurationMs)}
-                    </div>
-                  ) : null}
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={
+        <>
+          <div className="text-lg font-semibold text-primary">{t('logViewer.title') || '日志详情'}</div>
+          <div className="text-secondary text-sm font-mono break-all">{activeKey}</div>
+        </>
+      }
+      maxWidth="max-w-2xl"
+      className="log-modal-content"
+    >
+      <div className="log-modal-body p-lg space-y-lg">
+        {isLoading ? (
+          <EmptyState message={t('loading') || '加载中...'} />
+        ) : logEntry ? (
+          <>
+            <div className="grid gap-md grid-cols-1 md:grid-cols-2">
+              <Card variant="base" padding="md">
+                <div className="text-sm text-secondary mb-xs">{t('logViewer.summary.status') || '最终状态'}</div>
+                <div className="text-base font-semibold">{statusLabel(finalStatus, t) || '-'}</div>
+                {logEntry.totalDurationMs ? (
                   <div className="text-xs text-secondary mt-xs">
-                    {(t('logViewer.summary.attempts') || '尝试次数') + ': ' + (logEntry.attempts || events.length || 0)}
+                    {(t('logViewer.summary.duration') || '总耗时') + ': ' + formatDuration(logEntry.totalDurationMs)}
                   </div>
-                  {logEntry.lastError && logEntry.lastError.message ? (
-                    <div className="text-xs text-error mt-xs">{logEntry.lastError.message}</div>
-                  ) : null}
+                ) : null}
+                <div className="text-xs text-secondary mt-xs">
+                  {(t('logViewer.summary.attempts') || '尝试次数') + ': ' + (logEntry.attempts || events.length || 0)}
                 </div>
+                {logEntry.lastError && logEntry.lastError.message ? (
+                  <div className="text-xs text-error mt-xs">{logEntry.lastError.message}</div>
+                ) : null}
+              </Card>
 
-                <div className="card-base card-padding">
-                  <div className="text-sm text-secondary mb-xs">{t('logViewer.summary.context') || '上下文'}</div>
-                  <div className="text-xs text-secondary">
-                    {(t('selectApi') || '选择 API 类型') + ': ' + (logEntry.apiType || '-')}
-                  </div>
-                  <div className="text-xs text-secondary">
-                    {(t('selectModel') || '测试模型') + ': ' + (logEntry.model || '-')}
-                  </div>
-                  {metadata.proxyUrl ? (
-                    <div className="text-xs text-secondary">Proxy: {metadata.proxyUrl}</div>
-                  ) : null}
+              <Card variant="base" padding="md">
+                <div className="text-sm text-secondary mb-xs">{t('logViewer.summary.context') || '上下文'}</div>
+                <div className="text-xs text-secondary">
+                  {(t('selectApi') || '选择 API 类型') + ': ' + (logEntry.apiType || '-')}
+                </div>
+                <div className="flex items-center gap-md text-xs text-secondary">
+                  <span>{(t('selectModel') || '测试模型') + ': ' + (logEntry.model || '-')}</span>
                   {metadata.enablePaidDetection ? (
-                    <div className="text-xs text-secondary">{t('paidDetectionEnabled') || '已开启付费检测'}</div>
+                    <span>{t('paidDetectionEnabled') || '已开启付费检测'}</span>
                   ) : null}
                 </div>
-              </div>
-
-              <div className="space-y-md">
-                {events.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="empty-state-text">{t('logViewer.noEvents') || '暂无事件记录'}</div>
-                  </div>
-                ) : (
-                  events.map((event) => (
-                    <div key={event.id || event.timestamp} className="card-base card-padding">
-                      <div className="flex items-center justify-between mb-sm">
-                        <div>
-                          <div className="text-sm font-semibold text-primary">{stageLabel(event.stage, t)}</div>
-                          <div className="text-xs text-secondary">{formatTimestamp(event.timestamp)}</div>
-                        </div>
-                        <div className="text-xs text-secondary text-right">
-                          {event.attempt ? (t('logViewer.attempt') || '尝试') + ' #' + event.attempt : null}
-                          {event.durationMs != null ? <div>{(t('logViewer.duration') || '耗时') + ': ' + formatDuration(event.durationMs)}</div> : null}
-                          {event.status ? <div>{statusLabel(event.status, t)}</div> : null}
-                        </div>
-                      </div>
-
-                      {event.message ? (
-                        <div className="text-sm text-secondary mb-sm whitespace-pre-wrap">{event.message}</div>
-                      ) : null}
-
-                      {event.error ? (
-                        <div className="text-sm text-error mb-sm whitespace-pre-wrap">
-                          {typeof event.error === 'string' ? event.error : stringify(event.error)}
-                        </div>
-                      ) : null}
-
-                      {event.request ? (
-                        <details className="mb-sm">
-                          <summary className="text-sm font-semibold cursor-pointer">{t('logViewer.request') || '请求'}</summary>
-                          <pre className="bg-surface mt-xs p-sm rounded text-xs overflow-x-auto whitespace-pre-wrap">{stringify(event.request)}</pre>
-                        </details>
-                      ) : null}
-
-                      {event.response ? (
-                        <details>
-                          <summary className="text-sm font-semibold cursor-pointer">{t('logViewer.response') || '响应'}</summary>
-                          <pre className="bg-surface mt-xs p-sm rounded text-xs overflow-x-auto whitespace-pre-wrap">{stringify(event.response)}</pre>
-                        </details>
-                      ) : null}
-                    </div>
-                  ))
-                )}
-              </div>
-            </>
-          ) : (
-            <div className="empty-state">
-              <div className="empty-state-text">{t('logViewer.noData') || '暂无日志数据'}</div>
+                {metadata.proxyUrl ? (
+                  <div className="text-xs text-secondary">Proxy: {metadata.proxyUrl}</div>
+                ) : null}
+              </Card>
             </div>
-          )}
-        </div>
+
+            <div className="space-y-md">
+              {events.length === 0 ? (
+                <EmptyState message={t('logViewer.noEvents') || '暂无事件记录'} />
+              ) : (
+                events.map((event) => (
+                  <Card key={event.id || event.timestamp} variant="base" padding="md">
+                    <div className="flex items-center justify-between mb-sm">
+                      <div>
+                        <div className="text-sm font-semibold text-primary">{stageLabel(event.stage, t)}</div>
+                        <div className="text-xs text-secondary">{formatTimestamp(event.timestamp)}</div>
+                      </div>
+                      <div className="text-xs text-secondary text-right">
+                        {event.attempt ? (t('logViewer.attempt') || '尝试') + ' #' + event.attempt : null}
+                        {event.durationMs != null ? <div>{(t('logViewer.duration') || '耗时') + ': ' + formatDuration(event.durationMs)}</div> : null}
+                        {event.status ? <div>{statusLabel(event.status, t)}</div> : null}
+                      </div>
+                    </div>
+
+                    {event.message ? (
+                      <div className="text-sm text-secondary mb-sm whitespace-pre-wrap">{event.message}</div>
+                    ) : null}
+
+                    {event.error ? (
+                      <div className="text-sm text-error mb-sm whitespace-pre-wrap">
+                        {typeof event.error === 'string' ? event.error : stringify(event.error)}
+                      </div>
+                    ) : null}
+
+                    {event.request ? (
+                      <details className="mb-sm">
+                        <summary className="text-sm font-semibold cursor-pointer">{t('logViewer.request') || '请求'}</summary>
+                        <pre className="bg-surface mt-xs p-sm rounded text-xs overflow-x-auto whitespace-pre-wrap">{stringify(event.request)}</pre>
+                      </details>
+                    ) : null}
+
+                    {event.response ? (
+                      <details>
+                        <summary className="text-sm font-semibold cursor-pointer">{t('logViewer.response') || '响应'}</summary>
+                        <pre className="bg-surface mt-xs p-sm rounded text-xs overflow-x-auto whitespace-pre-wrap">{stringify(event.response)}</pre>
+                      </details>
+                    ) : null}
+                  </Card>
+                ))
+              )}
+            </div>
+          </>
+        ) : (
+          <EmptyState message={t('logViewer.noData') || '暂无日志数据'} />
+        )}
       </div>
-    </div>
+    </Modal>
   );
 };
 
 export default KeyLogModal;
-
-
-

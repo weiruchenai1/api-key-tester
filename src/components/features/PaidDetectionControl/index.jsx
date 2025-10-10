@@ -3,6 +3,8 @@ import { useLanguage } from '../../../hooks/useLanguage';
 import { useAppState } from '../../../contexts/AppStateContext';
 import { PAID_DETECTION_KEYS } from '../../../constants/localStorage';
 import Modal from '../../common/Modal';
+import Button from '../../common/Button';
+import Card from '../../common/Card';
 
 const PaidDetectionControl = () => {
   const { t } = useLanguage();
@@ -47,6 +49,7 @@ const PaidDetectionControl = () => {
                 type="checkbox"
                 checked={state.enablePaidDetection}
                 onChange={handleTogglePaidDetection}
+                disabled={state.isTesting}
                 className="switch-input"
               />
               <span className="switch-slider"></span>
@@ -67,12 +70,14 @@ const PaidDetectionControl = () => {
           {t('paidDetectionSettings.popupSettings')}
         </label>
         <div className="space-y-sm">
-          <button
-            className="btn-base btn-sm btn-ghost"
+          <Button
+            variant="ghost"
+            size="small"
             onClick={handleResetPrompt}
+            disabled={state.isTesting}
           >
             {t('paidDetectionSettings.resetPopup')}
-          </button>
+          </Button>
           <p className="text-xs text-tertiary">
             {t('paidDetectionSettings.resetDescription')}
           </p>
@@ -81,7 +86,7 @@ const PaidDetectionControl = () => {
 
       {/* 当前状态显示 */}
       {state.apiType === 'gemini' && (
-        <div className="card-base card-padding-sm bg-secondary">
+        <Card variant="base" padding="sm" className="bg-secondary">
           <div className="flex items-center justify-between mb-xs">
             <span className="text-xs text-tertiary">{t('paidDetectionSettings.currentApiType')}:</span>
             <span className="text-xs font-medium text-primary">Gemini</span>
@@ -113,7 +118,7 @@ const PaidDetectionControl = () => {
               <span className="text-xs font-medium text-primary">gemini-2.5-flash</span>
             </div>
           )}
-        </div>
+        </Card>
       )}
 
       <Modal
@@ -124,6 +129,7 @@ const PaidDetectionControl = () => {
         message={t('paidDetectionSettings.resetModalMessage')}
         confirmText={t('paidDetectionSettings.confirm')}
         cancelText={t('paidDetectionSettings.cancel')}
+        type="confirm"
       />
     </div>
   );

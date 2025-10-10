@@ -1,17 +1,26 @@
 import React, { useEffect } from 'react';
+import Card from '../Card';
+import IconButton from '../IconButton';
 import Button from '../Button';
 import { useLanguage } from '../../../hooks/useLanguage';
-import './Modal.module.css';
 
 const Modal = ({
-  isOpen,
+  isOpen = false,
   onClose,
   onConfirm,
   title,
   message,
-  type = 'confirm',
+  children,
+  type = 'custom',
   confirmText,
-  cancelText
+  cancelText,
+  maxWidth = 'max-w-2xl',
+  padding = 'none',
+  showCloseButton = true,
+  closeOnOverlayClick = true,
+  className = '',
+  zIndex = 10000,
+  ...props
 }) => {
   const { t } = useLanguage();
 
@@ -30,7 +39,7 @@ const Modal = ({
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape' && isOpen) {
-        onClose();
+        onClose?.();
       }
     };
 
@@ -41,45 +50,86 @@ const Modal = ({
   if (!isOpen) return null;
 
   const handleOverlayClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
+    if (closeOnOverlayClick && e.target === e.currentTarget) {
+      onClose?.();
     }
   };
 
+  const isConfirmModal = type === 'confirm' || type === 'alert';
+
   return (
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-content">
-        {title && <div className="modal-header">{title}</div>}
-        <div className="modal-body">
-          {message}
-        </div>
-        <div className="modal-footer">
-          {type === 'confirm' && (
-            <>
-              <Button
-                variant="secondary"
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" 
+      style={{ zIndex }}
+      onClick={handleOverlayClick}
+    >
+      <Card 
+        variant="base" 
+        padding={padding}
+        className={`log-modal-content ${maxWidth} m-md ${className}`} 
+        onClick={(e) => e.stopPropagation()}
+        {...props}
+      >
+        {(title || showCloseButton) && (
+          <div className="flex items-center justify-between p-lg border-b">
+            {title && (
+              <div className="flex-1">
+                {typeof title === 'string' ? (
+                  <h3 className="text-lg font-semibold text-primary">{title}</h3>
+                ) : (
+                  title
+                )}
+              </div>
+            )}
+            {showCloseButton && (
+              <IconButton
+                icon="×"
                 onClick={onClose}
-              >
-                {cancelText || t('cancel')}
-              </Button>
-              <Button
-                variant="primary"
-                onClick={onConfirm}
-              >
-                {confirmText || t('confirm')}
-              </Button>
-            </>
-          )}
-          {type === 'alert' && (
-            <Button
-              variant="primary"
-              onClick={onClose}
-            >
-              {confirmText || t('ok')}
-            </Button>
-          )}
-        </div>
-      </div>
+                variant="ghost"
+                size="small"
+                className="w-8 h-8 flex items-center justify-center"
+                aria-label={t('close') || '关闭'}
+              />
+            )}
+          </div>
+        )}
+        
+        {isConfirmModal ? (
+          <>
+            <div className="p-lg">
+              {message}
+            </div>
+            <div className="flex justify-end gap-sm p-lg border-t">
+              {type === 'confirm' && (
+                <>
+                  <Button
+                    variant="secondary"
+                    onClick={onClose}
+                  >
+                    {cancelText || t('cancel')}
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={onConfirm}
+                  >
+                    {confirmText || t('confirm')}
+                  </Button>
+                </>
+              )}
+              {type === 'alert' && (
+                <Button
+                  variant="primary"
+                  onClick={onClose}
+                >
+                  {confirmText || t('ok')}
+                </Button>
+              )}
+            </div>
+          </>
+        ) : (
+          children
+        )}
+      </Card>
     </div>
   );
 };

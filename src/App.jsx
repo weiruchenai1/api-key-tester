@@ -9,6 +9,7 @@ import Controls from './components/features/Controls';
 import Results from './components/features/Results';
 import AdvancedSettings from './components/features/AdvancedSettings';
 import ToastProvider from './components/common/ToastProvider';
+import Card from './components/common/Card';
 import { useLanguage } from './hooks/useLanguage';
 
 const AppContent = () => {
@@ -17,17 +18,17 @@ const AppContent = () => {
 
   const leftPanel = (
     <div>
-      <div className="function-card">
+      <Card variant="function">
         <ApiConfig />
-      </div>
+      </Card>
 
-      <div className="function-card">
+      <Card variant="function">
         <KeyInput />
-      </div>
+      </Card>
 
       <Controls />
 
-      <div className="function-card usage-card">
+      <Card variant="usage">
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px', flexShrink: 0 }}>
             <circle cx="12" cy="12" r="10" />
@@ -37,10 +38,10 @@ const AppContent = () => {
         </div>
         <div>{t('usage1')}</div>
         <div>{t('usage2')}</div>
-      </div>
+      </Card>
 
       <button
-        className="settings-button"
+        className="btn--settings"
         onClick={() => setIsAdvancedSettingsOpen(true)}
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -57,9 +58,7 @@ const AppContent = () => {
     </div>
   );
 
-  const rightPanel = (
-    <Results />
-  );
+  const rightPanel = <Results />;
 
   return (
     <>
