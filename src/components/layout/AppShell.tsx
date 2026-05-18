@@ -21,16 +21,14 @@ export function AppShell({ children }: AppShellProps) {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-canvas text-fg">
-      <div className="sticky top-0 z-[var(--z-sticky)]">
-        <Navbar onMenuClick={() => setMobileOpen((o) => !o)} />
-      </div>
-      <div className="flex flex-1 min-h-[calc(100vh-4rem)]">
+    <div className="h-screen flex flex-col bg-canvas text-fg overflow-hidden">
+      <Navbar onMenuClick={() => setMobileOpen((o) => !o)} />
+      <div className="flex flex-1 min-h-0">
         <Sidebar
           isMobileOpen={mobileOpen}
           onMobileClose={() => setMobileOpen(false)}
         />
-        <main className="flex-1 min-w-0 p-4 lg:p-6">{children}</main>
+        <main className="flex-1 min-w-0 overflow-y-auto p-4 lg:p-6">{children}</main>
       </div>
     </div>
   );

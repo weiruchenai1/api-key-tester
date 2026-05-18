@@ -125,26 +125,30 @@
   button {
     font-family: inherit;
   }
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-  ::-webkit-scrollbar-track {
-    background: var(--color-card);
-    border-radius: 999px;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-border);
-    border-radius: 999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-fg-muted);
-  }
-  /* Firefox */
-  html {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-border) var(--color-card);
-  }
+}
+
+/* 全局细滚动条 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) var(--color-card);
+}
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-card);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-fg-muted);
+}
+::-webkit-scrollbar-corner {
+  background: var(--color-card);
 }
 
 @layer components {
