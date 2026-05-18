@@ -21,7 +21,7 @@ export function AppShell({ children }: AppShellProps) {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col bg-canvas text-fg overflow-hidden">
+    <div className="h-dvh flex flex-col bg-canvas text-fg overflow-hidden">
       <Navbar onMenuClick={() => setMobileOpen((o) => !o)} />
       <div className="flex flex-1 min-h-0">
         <Sidebar
