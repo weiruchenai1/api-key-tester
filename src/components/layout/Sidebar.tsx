@@ -149,7 +149,7 @@ export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
           aria-label={cfg.name}
           aria-current={active ? 'page' : undefined}
           className={cn(
-            'sidebar-item justify-center p-2',
+            'sidebar-item justify-center p-2 select-none',
             active ? 'is-active text-fg font-semibold' : 'text-fg-muted hover:text-fg',
           )}
         >
@@ -187,7 +187,7 @@ export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
         aria-label={cfg.name}
         aria-current={active ? 'page' : undefined}
         className={cn(
-          'sidebar-item gap-3 px-3 py-2',
+          'sidebar-item gap-3 px-3 py-2 select-none',
           active ? 'is-active text-fg font-semibold' : 'text-fg-muted hover:text-fg font-medium',
         )}
       >
@@ -209,7 +209,7 @@ export function Sidebar({ isMobileOpen, onMobileClose }: SidebarProps) {
   // ═══════════════════════════════════════════════════════════════
 
   const desktopSidebar = (
-    <aside className="hidden lg:flex flex-col w-16 shrink-0 border-r border-border bg-card sticky top-16 self-start h-[calc(100vh-4rem)]">
+    <aside className="hidden lg:flex flex-col w-16 shrink-0 border-r border-border bg-card h-full">
       <div className="flex flex-col items-center gap-1 flex-1 overflow-y-auto px-2 pt-5 pb-[15px]">
         {configs.length === 0 ? (
           <span className="text-fg-subtle text-caption text-center leading-tight mt-4">{t('noKeys')}</span>
