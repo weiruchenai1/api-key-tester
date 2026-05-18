@@ -158,7 +158,7 @@ export default function App() {
         const signal = abortController.signal;
 
         (async () => {
-          for (const r of validKeys.slice(0, 5)) {
+          for (const r of validKeys) {
             if (signal.aborted) return;
             try {
               const result = await fetchBalance(
