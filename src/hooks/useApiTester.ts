@@ -186,6 +186,8 @@ export function useApiTester(activeConfigId: string | null) {
   });  // Start testing for current config
   const startTesting = useCallback(
     (config: WorkerConfig) => {
+      // Single-worker invariant: refuse if a test is already in progress.
+      if (testingConfigRef.current !== null) return;
       const cid = activeConfigRef.current;
       testingConfigRef.current = cid;
       initResults(config.keys);
@@ -213,20 +215,21 @@ export function useApiTester(activeConfigId: string | null) {
 
   // Clear current config's results and logs
   const clearResults = useCallback(() => {
-    keyUpdatesRef.current.clear();
-    logBufferRef.current = [];
-    if (rafIdRef.current != null) {
-      cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
-    }
     setCurrent({ results: [], logs: [] });
     const activeCid = activeConfigRef.current;
-    // Only cancel the worker if it's testing the config we're clearing
+    // Only tear down shared worker state if we own the worker for THIS config;
+    // otherwise another config's in-flight buffers must not be dropped.
     if (testingConfigRef.current === activeCid) {
+      keyUpdatesRef.current.clear();
+      logBufferRef.current = [];
+      if (rafIdRef.current != null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
       cancelWorker();
       testingConfigRef.current = null;
+      markTesting(activeCid, false);
     }
-    markTesting(activeCid, false);
   }, [setCurrent, cancelWorker, markTesting]);
 
   // Update a single result for current config
