@@ -27,10 +27,11 @@ interface ConfigState {
 
 export function useApiTester(activeConfigId: string | null) {
   const [configStates, setConfigStates] = useState<Record<string, ConfigState>>({});
-  const [isTesting, setIsTesting] = useState(false);
+  const [testingConfigs, setTestingConfigs] = useState<Set<string>>(() => new Set());
 
   const stateKey = activeConfigId ?? '__none__';
   const current = configStates[stateKey] ?? { results: [], logs: [] };
+  const isTesting = testingConfigs.has(stateKey);
 
   // ── Batching buffers ─────────────────────────────────────────────
 
@@ -40,6 +41,19 @@ export function useApiTester(activeConfigId: string | null) {
   const lastFlushRef = useRef(0);
   const activeConfigRef = useRef(stateKey);
   activeConfigRef.current = stateKey;
+  // Locked to the config that started the current test — worker messages
+  // route here regardless of which config the user navigates to mid-run.
+  const testingConfigRef = useRef<string | null>(null);
+
+  const markTesting = useCallback((cid: string, on: boolean) => {
+    setTestingConfigs((prev) => {
+      if (on === prev.has(cid)) return prev;
+      const next = new Set(prev);
+      if (on) next.add(cid);
+      else next.delete(cid);
+      return next;
+    });
+  }, []);
 
   const flushUpdates = useCallback((force = false) => {
     rafIdRef.current = null;
@@ -56,7 +70,7 @@ export function useApiTester(activeConfigId: string | null) {
 
     if (updates.size === 0 && logs.length === 0) return;
 
-    const cid = activeConfigRef.current;
+    const cid = testingConfigRef.current ?? activeConfigRef.current;
     setConfigStates((prev) => {
       const existing = prev[cid] ?? { results: [], logs: [] };
 
@@ -153,15 +167,17 @@ export function useApiTester(activeConfigId: string | null) {
     scheduleFlush();
   }, [scheduleFlush]);
 
-  // Handle completion — flush immediately then set isTesting false
+  // Handle completion — flush immediately then clear the testing flag
   const handleComplete = useCallback(() => {
     if (rafIdRef.current != null) {
       cancelAnimationFrame(rafIdRef.current);
       rafIdRef.current = null;
     }
     flushUpdates(true);
-    setIsTesting(false);
-  }, [flushUpdates]);
+    const cid = testingConfigRef.current;
+    testingConfigRef.current = null;
+    if (cid !== null) markTesting(cid, false);
+  }, [flushUpdates, markTesting]);
 
   const { startTesting: startWorker, cancelTesting: cancelWorker } = useWebWorker({
     onKeyUpdate: handleKeyUpdate,
@@ -170,15 +186,18 @@ export function useApiTester(activeConfigId: string | null) {
   });  // Start testing for current config
   const startTesting = useCallback(
     (config: WorkerConfig) => {
+      const cid = activeConfigRef.current;
+      testingConfigRef.current = cid;
       initResults(config.keys);
-      setIsTesting(true);
+      markTesting(cid, true);
       try {
         startWorker(config);
       } catch {
-        setIsTesting(false);
+        testingConfigRef.current = null;
+        markTesting(cid, false);
       }
     },
-    [initResults, startWorker],
+    [initResults, startWorker, markTesting],
   );  // Cancel testing — flush remaining then stop
   const cancelTesting = useCallback(() => {
     cancelWorker();
@@ -187,8 +206,10 @@ export function useApiTester(activeConfigId: string | null) {
       rafIdRef.current = null;
     }
     flushUpdates(true);
-    setIsTesting(false);
-  }, [cancelWorker, flushUpdates]);
+    const cid = testingConfigRef.current;
+    testingConfigRef.current = null;
+    if (cid !== null) markTesting(cid, false);
+  }, [cancelWorker, flushUpdates, markTesting]);
 
   // Clear current config's results and logs
   const clearResults = useCallback(() => {
@@ -199,9 +220,14 @@ export function useApiTester(activeConfigId: string | null) {
       rafIdRef.current = null;
     }
     setCurrent({ results: [], logs: [] });
-    setIsTesting(false);
-    cancelWorker();
-  }, [setCurrent, cancelWorker]);
+    const activeCid = activeConfigRef.current;
+    // Only cancel the worker if it's testing the config we're clearing
+    if (testingConfigRef.current === activeCid) {
+      cancelWorker();
+      testingConfigRef.current = null;
+    }
+    markTesting(activeCid, false);
+  }, [setCurrent, cancelWorker, markTesting]);
 
   // Update a single result for current config
   const updateResult = useCallback(

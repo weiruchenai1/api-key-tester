@@ -17,7 +17,7 @@ export function useModelFetcher({ t }: UseModelFetcherOptions) {
       authPrefix: string,
       queryParamAuth: boolean,
     ) => {
-      if (!baseUrl) { toast.error(t('enterApiKeysFirst')); return []; }
+      if (!baseUrl) { toast.error(t('emptyBaseUrl')); return []; }
       setIsFetching(true);
       try {
         const models = await fetchModels(key, baseUrl, authHeader, authPrefix, queryParamAuth);
