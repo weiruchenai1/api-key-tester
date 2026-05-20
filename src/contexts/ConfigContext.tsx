@@ -58,11 +58,11 @@ function loadState(): ConfigState {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const saved: ProviderConfig[] = JSON.parse(raw);
-      const savedMap = new Map(saved.map((c) => [c.provider, c]));
+      const savedMap = new Map(saved.map((c) => [c.id, c]));
 
       // Merge saved data into builtins, deep-merging advanced settings
       const merged = builtins.map((b) => {
-        const saved_ = savedMap.get(b.provider);
+        const saved_ = savedMap.get(b.id);
         if (!saved_) return b;
         const cfg = {
           ...b,
@@ -80,10 +80,10 @@ function loadState(): ConfigState {
         return cfg;
       });
 
-      // Add user-created configs (those whose provider isn't a builtin type, or extra ones)
-      const savedIds = new Set(builtins.map((b) => b.provider));
+      // Add user-created configs (anything that isn't a builtin id)
+      const builtinIds = new Set(builtins.map((b) => b.id));
       const userConfigs = saved
-        .filter((c) => !savedIds.has(c.provider as ProviderType))
+        .filter((c) => !builtinIds.has(c.id))
         .map((c) => {
           if (isEncrypted(c.apiKeys)) {
             encryptedApiKeys.set(c.id, c.apiKeys);
